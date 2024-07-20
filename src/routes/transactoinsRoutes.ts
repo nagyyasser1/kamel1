@@ -6,7 +6,7 @@ import authorizeMiddleware from "../middlewares/authorizeMiddleware";
 import {
   validateCreateTransaction,
   validateUpdateTransaction,
-} from "@/utils/validations/transactionsValidators";
+} from "../utils/validations/transactionsValidators";
 
 const router = Router();
 

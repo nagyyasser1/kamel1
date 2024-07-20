@@ -1,7 +1,7 @@
 import { Router } from "express";
 import clientsController from "../controllers/clientsController";
 import authMiddleware from "../middlewares/authMiddleware";
-import authorizeMiddleware from "@/middlewares/authorizeMiddleware";
+import authorizeMiddleware from "../middlewares/authorizeMiddleware";
 import { USER_ROLES } from "../constants/userRoles";
 import { validateCreateClient } from "../utils/validations/clientsValidators";
 
