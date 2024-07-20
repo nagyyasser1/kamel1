@@ -7,7 +7,6 @@ import appConfig from "../../config/appConfig";
 enum Role {
   ADMIN,
   ACCOUNTANT,
-  ADMINISTRATION,
   REVIEWER,
 }
 

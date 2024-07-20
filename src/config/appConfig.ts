@@ -9,6 +9,7 @@ interface AppConfig {
   jwtSecret: string;
   bcryptSalt: number;
   apiPrefix: string;
+  clientUrl: string;
 }
 
 const appConfig: AppConfig = {
@@ -20,6 +21,7 @@ const appConfig: AppConfig = {
   jwtSecret: process.env.JWT_SECRET || "your_jwt_secret",
   bcryptSalt: Number(process.env.BCRYPT_SALT) || 10,
   apiPrefix: process.env.API_PREFIX || "/api",
+  clientUrl: process.env.CLIENT_URL || "http://localhost:3000",
 };
 
 export default appConfig;

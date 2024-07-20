@@ -37,7 +37,18 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     );
 
     // Step 4: Return the token in the response
-    res.status(STATUS_CODES.OK).json({ access_token: token });
+    res
+      .status(STATUS_CODES.OK)
+      .json({
+        user: {
+          id: user.id,
+          name: user.name,
+          role: user.role,
+          email: user.email,
+          phone: user.phone,
+        },
+        access_token: token,
+      });
   } catch (error) {
     next(error);
   }
