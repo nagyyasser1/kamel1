@@ -24,6 +24,17 @@ export const resetPasswordSchema = Joi.object({
   newPassword: Joi.string().required(),
 });
 
+export const verifyResetCodeSchema = Joi.object({
+  email: Joi.string().required(),
+  code: Joi.string().required(),
+});
+
+export const resetPasswordWithCurrentSchema = Joi.object({
+  email: Joi.string().required(),
+  currentPassword: Joi.string().required(),
+  newPassword: Joi.string().required(),
+});
+
 export const validateSignUp = async (
   req: Request,
   res: Response,
@@ -97,6 +108,48 @@ export const validateResetPassword = async (
   next: NextFunction
 ) => {
   const result: ValidationResult = resetPasswordSchema.validate(
+    req.body,
+    { abortEarly: false } // Return all errors
+  );
+
+  // If errors, return error response
+  if (result.error) {
+    return res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).json({
+      message: "Invalid request data",
+      errors: result.error.details.map((err) => err.message),
+    });
+  }
+
+  next();
+};
+
+export const validateVerifyResetCode = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const result: ValidationResult = verifyResetCodeSchema.validate(
+    req.body,
+    { abortEarly: false } // Return all errors
+  );
+
+  // If errors, return error response
+  if (result.error) {
+    return res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).json({
+      message: "Invalid request data",
+      errors: result.error.details.map((err) => err.message),
+    });
+  }
+
+  next();
+};
+
+export const validateResetPasswordWithCurrent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const result: ValidationResult = resetPasswordWithCurrentSchema.validate(
     req.body,
     { abortEarly: false } // Return all errors
   );

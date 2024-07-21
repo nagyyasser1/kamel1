@@ -25,7 +25,7 @@ model User {
   id             String          @id @default(uuid())
   name           String
   role           Role
-  phone          String          @unique
+  phone          String
   email          String          @unique
   password       String
   passwordResets PasswordReset[]

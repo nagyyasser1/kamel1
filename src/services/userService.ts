@@ -1,5 +1,7 @@
 import { Role } from "@prisma/client";
 import prisma from "../prisma";
+import CustomError from "../utils/CustomError";
+import { STATUS_CODES } from "../constants/statusCodes";
 
 interface CreateUserDTO {
   name: string;
@@ -39,7 +41,7 @@ const getUserByEmail = async (email: string) => {
 };
 
 const getUserByPhone = async (phone: string) => {
-  return await prisma.user.findUnique({
+  return await prisma.user.findFirst({
     where: { phone },
   });
 };
@@ -75,7 +77,7 @@ const createUser = async (userData: CreateUserDTO) => {
   });
 
   if (existingUser) {
-    throw new Error("User already exists");
+    throw new CustomError("User already exists", STATUS_CODES.CONFLICT);
   }
 
   return await prisma.user.create({
@@ -91,9 +93,22 @@ const updateUser = async (id: string, userData: Partial<CreateUserDTO>) => {
 };
 
 const deleteUser = async (id: string) => {
-  return await prisma.user.delete({
-    where: { id },
+  const user = await getUserById(id);
+  if (!user) {
+    throw new Error("User not exists");
+  }
+  await prisma.$transaction(async (prisma) => {
+    // Delete related password resets
+    await prisma.passwordReset.deleteMany({
+      where: { userId: id },
+    });
+
+    // Delete user
+    await prisma.user.delete({
+      where: { id },
+    });
   });
+  return;
 };
 
 export default {
