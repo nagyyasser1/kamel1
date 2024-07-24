@@ -86,7 +86,7 @@ model Transaction {
   description   String
   fromAccountId String
   toAccountId   String
-  fromAccount   Account  @relation("SentTransactions", fields: [fromAccountId], references: [id])
-  toAccount     Account  @relation("ReceivedTransactions", fields: [toAccountId], references: [id])
+  fromAccount   Account  @relation("SentTransactions", fields: [fromAccountId], references: [id], onDelete: Cascade)
+  toAccount     Account  @relation("ReceivedTransactions", fields: [toAccountId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
 }

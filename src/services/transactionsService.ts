@@ -36,7 +36,24 @@ export const deleteTransaction = async (id: string) => {
 
 // Get all transactions
 export const getAllTransactions = async () => {
-  return await prisma.transaction.findMany();
+  return await prisma.transaction.findMany({
+    include: {
+      fromAccount: {
+        include: {
+          asset: true,
+          client: true,
+          supplier: true,
+        },
+      },
+      toAccount: {
+        include: {
+          asset: true,
+          client: true,
+          supplier: true,
+        },
+      },
+    },
+  });
 };
 
 // Get a transaction by ID

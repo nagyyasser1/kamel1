@@ -17,13 +17,13 @@ export const createAccount = async (data: CreateAccountData) => {
 
   switch (data.type) {
     case "ASSET":
-      accountData.asset = { connect: { id: data.ownerId } };
+      accountData.assetId = data.ownerId;
       break;
     case "CLIENT":
-      accountData.client = { connect: { id: data.ownerId } };
+      accountData.clientId = data.ownerId;
       break;
     case "SUPPLIER":
-      accountData.supplier = { connect: { id: data.ownerId } };
+      accountData.supplierId = data.ownerId;
       break;
     default:
       throw new Error("Invalid account type");
@@ -70,7 +70,13 @@ export const deleteAccount = async (id: string) => {
 };
 
 export const getAllAccounts = async () => {
-  return await prisma.account.findMany();
+  return await prisma.account.findMany({
+    include: {
+      asset: true,
+      client: true,
+      supplier: true,
+    },
+  });
 };
 
 export const getAccountById = async (id: string) => {
@@ -82,4 +88,28 @@ export const getAccountById = async (id: string) => {
       supplier: true,
     },
   });
+};
+
+export const accountExistsForC_S_A = async (
+  type: string,
+  ownerId: string
+): Promise<boolean> => {
+  const whereClause = (() => {
+    switch (type) {
+      case "CLIENT":
+        return { clientId: ownerId };
+      case "SUPPLIER":
+        return { supplierId: ownerId };
+      case "ASSET":
+        return { assetId: ownerId };
+      default:
+        throw new Error("Invalid account type");
+    }
+  })();
+
+  const account = await prisma.account.findFirst({
+    where: whereClause,
+  });
+
+  return account !== null;
 };

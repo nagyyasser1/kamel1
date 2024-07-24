@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { STATUS_CODES } from "../constants/statusCodes";
 import * as clientsService from "../services/clientsService";
+import CustomError from "../utils/CustomError";
 
 const createClientCtr = async (
   req: Request,
@@ -8,6 +9,13 @@ const createClientCtr = async (
   next: NextFunction
 ) => {
   try {
+    const clientExists = await clientsService.getClientByEmail(req.body?.email);
+    if (clientExists) {
+      throw new CustomError(
+        `email: ${clientExists.email} aready exists!`,
+        STATUS_CODES.CONFLICT
+      );
+    }
     const client = await clientsService.createClient(req.body);
     res.status(STATUS_CODES.CREATED).json(client);
   } catch (error) {

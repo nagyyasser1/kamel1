@@ -41,3 +41,23 @@ export const getClientById = async (id: string) => {
     where: { id },
   });
 };
+
+export const getClientByEmail = async (email: string) => {
+  return await prisma.client.findFirst({
+    where: { email },
+  });
+};
+
+export const clientHaveAccount = async (id: string): Promise<boolean> => {
+  const client = await prisma.account.findFirst({
+    where: { clientId: id },
+  });
+  return client !== null;
+};
+
+export const clientExists = async (id: string): Promise<boolean> => {
+  const client = await prisma.client.findUnique({
+    where: { id },
+  });
+  return client !== null;
+};

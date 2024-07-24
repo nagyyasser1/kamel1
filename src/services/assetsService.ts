@@ -39,3 +39,23 @@ export const getAssetById = async (id: string) => {
     where: { id },
   });
 };
+
+export const getAssetByCode = async (code: number) => {
+  return await prisma.asset.findUnique({
+    where: { code },
+  });
+};
+
+export const assetHaveAccount = async (id: string): Promise<boolean> => {
+  const account = await prisma.account.findFirst({
+    where: { assetId: id },
+  });
+  return account !== null;
+};
+
+export const assetExists = async (id: string): Promise<boolean> => {
+  const asset = await prisma.asset.findUnique({
+    where: { id },
+  });
+  return asset !== null;
+};

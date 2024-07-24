@@ -41,3 +41,17 @@ export const getSupplierById = async (id: string) => {
     where: { id },
   });
 };
+
+export const supplierHaveAccount = async (id: string): Promise<boolean> => {
+  const supplier = await prisma.account.findFirst({
+    where: { supplierId: id },
+  });
+  return supplier !== null;
+};
+
+export const supplierExists = async (id: string): Promise<boolean> => {
+  const supplier = await prisma.supplier.findUnique({
+    where: { id },
+  });
+  return supplier !== null;
+};

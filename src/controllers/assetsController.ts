@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { STATUS_CODES } from "../constants/statusCodes";
 import * as assetsService from "../services/assetsService";
+import CustomError from "../utils/CustomError";
 
 const createAssetCtr = async (
   req: Request,
@@ -8,6 +9,13 @@ const createAssetCtr = async (
   next: NextFunction
 ) => {
   try {
+    const assetExists = await assetsService.getAssetByCode(req.body?.code);
+    if (assetExists) {
+      throw new CustomError(
+        `asset with ${assetExists.code} aready exists!.`,
+        STATUS_CODES.CONFLICT
+      );
+    }
     const asset = await assetsService.createAsset(req.body);
     res.status(STATUS_CODES.CREATED).json(asset);
   } catch (error) {

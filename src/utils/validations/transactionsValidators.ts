@@ -10,10 +10,10 @@ export const createTransactionSchema = Joi.object({
 });
 
 export const updateTransactionSchema = Joi.object({
-  fromAccountId: Joi.string(),
-  toAccountId: Joi.string(),
-  amount: Joi.number(),
-  description: Joi.string(),
+  fromAccountId: Joi.string().optional(),
+  toAccountId: Joi.string().optional(),
+  amount: Joi.number().optional(),
+  description: Joi.string().optional(),
 });
 
 export const validateCreateTransaction = async (

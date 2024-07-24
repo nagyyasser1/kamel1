@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { STATUS_CODES } from "../constants/statusCodes";
 import * as accountsService from "../services/accountsService";
+import * as clientsService from "../services/clientsService";
+import * as suppliersService from "../services/suppliersService";
+import * as assetsService from "../services/assetsService";
+import CustomError from "../utils/CustomError";
 
 const createAccountCtr = async (
   req: Request,
@@ -8,6 +12,41 @@ const createAccountCtr = async (
   next: NextFunction
 ) => {
   try {
+    let accountExists: boolean = false;
+    let ownerExists: boolean;
+
+    const { type, ownerId } = req.body;
+
+    switch (type) {
+      case "ASSET":
+        ownerExists = await assetsService.assetExists(ownerId);
+        break;
+      case "CLIENT":
+        ownerExists = await clientsService.clientExists(ownerId);
+        break;
+      case "SUPPLIER":
+        ownerExists = await suppliersService.supplierExists(ownerId);
+        break;
+      default:
+        throw new CustomError("Invalid account type", STATUS_CODES.BAD_REQUEST);
+    }
+
+    if (!ownerExists) {
+      throw new CustomError(
+        `${type} with id: ${ownerId} doesn't exists!.`,
+        STATUS_CODES.NOT_FOUND
+      );
+    }
+
+    accountExists = await accountsService.accountExistsForC_S_A(type, ownerId);
+
+    if (accountExists) {
+      throw new CustomError(
+        `Account aready exists for user.`,
+        STATUS_CODES.CONFLICT
+      );
+    }
+
     const account = await accountsService.createAccount(req.body);
     res.status(STATUS_CODES.CREATED).json(account);
   } catch (error) {
