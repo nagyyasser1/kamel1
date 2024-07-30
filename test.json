@@ -1,0 +1,335 @@
+[
+  {
+    "id": 1,
+    "name": "Finance",
+    "number": 100,
+    "subCategories": [
+      {
+        "id": 2,
+        "name": "Tax",
+        "number": 110,
+        "subCategories": [
+          {
+            "id": 3,
+            "name": "Corporate Tax",
+            "number": 111,
+            "subCategories": []
+          },
+          {
+            "id": 4,
+            "name": "Personal Tax",
+            "number": 112,
+            "subCategories": [
+              {
+                "id": 5,
+                "name": "Income Tax",
+                "number": 113,
+                "subCategories": []
+              },
+              {
+                "id": 6,
+                "name": "Property Tax",
+                "number": 114,
+                "subCategories": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "name": "Audit",
+        "number": 120,
+        "subCategories": [
+          {
+            "id": 8,
+            "name": "Internal Audit",
+            "number": 121,
+            "subCategories": []
+          },
+          {
+            "id": 9,
+            "name": "External Audit",
+            "number": 122,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "name": "Budgeting",
+        "number": 130,
+        "subCategories": [
+          {
+            "id": 11,
+            "name": "Annual Budget",
+            "number": 131,
+            "subCategories": []
+          },
+          {
+            "id": 12,
+            "name": "Quarterly Budget",
+            "number": 132,
+            "subCategories": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "HR",
+    "number": 200,
+    "subCategories": [
+      {
+        "id": 14,
+        "name": "Recruitment",
+        "number": 210,
+        "subCategories": [
+          {
+            "id": 15,
+            "name": "Talent Acquisition",
+            "number": 211,
+            "subCategories": []
+          },
+          {
+            "id": 16,
+            "name": "Employee Onboarding",
+            "number": 212,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "name": "Payroll",
+        "number": 220,
+        "subCategories": [
+          {
+            "id": 18,
+            "name": "Salary Processing",
+            "number": 221,
+            "subCategories": []
+          },
+          {
+            "id": 19,
+            "name": "Bonuses",
+            "number": 222,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "name": "Employee Relations",
+        "number": 230,
+        "subCategories": [
+          {
+            "id": 21,
+            "name": "Conflict Resolution",
+            "number": 231,
+            "subCategories": []
+          },
+          {
+            "id": 22,
+            "name": "Employee Engagement",
+            "number": 232,
+            "subCategories": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "IT",
+    "number": 300,
+    "subCategories": [
+      {
+        "id": 24,
+        "name": "Infrastructure",
+        "number": 310,
+        "subCategories": [
+          {
+            "id": 25,
+            "name": "Network Management",
+            "number": 311,
+            "subCategories": []
+          },
+          {
+            "id": 26,
+            "name": "Server Maintenance",
+            "number": 312,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "name": "Software Development",
+        "number": 320,
+        "subCategories": [
+          {
+            "id": 28,
+            "name": "Frontend Development",
+            "number": 321,
+            "subCategories": []
+          },
+          {
+            "id": 29,
+            "name": "Backend Development",
+            "number": 322,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 30,
+        "name": "Cybersecurity",
+        "number": 330,
+        "subCategories": [
+          {
+            "id": 31,
+            "name": "Threat Detection",
+            "number": 331,
+            "subCategories": []
+          },
+          {
+            "id": 32,
+            "name": "Incident Response",
+            "number": 332,
+            "subCategories": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "name": "Marketing",
+    "number": 400,
+    "subCategories": [
+      {
+        "id": 34,
+        "name": "Digital Marketing",
+        "number": 410,
+        "subCategories": [
+          {
+            "id": 35,
+            "name": "SEO",
+            "number": 411,
+            "subCategories": []
+          },
+          {
+            "id": 36,
+            "name": "Content Marketing",
+            "number": 412,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 37,
+        "name": "Traditional Marketing",
+        "number": 420,
+        "subCategories": [
+          {
+            "id": 38,
+            "name": "Print Media",
+            "number": 421,
+            "subCategories": []
+          },
+          {
+            "id": 39,
+            "name": "Broadcast Media",
+            "number": 422,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 40,
+        "name": "Market Research",
+        "number": 430,
+        "subCategories": [
+          {
+            "id": 41,
+            "name": "Consumer Insights",
+            "number": 431,
+            "subCategories": []
+          },
+          {
+            "id": 42,
+            "name": "Competitive Analysis",
+            "number": 432,
+            "subCategories": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "name": "Operations",
+    "number": 500,
+    "subCategories": [
+      {
+        "id": 44,
+        "name": "Logistics",
+        "number": 510,
+        "subCategories": [
+          {
+            "id": 45,
+            "name": "Supply Chain Management",
+            "number": 511,
+            "subCategories": []
+          },
+          {
+            "id": 46,
+            "name": "Inventory Management",
+            "number": 512,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 47,
+        "name": "Quality Control",
+        "number": 520,
+        "subCategories": [
+          {
+            "id": 48,
+            "name": "Product Inspection",
+            "number": 521,
+            "subCategories": []
+          },
+          {
+            "id": 49,
+            "name": "Process Improvement",
+            "number": 522,
+            "subCategories": []
+          }
+        ]
+      },
+      {
+        "id": 50,
+        "name": "Customer Service",
+        "number": 530,
+        "subCategories": [
+          {
+            "id": 51,
+            "name": "Support",
+            "number": 531,
+            "subCategories": []
+          },
+          {
+            "id": 52,
+            "name": "Feedback Management",
+            "number": 532,
+            "subCategories": []
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  // url      = env("DATABASE_URL")
+  //url      = env("DATABASE_URL")
   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
@@ -41,43 +41,26 @@ model PasswordReset {
   @@index([userId], name: "user_id_idx")
 }
 
-model Asset {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  code        Int      @unique
-  account     Account?
-}
-
-model Client {
-  id      String   @id @default(uuid())
-  name    String
-  email   String
-  phone   String
-  type    String
-  account Account?
-}
-
-model Supplier {
-  id      String   @id @default(uuid())
-  name    String
-  email   String
-  phone   String
-  type    String
-  account Account?
+model Category {
+  id            Int        @id @default(autoincrement())
+  name          String
+  number        Int        @unique
+  status        Boolean    @default(false)
+  parentId      Int?
+  parent        Category?  @relation("CategorySubcategories", fields: [parentId], references: [id])
+  subCategories Category[] @relation("CategorySubcategories")
 }
 
 model Account {
   id                   String        @id @default(uuid())
   type                 AccountType
+  code                 Int
+  name                 String
+  email                String        @unique
+  description          String?
+  status               String?       @default("")
   sentTransactions     Transaction[] @relation("SentTransactions")
   receivedTransactions Transaction[] @relation("ReceivedTransactions")
-  asset                Asset?        @relation(fields: [assetId], references: [id])
-  assetId              String?       @unique
-  client               Client?       @relation(fields: [clientId], references: [id])
-  clientId             String?       @unique
-  supplier             Supplier?     @relation(fields: [supplierId], references: [id])
-  supplierId           String?       @unique
 }
 
 model Transaction {

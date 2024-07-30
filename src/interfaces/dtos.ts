@@ -37,3 +37,10 @@ export interface UpdateTransactionDto {
   amount?: number;
   description?: string;
 }
+
+export interface CreateAccountData {}
+
+export interface UpdateAccountData {
+  type?: string;
+  ownerId?: string;
+}

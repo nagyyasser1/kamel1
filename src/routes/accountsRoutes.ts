@@ -14,12 +14,11 @@ router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ADMIN));
 
 router.post("/", validateCreateAccount, accountsController.createAccountCtr);
 router.get("/", accountsController.getAllAccountsCtr);
-router.get("/:id", accountsController.getAccountByIdCtr);
-router.patch(
-  "/:id",
-  validateUpdateAccount,
-  accountsController.updateAccountCtr
-);
+// router.patch(
+//   "/:id",
+//   validateUpdateAccount,
+//   accountsController.updateAccountCtr
+// );
 router.delete("/:id", accountsController.deleteAccountCtr);
 
 export default router;
