@@ -6,7 +6,7 @@ export const createCategorySchema = Joi.object({
   name: Joi.string().required(),
   number: Joi.number().required(),
   status: Joi.boolean().required(),
-  parentId: Joi.number().required(),
+  parentId: Joi.number().allow(null).required(),
 });
 
 export const validateCreateCategory = async (
