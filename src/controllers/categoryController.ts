@@ -44,9 +44,7 @@ export const getCategoryById = async (
   next: NextFunction
 ) => {
   try {
-    const category = await categoryService.getCategoryById(
-      Number(req.params.id)
-    );
+    const category = await categoryService.getCategoryById(req.params.id);
     if (category) {
       res.json(category);
     } else {
@@ -64,7 +62,7 @@ export const updateCategory = async (
 ) => {
   try {
     const category = await categoryService.updateCategory(
-      Number(req.params.id),
+      req.params.id,
       req.body
     );
     res.json(category);
@@ -79,7 +77,7 @@ export const deleteCategory = async (
   next: NextFunction
 ) => {
   try {
-    await categoryService.deleteCategory(Number(req.params.id));
+    await categoryService.deleteCategory(req.params.id);
     res.json({ message: "Category deleted successfully" });
   } catch (error) {
     next(error);

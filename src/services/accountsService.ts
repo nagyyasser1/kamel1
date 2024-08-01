@@ -1,4 +1,3 @@
-import { CreateAccountData, UpdateAccountData } from "../interfaces/dtos";
 import prisma from "../prisma";
 
 export const createAccount = async (data: any) => {
@@ -7,35 +6,6 @@ export const createAccount = async (data: any) => {
   });
 };
 
-// export const updateAccount = async (id: string, data: UpdateAccountData) => {
-//   let accountData: any = {};
-
-//   if (data.type) {
-//     accountData.type = data.type;
-//   }
-
-//   if (data.ownerId) {
-//     switch (data.type) {
-//       case "ASSET":
-//         accountData.asset = { connect: { id: data.ownerId } };
-//         break;
-//       case "CLIENT":
-//         accountData.client = { connect: { id: data.ownerId } };
-//         break;
-//       case "SUPPLIER":
-//         accountData.supplier = { connect: { id: data.ownerId } };
-//         break;
-//       default:
-//         throw new Error("Invalid account type");
-//     }
-//   }
-
-//   return await prisma.account.update({
-//     where: { id },
-//     data: accountData,
-//   });
-// };
-
 export const deleteAccount = async (id: string) => {
   return await prisma.account.delete({
     where: { id },
@@ -43,12 +13,19 @@ export const deleteAccount = async (id: string) => {
 };
 
 export const getAllAccounts = async () => {
-  return await prisma.account.findMany({});
+  return await prisma.account.findMany({
+    include: {
+      category: true,
+    },
+  });
 };
 
 export const getAccountById = async (id: string) => {
   return await prisma.account.findUnique({
     where: { id },
+    include: {
+      category: true,
+    },
   });
 };
 
@@ -58,204 +35,197 @@ export const getAccountByEmail = async (email: string) => {
   });
 };
 
-// export async function getTransactionStatsForAllAccounts(
-//   year: number,
-//   month: number
-// ): Promise<TransactionStats[]> {
-//   const startDate = new Date(year, month - 1, 1);
-//   const endDate = new Date(year, month, 0);
+export const getAccountByName = async (name: string) => {
+  return await prisma.account.findFirst({
+    where: { name },
+  });
+};
 
+export const getTransactionsSummary = async (start: any, end: any) => {
+  // Step 1: Fetch accounts grouped by category
+  const accounts = await prisma.account.findMany({
+    where: {
+      OR: [
+        {
+          sentTransactions: {
+            some: {
+              createdAt: {
+                gte: start,
+                lte: end,
+              },
+            },
+          },
+        },
+        {
+          receivedTransactions: {
+            some: {
+              createdAt: {
+                gte: start,
+                lte: end,
+              },
+            },
+          },
+        },
+      ],
+    },
+    include: {
+      category: true,
+    },
+  });
+
+  // Step 2: Aggregate sent transactions
+  const sentTransactions = await prisma.transaction.groupBy({
+    by: ["fromAccountId"],
+    where: {
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  // Step 3: Aggregate received transactions
+  const receivedTransactions = await prisma.transaction.groupBy({
+    by: ["toAccountId"],
+    where: {
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  // Step 4: Combine results
+  const summary = accounts.map((account) => {
+    const sent = sentTransactions.find((tx) => tx.fromAccountId === account.id);
+    const received = receivedTransactions.find(
+      (tx) => tx.toAccountId === account.id
+    );
+
+    return {
+      accountId: account.id,
+      accountName: account.name,
+      categoryName: account.category?.name,
+      sentTransactionsCount: sent?._count?._all || 0,
+      sentTransactionsSum: sent?._sum?.amount || 0,
+      receivedTransactionsCount: received?._count?._all || 0,
+      receivedTransactionsSum: received?._sum?.amount || 0,
+    };
+  });
+
+  return summary;
+};
+
+export const getTransactionsSummaryForAccount = async (
+  accountId: string,
+  start: Date,
+  end: Date
+) => {
+  const sentTransactions = await prisma.transaction.aggregate({
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      amount: true,
+    },
+    where: {
+      fromAccountId: accountId,
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+  });
+
+  const receivedTransactions = await prisma.transaction.aggregate({
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      amount: true,
+    },
+    where: {
+      toAccountId: accountId,
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+  });
+
+  const account = await prisma.account.findUnique({
+    where: {
+      id: accountId,
+    },
+    include: {
+      category: true,
+    },
+  });
+
+  return {
+    account,
+    sentTransactions: {
+      count: sentTransactions._count._all,
+      sum: sentTransactions._sum.amount,
+    },
+    receivedTransactions: {
+      count: receivedTransactions._count._all,
+      sum: receivedTransactions._sum.amount,
+    },
+  };
+};
+
+// export const getTransactionsSummaryForCategory = async (
+//   categoryId: string,
+//   start: Date,
+//   end: Date
+// ) => {
+//   // Fetch accounts for the specified category
 //   const accounts = await prisma.account.findMany({
 //     where: {
-//       OR: [{ type: "ASSET" }, { type: "CLIENT" }, { type: "SUPPLIER" }],
+//       categoryId: categoryId,
+//     },
+//     select: {
+//       id: true,
 //     },
 //   });
 
-//   const transactionStats = await Promise.all(
-//     accounts.map(async (account) => {
-//       const sentTransactions = await prisma.transaction.aggregate({
-//         where: {
-//           fromAccountId: account.id,
-//           createdAt: {
-//             gte: startDate,
-//             lte: endDate,
-//           },
-//         },
-//         _count: {
-//           _all: true,
-//         },
-//         _sum: {
-//           amount: true,
-//         },
-//       });
+//   const accountIds = accounts.map((account) => account.id);
 
-//       const receivedTransactions = await prisma.transaction.aggregate({
-//         where: {
-//           toAccountId: account.id,
-//           createdAt: {
-//             gte: startDate,
-//             lte: endDate,
-//           },
-//         },
-//         _count: {
-//           _all: true,
-//         },
-//         _sum: {
-//           amount: true,
-//         },
-//       });
-
-//       return {
-//         accountId: account.id,
-//         accountType: account.type,
-//         sentTransactionsCount: sentTransactions._count._all ?? 0,
-//         receivedTransactionsCount: receivedTransactions._count._all ?? 0,
-//         sentTransactionsSum: sentTransactions._sum.amount ?? 0,
-//         receivedTransactionsSum: receivedTransactions._sum.amount ?? 0,
-//       };
-//     })
-//   );
-
-//   return transactionStats;
-// }
-
-// export async function getTransactionStatsForAccountType(
-//   type: AccountType,
-//   year: number,
-//   month: number
-// ) {
-//   const startDate = new Date(year, month - 1, 1);
-//   const endDate = new Date(year, month, 0);
-
-//   const senderStats = await prisma.transaction.groupBy({
-//     by: ["fromAccountId"],
-//     _sum: {
-//       amount: true,
-//     },
-//     where: {
-//       fromAccount: {
-//         type: type,
+//   if (accountIds.length === 0) {
+//     return {
+//       sentTransactions: {
+//         count: 0,
+//         amount: 0,
 //       },
-// createdAt: {
-//   gte: startDate,
-//   lte: endDate,
-// },
-//     },
-//   });
+//       receivedTransactions: {
+//         count: 0,
+//         amount: 0,
+//       },
+//     };
+//   }
 
-//   const receiverStats = await prisma.transaction.groupBy({
-//     by: ["toAccountId"],
-//     _sum: {
-//       amount: true,
-//     },
+//   // Aggregate sent transactions
+//   const sentTransactionsSummary = await prisma.transaction.aggregate({
 //     where: {
-//       toAccount: {
-//         type: type,
+//       fromAccountId: {
+//         in: accountIds,
 //       },
 //       createdAt: {
-//         gte: startDate,
-//         lte: endDate,
-//       },
-//     },
-//   });
-
-//   const senderCount = senderStats.length;
-//   const receiverCount = receiverStats.length;
-//   const totalSentAmount = senderStats.reduce(
-//     (sum, stat) => sum + (stat._sum.amount || 0),
-//     0
-//   );
-//   const totalReceivedAmount = receiverStats.reduce(
-//     (sum, stat) => sum + (stat._sum.amount || 0),
-//     0
-//   );
-
-//   return {
-//     senderCount,
-//     receiverCount,
-//     totalSentAmount,
-//     totalReceivedAmount,
-//   };
-// }
-
-// export async function getTransactionStatsForAccountType(
-//   type: AccountType,
-//   year: number,
-//   month: number
-// ) {
-//   const startDate = new Date(year, month - 1, 1);
-//   const endDate = new Date(year, month, 0);
-
-//   const sentTransactions = await prisma.transaction.aggregate({
-//     _sum: {
-//       amount: true,
-//     },
-//     _count: {
-//       _all: true,
-//     },
-//     where: {
-//       fromAccount: {
-//         type: type,
-//       },
-//       createdAt: {
-//         gte: startDate,
-//         lte: endDate,
-//       },
-//     },
-//   });
-
-//   // Aggregate received transactions for suppliers
-//   const receivedTransactions = await prisma.transaction.aggregate({
-//     _sum: {
-//       amount: true,
-//     },
-//     _count: {
-//       _all: true,
-//     },
-//     where: {
-//       toAccount: {
-//         type: type,
-//       },
-//       createdAt: {
-//         gte: startDate,
-//         lte: endDate,
-//       },
-//     },
-//   });
-
-//   return {
-//     sentTransactionsCount: sentTransactions._count._all ?? 0,
-//     sentTransactionsAmount: sentTransactions._sum.amount ?? 0,
-//     receivedTransactionsCount: receivedTransactions._count._all ?? 0,
-//     receivedTransactionsAmount: receivedTransactions._sum.amount ?? 0,
-//   };
-// }
-
-// export async function getTransactionStatsForAccountId(
-//   id: string,
-//   year: number,
-//   month: number
-// ) {
-//   const startDate = new Date(year, month - 1, 1);
-//   const endDate = new Date(year, month, 0);
-
-//   const account = await prisma.account.findUnique({
-//     where: {
-//       id: id,
-//     },
-//     include: {
-//       asset: true,
-//       client: true,
-//       supplier: true,
-//     },
-//   });
-
-//   const sentTransactions = await prisma.transaction.aggregate({
-//     where: {
-//       fromAccountId: id,
-//       createdAt: {
-//         gte: startDate,
-//         lte: endDate,
+//         gte: start,
+//         lt: end,
 //       },
 //     },
 //     _count: {
@@ -266,12 +236,15 @@ export const getAccountByEmail = async (email: string) => {
 //     },
 //   });
 
-//   const receivedTransactions = await prisma.transaction.aggregate({
+//   // Aggregate received transactions
+//   const receivedTransactionsSummary = await prisma.transaction.aggregate({
 //     where: {
-//       toAccountId: id,
+//       toAccountId: {
+//         in: accountIds,
+//       },
 //       createdAt: {
-//         gte: startDate,
-//         lte: endDate,
+//         gte: start,
+//         lt: end,
 //       },
 //     },
 //     _count: {
@@ -282,12 +255,97 @@ export const getAccountByEmail = async (email: string) => {
 //     },
 //   });
 
-//   return {
-//     accountType: account?.type,
-//     owner: account?.asset,
-//     sentTransactionsCount: sentTransactions._count._all ?? 0,
-//     receivedTransactionsCount: receivedTransactions._count._all ?? 0,
-//     sentTransactionsSum: sentTransactions._sum.amount ?? 0,
-//     receivedTransactionsSum: receivedTransactions._sum.amount ?? 0,
-//   };
-// }
+// return {
+//   sentTransactions: {
+//     count: sentTransactionsSummary._count._all || 0,
+//     amount: sentTransactionsSummary._sum.amount || 0,
+//   },
+//   receivedTransactions: {
+//     count: receivedTransactionsSummary._count._all || 0,
+//     amount: receivedTransactionsSummary._sum.amount || 0,
+//   },
+// };
+// };
+
+export const getTransactionsSummaryForCategory = async (
+  categoryId: string,
+  start: Date,
+  end: Date
+) => {
+  // Aggregate sent transactions within the specified month and year
+  const sentTransactionsSummary = await prisma.transaction.groupBy({
+    by: ["fromAccountId"],
+    where: {
+      fromAccount: {
+        categoryId: categoryId,
+      },
+      createdAt: {
+        gte: start,
+        lt: end,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  // Aggregate received transactions within the specified month and year
+  const receivedTransactionsSummary = await prisma.transaction.groupBy({
+    by: ["toAccountId"],
+    where: {
+      toAccount: {
+        categoryId: categoryId,
+      },
+      createdAt: {
+        gte: start,
+        lt: end,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  // Summarize results
+  const totalSentTransactions = sentTransactionsSummary.reduce(
+    (acc, group) => acc + group._count._all,
+    0
+  );
+  const totalReceivedTransactions = receivedTransactionsSummary.reduce(
+    (acc, group) => acc + group._count._all,
+    0
+  );
+
+  const sumSentAmount = sentTransactionsSummary.reduce(
+    (acc, group) => acc + (group._sum.amount ?? 0),
+    0
+  );
+  const sumReceivedAmount = receivedTransactionsSummary.reduce(
+    (acc, group) => acc + (group._sum.amount ?? 0),
+    0
+  );
+
+  // return {
+  //   totalSentTransactions,
+  //   totalReceivedTransactions,
+  //   sumSentAmount,
+  //   sumReceivedAmount,
+  // };
+
+  return {
+    sentTransactions: {
+      count: totalSentTransactions,
+      amount: sumSentAmount,
+    },
+    receivedTransactions: {
+      count: totalReceivedTransactions,
+      amount: sumReceivedAmount,
+    },
+  };
+};

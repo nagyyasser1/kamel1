@@ -32,6 +32,7 @@ export const createAccountSchema = Joi.object({
       otherwise: Joi.optional(),
     })
     .default(null),
+  categoryId: Joi.string().required(),
 });
 
 export const updateAccountSchema = Joi.object({
@@ -56,6 +57,7 @@ export const updateAccountSchema = Joi.object({
     then: Joi.optional(),
     otherwise: Joi.optional(),
   }),
+  categoryId: Joi.string().optional(),
 });
 
 export const validateCreateAccount = async (
