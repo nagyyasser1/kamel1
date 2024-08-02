@@ -23,29 +23,18 @@ const createAccountCtr = async (
         STATUS_CODES.NOT_FOUND
       );
     }
-    const accountType = req.body?.type;
-    if (accountType === "CLIENT" || "SUPPLIER") {
-      const existingAccount = await accountsService.getAccountByEmail(
-        req.body?.email
-      );
 
-      if (existingAccount) {
-        throw new CustomError(
-          `Account with email ${existingAccount.email} aready exists!.`,
-          STATUS_CODES.CONFLICT
-        );
-      }
-    } else {
-      const existingAccount = await accountsService.getAccountByName(
-        req.body?.name
+    const existingAccount = await accountsService.getAccountByName(
+      req.body?.name
+    );
+
+    if (existingAccount) {
+      throw new CustomError(
+        `Account with email ${existingAccount.name} aready exists!.`,
+        STATUS_CODES.CONFLICT
       );
-      if (existingAccount) {
-        throw new CustomError(
-          `Account with email ${existingAccount.name} aready exists!.`,
-          STATUS_CODES.CONFLICT
-        );
-      }
     }
+
     const account = await accountsService.createAccount(req.body);
     res.status(STATUS_CODES.CREATED).json(account);
   } catch (error) {
@@ -73,7 +62,8 @@ const getAllAccountsCtr = async (
   next: NextFunction
 ) => {
   try {
-    const accounts = await accountsService.getAllAccounts();
+    const { categroyId } = req.query;
+    const accounts = await accountsService.getAllAccounts(categroyId as string);
     res.status(STATUS_CODES.OK).json(accounts);
   } catch (error) {
     next(error);

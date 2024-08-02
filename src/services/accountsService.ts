@@ -12,8 +12,9 @@ export const deleteAccount = async (id: string) => {
   });
 };
 
-export const getAllAccounts = async () => {
+export const getAllAccounts = async (categoryId?: string) => {
   return await prisma.account.findMany({
+    where: categoryId ? { categoryId: categoryId } : {},
     include: {
       category: true,
     },
@@ -25,13 +26,9 @@ export const getAccountById = async (id: string) => {
     where: { id },
     include: {
       category: true,
+      sentTransactions: true,
+      receivedTransactions: true,
     },
-  });
-};
-
-export const getAccountByEmail = async (email: string) => {
-  return await prisma.account.findUnique({
-    where: { email },
   });
 };
 

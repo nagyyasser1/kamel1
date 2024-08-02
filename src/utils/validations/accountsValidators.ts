@@ -2,61 +2,19 @@ import { Request, Response, NextFunction } from "express";
 import Joi, { ValidationError, ValidationResult } from "joi";
 import { STATUS_CODES } from "../../constants/statusCodes";
 
-enum AccountType {
-  CLIENT = "CLIENT",
-  SUPPLIER = "SUPPLIER",
-  ASSET = "ASSET",
-}
-
 export const createAccountSchema = Joi.object({
-  type: Joi.string()
-    .trim()
-    .valid(...Object.values(AccountType))
-    .required(),
-  code: Joi.number().required(),
-  name: Joi.string().when("type", {
-    is: Joi.valid(AccountType.ASSET),
-    then: Joi.string().trim().required(),
-    otherwise: Joi.string().required(),
-  }),
-  email: Joi.string().when("type", {
-    is: Joi.valid(AccountType.CLIENT, AccountType.SUPPLIER),
-    then: Joi.required(),
-    otherwise: Joi.optional(),
-  }),
+  name: Joi.string().trim().required(),
+  number: Joi.number().required(),
+  email: Joi.string().trim().optional(),
   description: Joi.string().required(),
-  status: Joi.string()
-    .when("type", {
-      is: Joi.valid(AccountType.CLIENT, AccountType.SUPPLIER),
-      then: Joi.required(),
-      otherwise: Joi.optional(),
-    })
-    .default(null),
   categoryId: Joi.string().required(),
 });
 
 export const updateAccountSchema = Joi.object({
-  type: Joi.string()
-    .trim()
-    .valid(...Object.values(AccountType))
-    .optional(),
-  code: Joi.number().optional(),
-  name: Joi.string().when("type", {
-    is: Joi.valid(AccountType.ASSET),
-    then: Joi.string().trim().optional(),
-    otherwise: Joi.string().optional(),
-  }),
-  email: Joi.string().when("type", {
-    is: Joi.valid(AccountType.CLIENT, AccountType.SUPPLIER),
-    then: Joi.optional(),
-    otherwise: Joi.optional(),
-  }),
+  name: Joi.string().trim().optional(),
+  number: Joi.number().optional(),
+  email: Joi.string().trim().optional(),
   description: Joi.string().optional(),
-  status: Joi.string().when("type", {
-    is: Joi.valid(AccountType.CLIENT, AccountType.SUPPLIER),
-    then: Joi.optional(),
-    otherwise: Joi.optional(),
-  }),
   categoryId: Joi.string().optional(),
 });
 

@@ -15,12 +15,6 @@ enum Role {
   REVIEWER
 }
 
-enum AccountType {
-  CLIENT
-  SUPPLIER
-  ASSET
-}
-
 model User {
   id             String          @id @default(uuid())
   name           String
@@ -54,12 +48,10 @@ model Category {
 
 model Account {
   id                   String        @id @default(uuid())
-  type                 AccountType
-  code                 Int
-  name                 String
-  email                String        @unique
+  name                 String        @unique
+  number               Int
+  email                String?
   description          String?
-  status               String?       @default("")
   categoryId           String?
   category             Category?     @relation("CategoryAccounts", fields: [categoryId], references: [id], onDelete: SetNull)
   sentTransactions     Transaction[] @relation("SentTransactions")
