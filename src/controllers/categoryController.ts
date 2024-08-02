@@ -31,7 +31,15 @@ export const getCategories = async (
   next: NextFunction
 ) => {
   try {
-    const categories = await categoryService.getCategories();
+    const { hasAccounts } = req.query;
+    let categories;
+
+    if (hasAccounts === "true") {
+      categories = await categoryService.getCategoryThatHaveAccounts();
+    } else {
+      categories = await categoryService.getCategories();
+    }
+
     res.status(STATUS_CODES.OK).json(categories);
   } catch (error) {
     next(error);

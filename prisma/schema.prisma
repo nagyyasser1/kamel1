@@ -49,7 +49,7 @@ model Category {
 model Account {
   id                   String        @id @default(uuid())
   name                 String        @unique
-  number               Int
+  number               Int           @unique
   email                String?
   description          String?
   categoryId           String?

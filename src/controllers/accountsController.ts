@@ -30,7 +30,18 @@ const createAccountCtr = async (
 
     if (existingAccount) {
       throw new CustomError(
-        `Account with email ${existingAccount.name} aready exists!.`,
+        `Account with name ${existingAccount.name} aready exists!.`,
+        STATUS_CODES.CONFLICT
+      );
+    }
+
+    const existingAccountByNumber = await accountsService.getAccountByNumber(
+      req.body?.number
+    );
+
+    if (existingAccountByNumber) {
+      throw new CustomError(
+        `Account with number ${existingAccountByNumber.number} aready exists!.`,
         STATUS_CODES.CONFLICT
       );
     }

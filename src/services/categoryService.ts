@@ -74,6 +74,17 @@ export const getCategoryByNumber = async (number: number) => {
   });
 };
 
+export const getCategoryThatHaveAccounts = async () => {
+  const categories = await prisma.category.findMany({
+    where: {
+      accounts: {
+        some: {},
+      },
+    },
+  });
+  return categories;
+};
+
 // Update a category
 export const updateCategory = async (
   id: string,

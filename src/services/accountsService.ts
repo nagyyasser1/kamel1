@@ -33,8 +33,14 @@ export const getAccountById = async (id: string) => {
 };
 
 export const getAccountByName = async (name: string) => {
-  return await prisma.account.findFirst({
+  return await prisma.account.findUnique({
     where: { name },
+  });
+};
+
+export const getAccountByNumber = async (number: number) => {
+  return await prisma.account.findUnique({
+    where: { number },
   });
 };
 
