@@ -10,13 +10,15 @@ import {
 
 const router = Router();
 
-router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ACCOUNTANT));
+router.use(authMiddleware);
 
 router.post(
   "/",
+  authorizeMiddleware(USER_ROLES.ACCOUNTANT),
   validateCreateTransaction,
   transactionsController.createTransactionCtr
 );
+
 router.get("/", transactionsController.getAllTransactionsCtr);
 router.get("/:id", transactionsController.getTransactionByIdCtr);
 router.patch(
