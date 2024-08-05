@@ -10,7 +10,7 @@ import {
 
 const router = Router();
 
-router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ADMIN));
+router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ACCOUNTANT));
 
 router.post(
   "/",
