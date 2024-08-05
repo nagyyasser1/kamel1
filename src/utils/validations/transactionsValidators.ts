@@ -3,9 +3,10 @@ import Joi, { ValidationResult } from "joi";
 import { STATUS_CODES } from "../../constants/statusCodes";
 
 export const createTransactionSchema = Joi.object({
-  fromAccountId: Joi.string().required(),
-  toAccountId: Joi.string().required(),
+  fromId: Joi.string().required(),
+  toId: Joi.string().required(),
   amount: Joi.number().required(),
+  number: Joi.number().required(),
   description: Joi.string().required(),
 });
 
@@ -13,6 +14,7 @@ export const updateTransactionSchema = Joi.object({
   fromAccountId: Joi.string().optional(),
   toAccountId: Joi.string().optional(),
   amount: Joi.number().optional(),
+  number: Joi.number().optional(),
   description: Joi.string().optional(),
 });
 

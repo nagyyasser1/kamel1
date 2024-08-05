@@ -12,9 +12,22 @@ export const deleteAccount = async (id: string) => {
   });
 };
 
-export const getAllAccounts = async (categoryId?: string) => {
+export const getAllAccounts = async (categoryId?: string, name?: string) => {
+  const where: any = {};
+
+  if (categoryId) {
+    where.categoryId = categoryId;
+  }
+
+  if (name) {
+    where.name = {
+      contains: name,
+      mode: "insensitive", // Case-insensitive search
+    };
+  }
+
   return await prisma.account.findMany({
-    where: categoryId ? { categoryId: categoryId } : {},
+    where,
     include: {
       category: true,
     },
@@ -78,7 +91,7 @@ export const getTransactionsSummary = async (start: any, end: any) => {
 
   // Step 2: Aggregate sent transactions
   const sentTransactions = await prisma.transaction.groupBy({
-    by: ["fromAccountId"],
+    by: ["fromId"],
     where: {
       createdAt: {
         gte: start,
@@ -95,7 +108,7 @@ export const getTransactionsSummary = async (start: any, end: any) => {
 
   // Step 3: Aggregate received transactions
   const receivedTransactions = await prisma.transaction.groupBy({
-    by: ["toAccountId"],
+    by: ["toId"],
     where: {
       createdAt: {
         gte: start,
@@ -112,10 +125,8 @@ export const getTransactionsSummary = async (start: any, end: any) => {
 
   // Step 4: Combine results
   const summary = accounts.map((account) => {
-    const sent = sentTransactions.find((tx) => tx.fromAccountId === account.id);
-    const received = receivedTransactions.find(
-      (tx) => tx.toAccountId === account.id
-    );
+    const sent = sentTransactions.find((tx) => tx.fromId === account.id);
+    const received = receivedTransactions.find((tx) => tx.toId === account.id);
 
     return {
       accountId: account.id,
@@ -144,7 +155,7 @@ export const getTransactionsSummaryForAccount = async (
       amount: true,
     },
     where: {
-      fromAccountId: accountId,
+      fromId: accountId,
       createdAt: {
         gte: start,
         lte: end,
@@ -160,7 +171,7 @@ export const getTransactionsSummaryForAccount = async (
       amount: true,
     },
     where: {
-      toAccountId: accountId,
+      toId: accountId,
       createdAt: {
         gte: start,
         lte: end,
@@ -277,9 +288,9 @@ export const getTransactionsSummaryForCategory = async (
 ) => {
   // Aggregate sent transactions within the specified month and year
   const sentTransactionsSummary = await prisma.transaction.groupBy({
-    by: ["fromAccountId"],
+    by: ["fromId"],
     where: {
-      fromAccount: {
+      from: {
         categoryId: categoryId,
       },
       createdAt: {
@@ -297,9 +308,9 @@ export const getTransactionsSummaryForCategory = async (
 
   // Aggregate received transactions within the specified month and year
   const receivedTransactionsSummary = await prisma.transaction.groupBy({
-    by: ["toAccountId"],
+    by: ["toId"],
     where: {
-      toAccount: {
+      to: {
         categoryId: categoryId,
       },
       createdAt: {

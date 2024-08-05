@@ -73,8 +73,11 @@ const getAllAccountsCtr = async (
   next: NextFunction
 ) => {
   try {
-    const { categroyId } = req.query;
-    const accounts = await accountsService.getAllAccounts(categroyId as string);
+    const { categroyId, name } = req.query;
+    const accounts = await accountsService.getAllAccounts(
+      categroyId as string,
+      name as string
+    );
     res.status(STATUS_CODES.OK).json(accounts);
   } catch (error) {
     next(error);

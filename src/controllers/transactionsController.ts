@@ -11,22 +11,22 @@ const createTransactionCtr = async (
   try {
     // Validate that fromAccountId and toAccountId exist in the Account table
     const fromAccount = await prisma.account.findUnique({
-      where: { id: req.body.fromAccountId },
+      where: { id: req.body.fromId },
     });
 
     const toAccount = await prisma.account.findUnique({
-      where: { id: req.body.toAccountId },
+      where: { id: req.body.toId },
     });
 
     if (!fromAccount) {
       return res.status(STATUS_CODES.NOT_FOUND).json({
-        message: `Account with id ${req.body.fromAccountId} does not exist`,
+        message: `Account with id ${req.body.fromId} does not exist`,
       });
     }
 
     if (!toAccount) {
       return res.status(STATUS_CODES.NOT_FOUND).json({
-        message: `Account with id ${req.body.toAccountId} does not exist`,
+        message: `Account with id ${req.body.toId} does not exist`,
       });
     }
     const transaction = await transactionsService.createTransaction(req.body);

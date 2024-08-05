@@ -3,8 +3,9 @@ import prisma from "../prisma";
 // Create a transaction
 export const createTransaction = async (data: {
   amount: number;
-  fromAccountId: string;
-  toAccountId: string;
+  number: number;
+  fromId: string;
+  toId: string;
   description: string;
 }) => {
   return await prisma.transaction.create({
@@ -17,6 +18,7 @@ export const updateTransaction = async (
   id: string,
   data: Partial<{
     amount: number;
+    number: number;
     fromAccountId: string;
     toAccountId: string;
   }>
@@ -38,8 +40,8 @@ export const deleteTransaction = async (id: string) => {
 export const getAllTransactions = async () => {
   return await prisma.transaction.findMany({
     include: {
-      fromAccount: true,
-      toAccount: true,
+      from: true,
+      to: true,
     },
   });
 };
@@ -59,129 +61,129 @@ interface TransactionStats {
   receivedTransactionsSum: number;
 }
 
-export async function getTransactionStatsForAllAccounts(
-  year: number,
-  month: number
-): Promise<TransactionStats[]> {
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0);
+// export async function getTransactionStatsForAllAccounts(
+//   year: number,
+//   month: number
+// ): Promise<TransactionStats[]> {
+//   const startDate = new Date(year, month - 1, 1);
+//   const endDate = new Date(year, month, 0);
 
-  const sentTransactions = await prisma.transaction.groupBy({
-    by: ["fromAccountId"],
-    where: {
-      createdAt: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-    _count: {
-      _all: true,
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+//   const sentTransactions = await prisma.transaction.groupBy({
+//     by: ["fromAccountId"],
+//     where: {
+//       createdAt: {
+//         gte: startDate,
+//         lte: endDate,
+//       },
+//     },
+//     _count: {
+//       _all: true,
+//     },
+//     _sum: {
+//       amount: true,
+//     },
+//   });
 
-  const receivedTransactions = await prisma.transaction.groupBy({
-    by: ["toAccountId"],
-    where: {
-      createdAt: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-    _count: {
-      _all: true,
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+//   const receivedTransactions = await prisma.transaction.groupBy({
+//     by: ["toAccountId"],
+//     where: {
+//       createdAt: {
+//         gte: startDate,
+//         lte: endDate,
+//       },
+//     },
+//     _count: {
+//       _all: true,
+//     },
+//     _sum: {
+//       amount: true,
+//     },
+//   });
 
-  const transactionStatsMap: { [accountId: string]: TransactionStats } = {};
+//   const transactionStatsMap: { [accountId: string]: TransactionStats } = {};
 
-  sentTransactions.forEach((transaction) => {
-    const accountId = transaction.fromAccountId;
-    if (!transactionStatsMap[accountId]) {
-      transactionStatsMap[accountId] = {
-        accountId,
-        sentTransactionsCount: 0,
-        receivedTransactionsCount: 0,
-        sentTransactionsSum: 0,
-        receivedTransactionsSum: 0,
-      };
-    }
-    transactionStatsMap[accountId].sentTransactionsCount =
-      transaction._count._all ?? 0;
-    transactionStatsMap[accountId].sentTransactionsSum =
-      transaction._sum.amount ?? 0;
-  });
+//   sentTransactions.forEach((transaction) => {
+//     const accountId = transaction.fromId;
+//     if (!transactionStatsMap[accountId]) {
+//       transactionStatsMap[accountId] = {
+//         accountId,
+//         sentTransactionsCount: 0,
+//         receivedTransactionsCount: 0,
+//         sentTransactionsSum: 0,
+//         receivedTransactionsSum: 0,
+//       };
+//     }
+//     transactionStatsMap[accountId].sentTransactionsCount =
+//       transaction._count?._all ?? 0;
+//     transactionStatsMap[accountId].sentTransactionsSum =
+//       transaction._sum.amount ?? 0;
+//   });
 
-  receivedTransactions.forEach((transaction) => {
-    const accountId = transaction.toAccountId;
-    if (!transactionStatsMap[accountId]) {
-      transactionStatsMap[accountId] = {
-        accountId,
-        sentTransactionsCount: 0,
-        receivedTransactionsCount: 0,
-        sentTransactionsSum: 0,
-        receivedTransactionsSum: 0,
-      };
-    }
-    transactionStatsMap[accountId].receivedTransactionsCount =
-      transaction._count._all ?? 0;
-    transactionStatsMap[accountId].receivedTransactionsSum =
-      transaction._sum.amount ?? 0;
-  });
+//   receivedTransactions.forEach((transaction) => {
+//     const accountId = transaction.toId;
+//     if (!transactionStatsMap[accountId]) {
+//       transactionStatsMap[accountId] = {
+//         accountId,
+//         sentTransactionsCount: 0,
+//         receivedTransactionsCount: 0,
+//         sentTransactionsSum: 0,
+//         receivedTransactionsSum: 0,
+//       };
+//     }
+//     transactionStatsMap[accountId].receivedTransactionsCount =
+//       transaction._count?._all ?? 0;
+//     transactionStatsMap[accountId].receivedTransactionsSum =
+//       transaction._sum?.amount ?? 0;
+//   });
 
-  return Object.values(transactionStatsMap);
-}
+//   return Object.values(transactionStatsMap);
+// }
 
-export async function getTransactionStatsForMonth(
-  accountId: string,
-  year: number,
-  month: number
-): Promise<TransactionStats> {
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0);
+// export async function getTransactionStatsForMonth(
+//   accountId: string,
+//   year: number,
+//   month: number
+// ): Promise<TransactionStats> {
+//   const startDate = new Date(year, month - 1, 1);
+//   const endDate = new Date(year, month, 0);
 
-  const sentTransactions = await prisma.transaction.aggregate({
-    where: {
-      fromAccountId: accountId,
-      createdAt: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-    _count: {
-      _all: true,
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+//   const sentTransactions = await prisma.transaction.aggregate({
+//     where: {
+//       fromAccountId: accountId,
+//       createdAt: {
+//         gte: startDate,
+//         lte: endDate,
+//       },
+//     },
+//     _count: {
+//       _all: true,
+//     },
+//     _sum: {
+//       amount: true,
+//     },
+//   });
 
-  const receivedTransactions = await prisma.transaction.aggregate({
-    where: {
-      toAccountId: accountId,
-      createdAt: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-    _count: {
-      _all: true,
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+//   const receivedTransactions = await prisma.transaction.aggregate({
+//     where: {
+//       toAccountId: accountId,
+//       createdAt: {
+//         gte: startDate,
+//         lte: endDate,
+//       },
+//     },
+//     _count: {
+//       _all: true,
+//     },
+//     _sum: {
+//       amount: true,
+//     },
+//   });
 
-  return {
-    accountId,
-    sentTransactionsCount: sentTransactions._count._all ?? 0,
-    receivedTransactionsCount: receivedTransactions._count._all ?? 0,
-    sentTransactionsSum: sentTransactions._sum.amount ?? 0,
-    receivedTransactionsSum: receivedTransactions._sum.amount ?? 0,
-  };
-}
+//   return {
+//     accountId,
+//     sentTransactionsCount: sentTransactions._count._all ?? 0,
+//     receivedTransactionsCount: receivedTransactions._count._all ?? 0,
+//     sentTransactionsSum: sentTransactions._sum.amount ?? 0,
+//     receivedTransactionsSum: receivedTransactions._sum.amount ?? 0,
+//   };
+// }

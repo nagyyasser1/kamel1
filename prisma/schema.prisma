@@ -3,10 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  //url      = env("DATABASE_URL")
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  //url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  //directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 enum Role {
@@ -59,12 +59,13 @@ model Account {
 }
 
 model Transaction {
-  id            String   @id @default(uuid())
-  amount        Float
-  description   String
-  fromAccountId String
-  toAccountId   String
-  fromAccount   Account  @relation("SentTransactions", fields: [fromAccountId], references: [id], onDelete: Cascade)
-  toAccount     Account  @relation("ReceivedTransactions", fields: [toAccountId], references: [id], onDelete: Cascade)
-  createdAt     DateTime @default(now())
+  id          String   @id @default(uuid())
+  amount      Float
+  description String
+  number      Int      @unique
+  fromId      String
+  toId        String
+  from        Account  @relation("SentTransactions", fields: [fromId], references: [id], onDelete: Cascade)
+  to          Account  @relation("ReceivedTransactions", fields: [toId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 }
