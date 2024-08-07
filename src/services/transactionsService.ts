@@ -36,6 +36,10 @@ export const deleteTransaction = async (id: string) => {
   });
 };
 
+export const deleteTransactions = async () => {
+  return await prisma.transaction.deleteMany();
+};
+
 // Get all transactions
 export const getAllTransactions = async () => {
   return await prisma.transaction.findMany({
@@ -50,6 +54,12 @@ export const getAllTransactions = async () => {
 export const getTransactionById = async (id: string) => {
   return await prisma.transaction.findUnique({
     where: { id },
+  });
+};
+
+export const getTransactionByNum = async (number: number) => {
+  return await prisma.transaction.findUnique({
+    where: { number },
   });
 };
 

@@ -4,7 +4,6 @@ import * as accountsService from "../services/accountsService";
 import CustomError from "../utils/CustomError";
 import entryExists from "../utils/entryExists.util";
 import { EntryType } from "../utils/enums";
-import getMonthRange from "../utils/getMonthRange.util";
 
 const createAccountCtr = async (
   req: Request,
@@ -104,55 +103,23 @@ const getAccountById = async (
   }
 };
 
-export const getTransactionsSummary = async (
+export const getTransactionsSummaryForCategories = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { year, month } = req.query;
-    const { start, end } = getMonthRange(Number(year), Number(month));
-    const result = await accountsService.getTransactionsSummary(start, end);
-    res.status(STATUS_CODES.OK).send(result);
-  } catch (error) {
-    next(error);
-  }
-};
+    const { year } = req.query;
 
-export const getTransactionsSummaryForAccount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { year, month } = req.query;
-    const { id } = req.params;
-    const { start, end } = getMonthRange(Number(year), Number(month));
-    const summary = await accountsService.getTransactionsSummaryForAccount(
-      id,
-      start,
-      end
-    );
+    if (!year) {
+      throw new CustomError(
+        "year query must be provided!",
+        STATUS_CODES.BAD_REQUEST
+      );
+    }
 
-    res.json(summary);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getTransactionsSummaryForCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { year, month } = req.query;
-    const { id } = req.params;
-    const { start, end } = getMonthRange(Number(year), Number(month));
-    const result = await accountsService.getTransactionsSummaryForCategory(
-      id,
-      start,
-      end
+    const result = await accountsService.getCategoryTransactionSummary(
+      Number(year)
     );
     res.status(STATUS_CODES.OK).send(result);
   } catch (error) {
@@ -164,8 +131,6 @@ export default {
   createAccountCtr,
   deleteAccountCtr,
   getAllAccountsCtr,
-  getTransactionsSummary,
   getAccountById,
-  getTransactionsSummaryForAccount,
-  getTransactionsSummaryForCategory,
+  getTransactionsSummaryForCategories,
 };

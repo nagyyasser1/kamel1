@@ -12,15 +12,7 @@ router.get("/", accountsController.getAllAccountsCtr);
 
 router.use(authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateAccount, accountsController.createAccountCtr);
-router.get("/stats", accountsController.getTransactionsSummary);
-router.get(
-  "/stats/account/:id",
-  accountsController.getTransactionsSummaryForAccount
-);
-router.get(
-  "/stats/category/:id",
-  accountsController.getTransactionsSummaryForCategory
-);
+router.get("/stats", accountsController.getTransactionsSummaryForCategories);
 router.get("/:id", accountsController.getAccountById);
 router.delete("/:id", accountsController.deleteAccountCtr);
 

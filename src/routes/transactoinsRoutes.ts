@@ -14,7 +14,7 @@ router.use(authMiddleware);
 
 router.post(
   "/",
-  authorizeMiddleware(USER_ROLES.ACCOUNTANT),
+  // authorizeMiddleware(USER_ROLES.ACCOUNTANT),
   validateCreateTransaction,
   transactionsController.createTransactionCtr
 );
@@ -27,5 +27,6 @@ router.patch(
   transactionsController.updateTransactionCtr
 );
 router.delete("/:id", transactionsController.deleteTransactionCtr);
+router.delete("/", transactionsController.deleteTransactionsCtr);
 
 export default router;

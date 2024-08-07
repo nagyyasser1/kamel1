@@ -98,7 +98,27 @@ export const updateCategory = async (
 
 // Delete a category
 export const deleteCategory = async (id: string) => {
-  await prisma.category.delete({
+  // Check if the category has any subcategories or accounts before deleting
+  const category = await prisma.category.findUnique({
+    where: { id },
+    include: {
+      subCategories: true,
+      accounts: true,
+    },
+  });
+
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  if (category.subCategories.length > 0 || category.accounts.length > 0) {
+    throw new Error(
+      "Cannot delete a category that has subcategories or accounts"
+    );
+  }
+
+  // Proceed to delete the category
+  return prisma.category.delete({
     where: { id },
   });
 };

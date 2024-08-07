@@ -29,6 +29,15 @@ const createTransactionCtr = async (
         message: `Account with id ${req.body.toId} does not exist`,
       });
     }
+
+    const existingTransactionNum =
+      await transactionsService.getTransactionByNum(req.body?.number);
+    if (existingTransactionNum) {
+      return res.status(STATUS_CODES.CONFLICT).json({
+        message: `Transaction with number ${req.body?.number} aready exists!`,
+      });
+    }
+
     const transaction = await transactionsService.createTransaction(req.body);
     res.status(STATUS_CODES.CREATED).json(transaction);
   } catch (error) {
@@ -67,6 +76,18 @@ const deleteTransactionCtr = async (
   }
 };
 
+const deleteTransactionsCtr = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await transactionsService.deleteTransactions();
+    res.status(STATUS_CODES.NO_CONTENT).send();
+  } catch (error) {
+    next(error);
+  }
+};
 const getAllTransactionsCtr = async (
   req: Request,
   res: Response,
@@ -106,4 +127,5 @@ export default {
   deleteTransactionCtr,
   getAllTransactionsCtr,
   getTransactionByIdCtr,
+  deleteTransactionsCtr,
 };
