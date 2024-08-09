@@ -7,10 +7,10 @@ import { validateCreateAccount } from "../utils/validations/accountsValidators";
 
 const router = Router();
 
-router.use(authMiddleware);
+// router.use(authMiddleware);
 router.get("/", accountsController.getAllAccountsCtr);
 
-router.use(authorizeMiddleware(USER_ROLES.ADMIN));
+// router.use(authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateAccount, accountsController.createAccountCtr);
 router.get("/stats", accountsController.getTransactionsSummaryForCategories);
 router.get("/:id", accountsController.getAccountById);
