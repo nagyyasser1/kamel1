@@ -4,6 +4,9 @@ import * as accountsService from "../services/accountsService";
 import CustomError from "../utils/CustomError";
 import entryExists from "../utils/entryExists.util";
 import { EntryType } from "../utils/enums";
+import sumGroupOfAccounts from "../utils/sumGroupOfAccounts";
+import { AccountsWname } from "../constants/accountsCodes";
+import { Account } from "../types";
 
 const createAccountCtr = async (
   req: Request,
@@ -127,10 +130,128 @@ export const getTransactionsSummaryForCategories = async (
   }
 };
 
+const getTransForAccountsByNums = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const summaries =
+      await accountsService.getTransactionsSummaryForArrayOfAccountsNumber();
+
+    const NetSales =
+      sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
+      Math.abs(
+        sumGroupOfAccounts(summaries, [
+          AccountsWname.allowedDiscount,
+          AccountsWname.salesReturns,
+        ])
+      );
+
+    const purchasesReturnedExpenses = sumGroupOfAccounts(summaries, [
+      AccountsWname.purchases,
+      AccountsWname.purchaseReturns,
+      AccountsWname.purchasesExpenses,
+    ]);
+
+    const inventoryAtTheEndOfThePeriod = sumGroupOfAccounts(summaries, [
+      AccountsWname.inventoryAtTheEndOfThePeriod,
+    ]);
+    //
+
+    const otherRevenues = sumGroupOfAccounts(summaries, [
+      AccountsWname.otherRevenues1,
+      AccountsWname.otherRevenues2,
+    ]);
+
+    const activitySalesRevenue = sumGroupOfAccounts(summaries, [
+      AccountsWname.activitySalesRevenue1,
+      AccountsWname.activitySalesRevenue2,
+      AccountsWname.activitySalesRevenue3,
+    ]);
+
+    const totalSellingAndDistributionExpenses = sumGroupOfAccounts(summaries, [
+      AccountsWname.freeSamplesAndGifts,
+      AccountsWname.propagandaAndAdvertising,
+      AccountsWname.sellingAgentsCommission,
+      AccountsWname.shippingAndDeliveryOfOrders,
+      AccountsWname.damagedAndFinishedGoods,
+      AccountsWname.inventoryAdjustments,
+      AccountsWname.packagingAndPackingExpenses,
+    ]);
+
+    const totalGeneralAdministrativeAndOperatingExpenses = sumGroupOfAccounts(
+      summaries,
+      [
+        AccountsWname.salariesOfExecutivesAndOfficials,
+        AccountsWname.travelAndTransportation,
+        AccountsWname.bankCommissions,
+        AccountsWname.accountingAuditAndConsultingExpenses,
+        AccountsWname.rewardsAndPerks,
+        AccountsWname.workPermits,
+        AccountsWname.travelTickets,
+        AccountsWname.compensationForLeavingService,
+        AccountsWname.badDebts,
+        AccountsWname.healthInsurance,
+        AccountsWname.currencyConversionDifferences,
+        AccountsWname.otherMiscellaneousExpenses,
+        AccountsWname.stationeryAndPublications,
+        AccountsWname.hospitalityAndReception,
+        AccountsWname.socialInsurance,
+        AccountsWname.trafficViolations,
+        AccountsWname.treatmentAndMedicalExamination,
+        AccountsWname.cleaningExpenses,
+        AccountsWname.governmentFees,
+        AccountsWname.carWash,
+        AccountsWname.carFuel,
+        AccountsWname.rentals,
+        AccountsWname.electricityAndWater,
+        AccountsWname.wagesAndSalaries,
+        AccountsWname.generalMaintenanceExpenses,
+        AccountsWname.telephoneMailInternet,
+      ]
+    );
+
+    const Allotments = sumGroupOfAccounts(summaries, [
+      AccountsWname.transportationDepreciationExpense,
+      AccountsWname.hardwareSoftwareDepreciationExpense,
+      AccountsWname.furnitureFurnishingsDepreciationExpense,
+      AccountsWname.depreciationExpenseForMachineryEquipment,
+    ]);
+
+    const salesOutputTax = sumGroupOfAccounts(summaries, [
+      AccountsWname.salesOutputTax,
+    ]);
+
+    const accountsObject = summaries.reduce((acc, account) => {
+      if (account) {
+        acc[account?.accountName] = account;
+      }
+      return acc;
+    }, {} as Record<string, Account>);
+
+    res.json({
+      NetSales,
+      purchasesReturnedExpenses,
+      inventoryAtTheEndOfThePeriod,
+      otherRevenues,
+      activitySalesRevenue,
+      totalSellingAndDistributionExpenses,
+      totalGeneralAdministrativeAndOperatingExpenses,
+      Allotments,
+      salesOutputTax,
+      accountsObject,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createAccountCtr,
   deleteAccountCtr,
   getAllAccountsCtr,
   getAccountById,
   getTransactionsSummaryForCategories,
+  getTransForAccountsByNums,
 };

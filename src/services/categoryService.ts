@@ -122,3 +122,101 @@ export const deleteCategory = async (id: string) => {
     where: { id },
   });
 };
+
+export async function getCategoryTransactionSummaryForCategories() {
+  const categoryNumbers: number[] = [1203, 1204, 1207, 4101, 4102, 4103];
+  const currentYear = new Date().getFullYear();
+  const startOfCurrentYear = new Date(`${currentYear}-01-01`);
+  const startOfNextYear = new Date(`${currentYear + 1}-01-01`);
+
+  const results = await Promise.all(
+    categoryNumbers.map(async (categoryNumber) => {
+      const category = await prisma.category.findUnique({
+        where: {
+          number: categoryNumber,
+        },
+        select: {
+          name: true,
+          accounts: {
+            select: {
+              sentTransactions: {
+                select: {
+                  amount: true,
+                  createdAt: true,
+                },
+              },
+              receivedTransactions: {
+                select: {
+                  amount: true,
+                  createdAt: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!category) {
+        throw new Error(`Category with number ${categoryNumber} not found`);
+      }
+
+      const { name, accounts } = category;
+
+      const thisYearSentTransactions = accounts.flatMap((account) =>
+        account.sentTransactions.filter(
+          (tx) =>
+            tx.createdAt >= startOfCurrentYear && tx.createdAt < startOfNextYear
+        )
+      );
+
+      const previousYearsSentTransactions = accounts.flatMap((account) =>
+        account.sentTransactions.filter(
+          (tx) => tx.createdAt < startOfCurrentYear
+        )
+      );
+
+      const thisYearReceivedTransactions = accounts.flatMap((account) =>
+        account.receivedTransactions.filter(
+          (tx) =>
+            tx.createdAt >= startOfCurrentYear && tx.createdAt < startOfNextYear
+        )
+      );
+
+      const previousYearsReceivedTransactions = accounts.flatMap((account) =>
+        account.receivedTransactions.filter(
+          (tx) => tx.createdAt < startOfCurrentYear
+        )
+      );
+
+      return {
+        categoryName: name,
+        thisYear: {
+          totalSentTransactions: thisYearSentTransactions.length,
+          totalSentAmount: thisYearSentTransactions.reduce(
+            (sum, tx) => sum + tx.amount,
+            0
+          ),
+          totalReceivedTransactions: thisYearReceivedTransactions.length,
+          totalReceivedAmount: thisYearReceivedTransactions.reduce(
+            (sum, tx) => sum + tx.amount,
+            0
+          ),
+        },
+        previousYears: {
+          totalSentTransactions: previousYearsSentTransactions.length,
+          totalSentAmount: previousYearsSentTransactions.reduce(
+            (sum, tx) => sum + tx.amount,
+            0
+          ),
+          totalReceivedTransactions: previousYearsReceivedTransactions.length,
+          totalReceivedAmount: previousYearsReceivedTransactions.reduce(
+            (sum, tx) => sum + tx.amount,
+            0
+          ),
+        },
+      };
+    })
+  );
+
+  return results;
+}

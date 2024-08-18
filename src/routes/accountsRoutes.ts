@@ -13,6 +13,7 @@ router.get("/", accountsController.getAllAccountsCtr);
 // router.use(authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateAccount, accountsController.createAccountCtr);
 router.get("/stats", accountsController.getTransactionsSummaryForCategories);
+router.get("/stats/accounts", accountsController.getTransForAccountsByNums);
 router.get("/:id", accountsController.getAccountById);
 router.delete("/:id", accountsController.deleteAccountCtr);
 

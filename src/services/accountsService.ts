@@ -1,3 +1,4 @@
+import ACCOUNTS_CODES_FOR_INCOME from "../constants/accountsCodes";
 import prisma from "../prisma";
 
 export const createAccount = async (data: any) => {
@@ -183,215 +184,121 @@ export async function getCategoryTransactionSummary(year: number) {
   return summary;
 }
 
-// export async function getCategoryTransactionSummary(year: number) {
-//   const previousYear = year - 1;
+export async function getTransactionsSummaryForArrayOfAccountsNumber() {
+  const accountNums = ACCOUNTS_CODES_FOR_INCOME;
 
-//   const categories = await prisma.category.findMany({
-//     where: {
-//       accounts: {
-//         some: {},
-//       },
-//     },
-//     include: {
-//       accounts: {
-//         include: {
-//           sentTransactions: {
-//             where: {
-//               OR: [
-//                 {
-//                   createdAt: {
-//                     gte: new Date(`${year}-01-01`),
-//                     lt: new Date(`${year + 1}-01-01`),
-//                   },
-//                 },
-//                 {
-//                   createdAt: {
-//                     gte: new Date(`${previousYear}-01-01`),
-//                     lt: new Date(`${previousYear + 1}-01-01`),
-//                   },
-//                 },
-//               ],
-//             },
-//           },
-//           receivedTransactions: {
-//             where: {
-//               OR: [
-//                 {
-//                   createdAt: {
-//                     gte: new Date(`${year}-01-01`),
-//                     lt: new Date(`${year + 1}-01-01`),
-//                   },
-//                 },
-//                 {
-//                   createdAt: {
-//                     gte: new Date(`${previousYear}-01-01`),
-//                     lt: new Date(`${previousYear + 1}-01-01`),
-//                   },
-//                 },
-//               ],
-//             },
-//           },
-//         },
-//       },
-//     },
-//   });
+  // Define the start and end dates for this year and previous years
+  const now = new Date();
+  const thisYearStart = new Date(now.getFullYear(), 0, 1);
 
-//   const summary = categories.map((category) => {
-//     const monthlySummary = Array.from({ length: 12 }, (_, index) => ({
-//       month: index + 1,
-//       totalSentTransactions: 0,
-//       totalReceivedTransactions: 0,
-//       totalSentAmount: BigInt(0),
-//       totalReceivedAmount: BigInt(0),
-//     }));
+  // Query to get transactions summary for each account number
+  const summaries = await Promise.all(
+    accountNums.map(async (accountNum) => {
+      const account = await prisma.account.findUnique({
+        where: { number: accountNum },
+        include: {
+          sentTransactions: true,
+          receivedTransactions: true,
+        },
+      });
 
-//     let totalSentTransactions = 0;
-//     let totalReceivedTransactions = 0;
-//     let totalSentAmount = BigInt(0);
-//     let totalReceivedAmount = BigInt(0);
+      if (!account) {
+        return null; // Handle case where account is not found
+      }
 
-//     let prevYearSentTransactions = 0;
-//     let prevYearReceivedTransactions = 0;
-//     let prevYearSentAmount = BigInt(0);
-//     let prevYearReceivedAmount = BigInt(0);
+      // Aggregate this year's sent transactions
+      const thisYearSent = await prisma.transaction.aggregate({
+        where: {
+          fromId: account.id,
+          createdAt: {
+            gte: thisYearStart,
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+        _count: {
+          id: true,
+        },
+      });
 
-//     category.accounts.forEach((account) => {
-//       account.sentTransactions.forEach((transaction) => {
-//         const transactionYear = transaction.createdAt.getFullYear();
-//         const month = transaction.createdAt.getMonth();
+      // Aggregate this year's received transactions
+      const thisYearReceived = await prisma.transaction.aggregate({
+        where: {
+          toId: account.id,
+          createdAt: {
+            gte: thisYearStart,
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+        _count: {
+          id: true,
+        },
+      });
 
-//         if (transactionYear === year) {
-//           monthlySummary[month].totalSentTransactions += 1;
-//           monthlySummary[month].totalSentAmount += BigInt(transaction.amount);
+      // Aggregate previous years' sent transactions
+      const previousYearsSent = await prisma.transaction.aggregate({
+        where: {
+          fromId: account.id,
+          createdAt: {
+            lt: thisYearStart,
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+        _count: {
+          id: true,
+        },
+      });
 
-//           totalSentTransactions += 1;
-//           totalSentAmount += BigInt(transaction.amount);
-//         } else if (transactionYear === previousYear) {
-//           prevYearSentTransactions += 1;
-//           prevYearSentAmount += BigInt(transaction.amount);
-//         }
-//       });
+      // Aggregate previous years' received transactions
+      const previousYearsReceived = await prisma.transaction.aggregate({
+        where: {
+          toId: account.id,
+          createdAt: {
+            lt: thisYearStart,
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+        _count: {
+          id: true,
+        },
+      });
 
-//       account.receivedTransactions.forEach((transaction) => {
-//         const transactionYear = transaction.createdAt.getFullYear();
-//         const month = transaction.createdAt.getMonth();
+      // Calculate balances
+      const thisYearBalance =
+        (thisYearSent._sum.amount || 0) - (thisYearReceived._sum.amount || 0);
+      const previousYearsBalance =
+        (previousYearsSent._sum.amount || 0) -
+        (previousYearsReceived._sum.amount || 0);
+      const totalBalance = thisYearBalance + previousYearsBalance;
 
-//         if (transactionYear === year) {
-//           monthlySummary[month].totalReceivedTransactions += 1;
-//           monthlySummary[month].totalReceivedAmount += BigInt(
-//             transaction.amount
-//           );
+      return {
+        accountName: account.name,
+        accountCode: account.number,
+        totalBalance: totalBalance,
+        thisYear: {
+          totalSentTransactions: thisYearSent._count.id || 0,
+          totalSentAmount: thisYearSent._sum.amount || 0,
+          totalReceivedTransactions: thisYearReceived._count.id || 0,
+          totalReceivedAmount: thisYearReceived._sum.amount || 0,
+          balance: thisYearBalance,
+        },
+        previousYears: {
+          totalSentTransactions: previousYearsSent._count.id || 0,
+          totalSentAmount: previousYearsSent._sum.amount || 0,
+          totalReceivedTransactions: previousYearsReceived._count.id || 0,
+          totalReceivedAmount: previousYearsReceived._sum.amount || 0,
+          balance: previousYearsBalance,
+        },
+      };
+    })
+  );
 
-//           totalReceivedTransactions += 1;
-//           totalReceivedAmount += BigInt(transaction.amount);
-//         } else if (transactionYear === previousYear) {
-//           prevYearReceivedTransactions += 1;
-//           prevYearReceivedAmount += BigInt(transaction.amount);
-//         }
-//       });
-//     });
-
-//     return {
-//       categoryId: category.id,
-//       categoryName: category.name,
-//       totalSentTransactions,
-//       totalReceivedTransactions,
-//       totalSentAmount: Number(totalSentAmount),
-//       totalReceivedAmount: Number(totalReceivedAmount),
-//       prevYearSentTransactions,
-//       prevYearReceivedTransactions,
-//       prevYearSentAmount: Number(prevYearSentAmount),
-//       prevYearReceivedAmount: Number(prevYearReceivedAmount),
-//       monthlySummary: monthlySummary.map((monthData) => ({
-//         ...monthData,
-//         totalSentAmount: Number(monthData.totalSentAmount),
-//         totalReceivedAmount: Number(monthData.totalReceivedAmount),
-//       })),
-//     };
-//   });
-
-//   return summary;
-// }
-
-// export async function getCategoryTransactionSummary(year: number) {
-//   const categories = await prisma.category.findMany({
-//     where: {
-//       accounts: {
-//         some: {},
-//       },
-//     },
-//     include: {
-//       accounts: {
-//         include: {
-//           sentTransactions: {
-//             where: {
-//               createdAt: {
-//                 gte: new Date(`${year}-01-01`),
-//                 lt: new Date(`${year + 1}-01-01`),
-//               },
-//             },
-//           },
-//           receivedTransactions: {
-//             where: {
-//               createdAt: {
-//                 gte: new Date(`${year}-01-01`),
-//                 lt: new Date(`${year + 1}-01-01`),
-//               },
-//             },
-//           },
-//         },
-//       },
-//     },
-//   });
-
-//   const summary = categories.map((category) => {
-//     const monthlySummary = Array.from({ length: 12 }, (_, index) => ({
-//       month: index + 1,
-//       totalSentTransactions: 0,
-//       totalReceivedTransactions: 0,
-//       totalSentAmount: BigInt(0),
-//       totalReceivedAmount: BigInt(0),
-//     }));
-
-//     let totalSentTransactions = 0;
-//     let totalReceivedTransactions = 0;
-//     let totalSentAmount = BigInt(0);
-//     let totalReceivedAmount = BigInt(0);
-
-//     category.accounts.forEach((account) => {
-//       account.sentTransactions.forEach((transaction) => {
-//         const month = transaction.createdAt.getMonth();
-//         monthlySummary[month].totalSentTransactions += 1;
-//         monthlySummary[month].totalSentAmount += BigInt(transaction.amount);
-
-//         totalSentTransactions += 1;
-//         totalSentAmount += BigInt(transaction.amount);
-//       });
-
-//       account.receivedTransactions.forEach((transaction) => {
-//         const month = transaction.createdAt.getMonth();
-//         monthlySummary[month].totalReceivedTransactions += 1;
-//         monthlySummary[month].totalReceivedAmount += BigInt(transaction.amount);
-
-//         totalReceivedTransactions += 1;
-//         totalReceivedAmount += BigInt(transaction.amount);
-//       });
-//     });
-
-//     return {
-//       categoryId: category.id,
-//       categoryName: category.name,
-//       totalSentTransactions,
-//       totalReceivedTransactions,
-//       totalSentAmount: Number(totalSentAmount),
-//       totalReceivedAmount: Number(totalReceivedAmount),
-//       monthlySummary: monthlySummary.map((monthData) => ({
-//         ...monthData,
-//         totalSentAmount: Number(monthData.totalSentAmount),
-//         totalReceivedAmount: Number(monthData.totalReceivedAmount),
-//       })),
-//     };
-//   });
-
-//   return summary;
-// }
+  return summaries.filter((summary) => summary !== null);
+}

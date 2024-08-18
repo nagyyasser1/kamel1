@@ -13,7 +13,7 @@ import authorizeMiddleware from "../middlewares/authorizeMiddleware";
 
 const router = Router();
 
-router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ADMIN));
+// router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateCategory, createCategory);
 router.get("/", getCategories);
 router.get("/:id", getCategoryById);
