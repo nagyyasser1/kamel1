@@ -225,7 +225,7 @@ const getTransForAccountsByNums = async (
 
     const accountsObject = summaries.reduce((acc, account) => {
       if (account) {
-        acc[account?.accountName] = account;
+        acc[account?.accountCode] = account;
       }
       return acc;
     }, {} as Record<string, Account>);

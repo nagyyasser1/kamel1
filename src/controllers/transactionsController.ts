@@ -101,6 +101,19 @@ const getAllTransactionsCtr = async (
   }
 };
 
+const getAllTransactionsCtrByDay = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const transactions = await transactionsService.getAllTransactionsByDay();
+    res.status(STATUS_CODES.OK).json(transactions);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getTransactionByIdCtr = async (
   req: Request,
   res: Response,
@@ -127,5 +140,6 @@ export default {
   deleteTransactionCtr,
   getAllTransactionsCtr,
   getTransactionByIdCtr,
+  getAllTransactionsCtrByDay,
   deleteTransactionsCtr,
 };

@@ -20,6 +20,7 @@ router.post(
 );
 
 router.get("/", transactionsController.getAllTransactionsCtr);
+router.get("/day", transactionsController.getAllTransactionsCtrByDay);
 router.get("/:id", transactionsController.getTransactionByIdCtr);
 router.patch(
   "/:id",
