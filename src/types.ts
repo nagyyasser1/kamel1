@@ -24,4 +24,7 @@ type Account = {
   };
 };
 
+type Testt = {
+  test: string;
+};
 export { JWT_PAYLOAD, Account };
