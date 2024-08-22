@@ -137,6 +137,7 @@ async function getCategoryTransactionSummaryForCategories(
           number: categoryNumber,
         },
         select: {
+          id: true,
           name: true,
           number: true,
           accounts: {
@@ -159,7 +160,7 @@ async function getCategoryTransactionSummaryForCategories(
       });
 
       if (category) {
-        const { name, number, accounts } = category;
+        const { id, name, number, accounts } = category;
 
         const thisYearSentTransactions = accounts.flatMap((account) =>
           account.sentTransactions.filter(
@@ -190,6 +191,7 @@ async function getCategoryTransactionSummaryForCategories(
         );
 
         return {
+          id,
           categoryName: name,
           categoryNumber: number,
           thisYear: {

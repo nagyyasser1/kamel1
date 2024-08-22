@@ -281,6 +281,7 @@ export async function getTransactionsSummaryForArrayOfAccountsNumber() {
       const totalBalance = thisYearBalance + previousYearsBalance;
 
       return {
+        id: account.id,
         accountName: account.name,
         accountCode: account.number,
         totalBalance: totalBalance,
@@ -400,6 +401,7 @@ export async function statementFPositionSrvc() {
       const totalBalance = thisYearBalance + previousYearsBalance;
 
       return {
+        id: account.id,
         accountName: account.name,
         accountCode: account.number,
         totalBalance: totalBalance,
