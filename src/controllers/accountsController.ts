@@ -5,8 +5,10 @@ import CustomError from "../utils/CustomError";
 import entryExists from "../utils/entryExists.util";
 import { EntryType } from "../utils/enums";
 import sumGroupOfAccounts from "../utils/sumGroupOfAccounts";
-import { AccountsWname } from "../constants/accountsCodes";
+import { AccountsWname, FPCategoriesCodes } from "../constants/accountsCodes";
 import { Account } from "../types";
+import sumGroupOfAccountsWithCustomPercentage from "../utils/sumGroupOfAccountsWithCustomPercentage";
+import categoryService from "../services/categoryService";
 
 const createAccountCtr = async (
   req: Request,
@@ -219,6 +221,25 @@ const getTransForAccountsByNums = async (
       AccountsWname.depreciationExpenseForMachineryEquipment,
     ]);
 
+    const AllotmentsAfter = sumGroupOfAccountsWithCustomPercentage(summaries, [
+      {
+        accountCode: AccountsWname.transportationDepreciationExpense,
+        percentage: 10,
+      },
+      {
+        accountCode: AccountsWname.hardwareSoftwareDepreciationExpense,
+        percentage: 10,
+      },
+      {
+        accountCode: AccountsWname.furnitureFurnishingsDepreciationExpense,
+        percentage: 10,
+      },
+      {
+        accountCode: AccountsWname.depreciationExpenseForMachineryEquipment,
+        percentage: 10,
+      },
+    ]);
+
     const salesOutputTax = sumGroupOfAccounts(summaries, [
       AccountsWname.salesOutputTax,
     ]);
@@ -239,11 +260,30 @@ const getTransForAccountsByNums = async (
       totalSellingAndDistributionExpenses,
       totalGeneralAdministrativeAndOperatingExpenses,
       Allotments,
+      AllotmentsAfter,
       salesOutputTax,
       accountsObject,
     });
   } catch (error) {
     next(error);
+  }
+};
+
+const statementOfFinancialPositionCrl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const AccountsSummaries = await accountsService.statementFPositionSrvc();
+    const CategorySummaries =
+      await categoryService.getCategoryTransactionSummaryForCategories(
+        FPCategoriesCodes
+      );
+
+    res.json({ AccountsSummaries, CategorySummaries });
+  } catch (error) {
+    next;
   }
 };
 
@@ -254,4 +294,5 @@ export default {
   getAccountById,
   getTransactionsSummaryForCategories,
   getTransForAccountsByNums,
+  statementOfFinancialPositionCrl,
 };

@@ -123,8 +123,9 @@ export const deleteCategory = async (id: string) => {
   });
 };
 
-export async function getCategoryTransactionSummaryForCategories() {
-  const categoryNumbers: number[] = [1203, 1204, 1207, 4101, 4102, 4103];
+async function getCategoryTransactionSummaryForCategories(
+  categoryNumbers: number[]
+) {
   const currentYear = new Date().getFullYear();
   const startOfCurrentYear = new Date(`${currentYear}-01-01`);
   const startOfNextYear = new Date(`${currentYear + 1}-01-01`);
@@ -137,6 +138,7 @@ export async function getCategoryTransactionSummaryForCategories() {
         },
         select: {
           name: true,
+          number: true,
           accounts: {
             select: {
               sentTransactions: {
@@ -156,67 +158,72 @@ export async function getCategoryTransactionSummaryForCategories() {
         },
       });
 
-      if (!category) {
-        throw new Error(`Category with number ${categoryNumber} not found`);
+      if (category) {
+        const { name, number, accounts } = category;
+
+        const thisYearSentTransactions = accounts.flatMap((account) =>
+          account.sentTransactions.filter(
+            (tx) =>
+              tx.createdAt >= startOfCurrentYear &&
+              tx.createdAt < startOfNextYear
+          )
+        );
+
+        const previousYearsSentTransactions = accounts.flatMap((account) =>
+          account.sentTransactions.filter(
+            (tx) => tx.createdAt < startOfCurrentYear
+          )
+        );
+
+        const thisYearReceivedTransactions = accounts.flatMap((account) =>
+          account.receivedTransactions.filter(
+            (tx) =>
+              tx.createdAt >= startOfCurrentYear &&
+              tx.createdAt < startOfNextYear
+          )
+        );
+
+        const previousYearsReceivedTransactions = accounts.flatMap((account) =>
+          account.receivedTransactions.filter(
+            (tx) => tx.createdAt < startOfCurrentYear
+          )
+        );
+
+        return {
+          categoryName: name,
+          categoryNumber: number,
+          thisYear: {
+            totalSentTransactions: thisYearSentTransactions.length,
+            totalSentAmount: thisYearSentTransactions.reduce(
+              (sum, tx) => sum + tx.amount,
+              0
+            ),
+            totalReceivedTransactions: thisYearReceivedTransactions.length,
+            totalReceivedAmount: thisYearReceivedTransactions.reduce(
+              (sum, tx) => sum + tx.amount,
+              0
+            ),
+          },
+          previousYears: {
+            totalSentTransactions: previousYearsSentTransactions.length,
+            totalSentAmount: previousYearsSentTransactions.reduce(
+              (sum, tx) => sum + tx.amount,
+              0
+            ),
+            totalReceivedTransactions: previousYearsReceivedTransactions.length,
+            totalReceivedAmount: previousYearsReceivedTransactions.reduce(
+              (sum, tx) => sum + tx.amount,
+              0
+            ),
+          },
+        };
       }
-
-      const { name, accounts } = category;
-
-      const thisYearSentTransactions = accounts.flatMap((account) =>
-        account.sentTransactions.filter(
-          (tx) =>
-            tx.createdAt >= startOfCurrentYear && tx.createdAt < startOfNextYear
-        )
-      );
-
-      const previousYearsSentTransactions = accounts.flatMap((account) =>
-        account.sentTransactions.filter(
-          (tx) => tx.createdAt < startOfCurrentYear
-        )
-      );
-
-      const thisYearReceivedTransactions = accounts.flatMap((account) =>
-        account.receivedTransactions.filter(
-          (tx) =>
-            tx.createdAt >= startOfCurrentYear && tx.createdAt < startOfNextYear
-        )
-      );
-
-      const previousYearsReceivedTransactions = accounts.flatMap((account) =>
-        account.receivedTransactions.filter(
-          (tx) => tx.createdAt < startOfCurrentYear
-        )
-      );
-
-      return {
-        categoryName: name,
-        thisYear: {
-          totalSentTransactions: thisYearSentTransactions.length,
-          totalSentAmount: thisYearSentTransactions.reduce(
-            (sum, tx) => sum + tx.amount,
-            0
-          ),
-          totalReceivedTransactions: thisYearReceivedTransactions.length,
-          totalReceivedAmount: thisYearReceivedTransactions.reduce(
-            (sum, tx) => sum + tx.amount,
-            0
-          ),
-        },
-        previousYears: {
-          totalSentTransactions: previousYearsSentTransactions.length,
-          totalSentAmount: previousYearsSentTransactions.reduce(
-            (sum, tx) => sum + tx.amount,
-            0
-          ),
-          totalReceivedTransactions: previousYearsReceivedTransactions.length,
-          totalReceivedAmount: previousYearsReceivedTransactions.reduce(
-            (sum, tx) => sum + tx.amount,
-            0
-          ),
-        },
-      };
     })
   );
 
   return results;
 }
+
+export default {
+  getCategoryTransactionSummaryForCategories,
+};

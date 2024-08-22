@@ -7,6 +7,52 @@ const ACCOUNTS_CODES_FOR_INCOME = [
   540401, 220201,
 ];
 
+export const FP_accounts = [
+  110101, 110102, 110103, 110104, 110105, 110106, 110201, 110202, 110203,
+  220601, 220707, 220501, 220404, 220303, 220201, 120401, 120301, 120701, 1201,
+];
+
+export const AccountsWnameFP = {
+  lands: 110101,
+  buildingsAndRealEstate: 110102,
+  furnitureAndFurnishings: 110103,
+  machinesAndEquipment: 110104,
+  cars: 110105,
+  otherAssets: 110106,
+  fame: 110201,
+  programs: 110202,
+  patent: 110203,
+  arrestPapers: 220601,
+  otherAccountsReceivable: 220707,
+  ayradatMuqadamuh: 220501,
+  masrufatMustahiqih: 220404,
+  alqurudQasiruhAlajil: 220303,
+  daribuhAlmabieat: 220201,
+  purchaseReturns: 120401,
+  purchases: 120301,
+  purchasesExpenses: 120701,
+  cash: 1201,
+};
+
+export const FPCategoriesCodes = [
+  120601, 120602, 121201, 121202, 120201, 120202, 120101, 120102, 54, 220101,
+  220102,
+];
+
+export const AccountsWnameFPCategory = {
+  inventory1: 120601,
+  inventory2: 120602,
+  clientsAbroad: 121201,
+  clientsInside: 121202,
+  ancestor: 120201,
+  covenant: 120202,
+  theBox: 120101,
+  theBanK: 120102,
+  alMothsatat: 54,
+  almoredenOutside: 220101,
+  almoredenInside: 220102,
+};
+
 export const AccountsWname = {
   sales: 410101,
   salesReturns: 410201,
