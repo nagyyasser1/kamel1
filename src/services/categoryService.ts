@@ -190,33 +190,51 @@ async function getCategoryTransactionSummaryForCategories(
           )
         );
 
+        const thisYearTotalSentAmount = thisYearSentTransactions.reduce(
+          (sum, tx) => sum + tx.amount,
+          0
+        );
+
+        const thisYearTotalReceivedAmount = thisYearReceivedTransactions.reduce(
+          (sum, tx) => sum + tx.amount,
+          0
+        );
+
+        const previousYearsTotalSentAmount =
+          previousYearsSentTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+
+        const previousYearsTotalReceivedAmount =
+          previousYearsReceivedTransactions.reduce(
+            (sum, tx) => sum + tx.amount,
+            0
+          );
+
+        const thisYearBalance =
+          thisYearTotalReceivedAmount - thisYearTotalSentAmount;
+
+        const previousYearsBalance =
+          previousYearsTotalReceivedAmount - previousYearsTotalSentAmount;
+
+        const totalBalance = thisYearBalance + previousYearsBalance;
+
         return {
           id,
           categoryName: name,
           categoryNumber: number,
+          totalBalance,
           thisYear: {
             totalSentTransactions: thisYearSentTransactions.length,
-            totalSentAmount: thisYearSentTransactions.reduce(
-              (sum, tx) => sum + tx.amount,
-              0
-            ),
+            totalSentAmount: thisYearTotalSentAmount,
             totalReceivedTransactions: thisYearReceivedTransactions.length,
-            totalReceivedAmount: thisYearReceivedTransactions.reduce(
-              (sum, tx) => sum + tx.amount,
-              0
-            ),
+            totalReceivedAmount: thisYearTotalReceivedAmount,
+            balance: thisYearBalance,
           },
           previousYears: {
             totalSentTransactions: previousYearsSentTransactions.length,
-            totalSentAmount: previousYearsSentTransactions.reduce(
-              (sum, tx) => sum + tx.amount,
-              0
-            ),
+            totalSentAmount: previousYearsTotalSentAmount,
             totalReceivedTransactions: previousYearsReceivedTransactions.length,
-            totalReceivedAmount: previousYearsReceivedTransactions.reduce(
-              (sum, tx) => sum + tx.amount,
-              0
-            ),
+            totalReceivedAmount: previousYearsTotalReceivedAmount,
+            balance: previousYearsBalance,
           },
         };
       }

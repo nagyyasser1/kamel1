@@ -281,7 +281,21 @@ const statementOfFinancialPositionCrl = async (
         FPCategoriesCodes
       );
 
-    res.json({ AccountsSummaries, CategorySummaries });
+    const accountsObject = AccountsSummaries.reduce((acc, account) => {
+      if (account) {
+        acc[account?.accountCode] = account;
+      }
+      return acc;
+    }, {} as Record<string, Account>);
+
+    const categoriesObject = CategorySummaries.reduce((cat, categroy) => {
+      if (categroy) {
+        cat[categroy?.categoryNumber] = categroy;
+      }
+      return cat;
+    }, {} as any);
+
+    res.json({ accountsObject, categoriesObject });
   } catch (error) {
     next;
   }
