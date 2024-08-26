@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import * as categoryService from "../services/categoryService";
+import categoryService from "../services/categoryService";
 import CustomError from "../utils/CustomError";
 import { STATUS_CODES } from "../constants/statusCodes";
 
@@ -87,6 +87,43 @@ export const deleteCategory = async (
   try {
     await categoryService.deleteCategory(req.params.id);
     res.json({ message: "Category deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+export const categoryStatistics = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, code } = req.query;
+
+    if (!id && !code)
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        message: "id or code must be provided in the query!",
+      });
+
+    // Convert id to string or undefined
+    const categoryId = typeof id === "string" ? id : undefined;
+
+    // Convert code to number or undefined
+    const categoryCode =
+      typeof code === "string" ? parseInt(code, 10) : undefined;
+
+    if (categoryCode) {
+      if (isNaN(categoryCode as number)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          message: "Invalid code provided. It must be a number.",
+        });
+      }
+    }
+
+    const result = await categoryService.getCategoryStatistics(
+      categoryId,
+      categoryCode
+    );
+    res.send(result);
   } catch (error) {
     next(error);
   }

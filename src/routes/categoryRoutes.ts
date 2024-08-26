@@ -5,6 +5,7 @@ import {
   getCategoryById,
   updateCategory,
   deleteCategory,
+  categoryStatistics,
 } from "../controllers/categoryController";
 import { validateCreateCategory } from "../utils/validations/categoryValidators";
 import authMiddleware from "../middlewares/authMiddleware";
@@ -16,6 +17,7 @@ const router = Router();
 // router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateCategory, createCategory);
 router.get("/", getCategories);
+router.get("/stats", categoryStatistics);
 router.get("/:id", getCategoryById);
 router.put("/:id", updateCategory);
 router.delete("/:id", deleteCategory);

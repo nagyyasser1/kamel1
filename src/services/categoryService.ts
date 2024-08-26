@@ -1,7 +1,7 @@
 import prisma from "../prisma";
 
 // Create a category
-export const createCategory = async (data: {
+const createCategory = async (data: {
   name: string;
   number: number;
   parentId?: string;
@@ -12,7 +12,7 @@ export const createCategory = async (data: {
 };
 
 // Get all top-level categories
-export const getCategories = async () => {
+const getCategories = async () => {
   return prisma.category.findMany({
     where: { parentId: null },
     include: {
@@ -46,7 +46,7 @@ export const getCategories = async () => {
 };
 
 // Get a category by ID
-export const getCategoryById = async (id: string) => {
+const getCategoryById = async (id: string) => {
   return prisma.category.findUnique({
     where: { id },
     include: {
@@ -60,8 +60,103 @@ export const getCategoryById = async (id: string) => {
   });
 };
 
+const getCategoryStatistics = async (id?: string, code?: number) => {
+  const whereCondition: any = {};
+
+  if (id) {
+    whereCondition.id = id;
+  }
+
+  if (code) {
+    whereCondition.number = code;
+  }
+
+  const statistics = await prisma.category.findUnique({
+    where: whereCondition,
+    include: {
+      accounts: {
+        include: {
+          sentTransactions: true,
+          receivedTransactions: true,
+        },
+      },
+    },
+  });
+
+  if (!statistics) return null;
+
+  const currentYear = new Date().getFullYear();
+  const startOfCurrentYear = new Date(currentYear, 0, 1); // January 1st of the current year
+  const endOfCurrentYear = new Date(currentYear, 11, 31, 23, 59, 59, 999); // December 31st of the current year
+
+  let categoryCurrentYearStats = {
+    sentTotal: 0,
+    receivedTotal: 0,
+  };
+
+  let categoryPreviousYearsStats = {
+    sentTotal: 0,
+    receivedTotal: 0,
+  };
+
+  const accountsStatistics = statistics.accounts.map((account) => {
+    let currentYearStats = {
+      sentTotal: 0,
+      receivedTotal: 0,
+    };
+
+    let previousYearsStats = {
+      sentTotal: 0,
+      receivedTotal: 0,
+    };
+
+    account.sentTransactions.forEach((transaction) => {
+      const transactionDate = new Date(transaction.createdAt);
+      if (
+        transactionDate >= startOfCurrentYear &&
+        transactionDate <= endOfCurrentYear
+      ) {
+        currentYearStats.sentTotal += transaction.amount;
+        categoryCurrentYearStats.sentTotal += transaction.amount;
+      } else {
+        previousYearsStats.sentTotal += transaction.amount;
+        categoryPreviousYearsStats.sentTotal += transaction.amount;
+      }
+    });
+
+    account.receivedTransactions.forEach((transaction) => {
+      const transactionDate = new Date(transaction.createdAt);
+      if (
+        transactionDate >= startOfCurrentYear &&
+        transactionDate <= endOfCurrentYear
+      ) {
+        currentYearStats.receivedTotal += transaction.amount;
+        categoryCurrentYearStats.receivedTotal += transaction.amount;
+      } else {
+        previousYearsStats.receivedTotal += transaction.amount;
+        categoryPreviousYearsStats.receivedTotal += transaction.amount;
+      }
+    });
+
+    return {
+      accountId: account.id,
+      accountNumber: account.number,
+      accountName: account.name,
+      currentYearStats,
+      previousYearsStats,
+    };
+  });
+
+  return {
+    currentYear: categoryCurrentYearStats,
+    previousYears: categoryPreviousYearsStats,
+    accounts: accountsStatistics,
+    details: statistics,
+  };
+};
+
 // Get a category by Number
-export const getCategoryByNumber = async (number: number) => {
+const getCategoryByNumber = async (number: number) => {
   return prisma.category.findUnique({
     where: { number },
     include: {
@@ -74,7 +169,7 @@ export const getCategoryByNumber = async (number: number) => {
   });
 };
 
-export const getCategoryThatHaveAccounts = async () => {
+const getCategoryThatHaveAccounts = async () => {
   const categories = await prisma.category.findMany({
     where: {
       accounts: {
@@ -86,7 +181,7 @@ export const getCategoryThatHaveAccounts = async () => {
 };
 
 // Update a category
-export const updateCategory = async (
+const updateCategory = async (
   id: string,
   data: { name?: string; number?: number }
 ) => {
@@ -97,7 +192,7 @@ export const updateCategory = async (
 };
 
 // Delete a category
-export const deleteCategory = async (id: string) => {
+const deleteCategory = async (id: string) => {
   // Check if the category has any subcategories or accounts before deleting
   const category = await prisma.category.findUnique({
     where: { id },
@@ -246,4 +341,12 @@ async function getCategoryTransactionSummaryForCategories(
 
 export default {
   getCategoryTransactionSummaryForCategories,
+  getCategoryStatistics,
+  deleteCategory,
+  updateCategory,
+  getCategoryThatHaveAccounts,
+  getCategoryByNumber,
+  createCategory,
+  getCategories,
+  getCategoryById,
 };
