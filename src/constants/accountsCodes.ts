@@ -65,7 +65,7 @@ export const AccountsWname = {
 
 export const FP_accounts = [
   110101, 110102, 110103, 110104, 110105, 110106, 110201, 110202, 110203,
-  220601, 220707, 220501, 220404, 220303, 220201, 120401, 120301, 120701, 1201,
+  220601, 220701, 220501, 220401, 220301, 220201, 120401, 120301, 120701, 1201,
   2101, 2102, 2103, 120501, 120801,
 ];
 
@@ -79,10 +79,10 @@ export const FP_accounts_names = {
   fame: 110201,
   programs: 110202,
   patent: 110203,
-  otherAccountsReceivable: 220707,
+  otherAccountsReceivable: 220701,
   ayradatMuqadamuh: 220501,
-  masrufatMustahiqih: 220404,
-  alqurudQasiruhAlajil: 220303,
+  masrufatMustahiqih: 220401,
+  alqurudQasiruhAlajil: 220301,
   daribuhAlmabieat: 220201,
   purchaseReturns: 120401,
   purchases: 120301,
