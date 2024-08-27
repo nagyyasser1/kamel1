@@ -150,12 +150,10 @@ const getTransForAccountsByNums = async (
 
     const NetSales =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
-      Math.abs(
-        sumGroupOfAccounts(summaries, [
-          AccountsWname.allowedDiscount,
-          AccountsWname.salesReturns,
-        ])
-      );
+      sumGroupOfAccounts(summaries, [
+        AccountsWname.allowedDiscount,
+        AccountsWname.salesReturns,
+      ]);
 
     const purchasesReturnedExpenses = sumGroupOfAccounts(summaries, [
       AccountsWname.purchases,
@@ -163,31 +161,16 @@ const getTransForAccountsByNums = async (
       AccountsWname.purchasesExpenses,
     ]);
 
-    // const inventoryAtTheEndOfThePeriod = sumGroupOfAccounts(summaries, [
-    //   AccountsWname.inventoryAtTheEndOfThePeriod,
-    // ]);
-
     const inventoryAtTheEndOfThePeriod =
       await categoryService.getCategoryStatistics(
         null,
         CategoryWname.inventoryAtTheEndOfThePeriod
       );
 
-    // const otherRevenues = sumGroupOfAccounts(summaries, [
-    //   AccountsWname.otherRevenues1,
-    //   AccountsWname.otherRevenues2,
-    // ]);
-
     const otherRevenues = await categoryService.getCategoryStatistics(
       null,
       CategoryWname.activitySalesRevenue
     );
-
-    // const activitySalesRevenue = sumGroupOfAccounts(summaries, [
-    //   AccountsWname.activitySalesRevenue1,
-    //   AccountsWname.activitySalesRevenue2,
-    //   AccountsWname.activitySalesRevenue3,
-    // ]);
 
     const activitySalesRevenue = await categoryService.getCategoryStatistics(
       null,
@@ -365,23 +348,19 @@ const statementOfFinancialPositionCrl = async (
       categoriesObject[FP_categories_names.almoredenOutside],
     ]);
 
-    // update some accounts
-    accountsObject[FP_accounts_names.lands].totalBalance =
-      accountsObject[FP_accounts_names.lands].totalBalance;
+    accountsObject[
+      FP_accounts_names.buildingsAndRealEstate
+    ].totalBalance *= 0.98;
 
-    accountsObject[FP_accounts_names.buildingsAndRealEstate].totalBalance =
-      accountsObject[FP_accounts_names.buildingsAndRealEstate].totalBalance;
+    accountsObject[
+      FP_accounts_names.furnitureAndFurnishings
+    ].totalBalance *= 0.85;
 
-    accountsObject[FP_accounts_names.furnitureAndFurnishings].totalBalance =
-      accountsObject[FP_accounts_names.furnitureAndFurnishings].totalBalance;
+    accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance *= 0.85;
 
-    accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance =
-      accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance;
+    accountsObject[FP_accounts_names.cars].totalBalance *= 0.9;
 
-    accountsObject[FP_accounts_names.cars].totalBalance =
-      accountsObject[FP_accounts_names.cars].totalBalance;
-
-    accountsObject[FP_accounts_names.otherAssets].totalBalance =
+    accountsObject[FP_accounts_names.otherAssets].totalBalance *=
       accountsObject[FP_accounts_names.otherAssets].totalBalance;
 
     const alasulAlthaabituhAlmalmusah = sumFpAccounts([
