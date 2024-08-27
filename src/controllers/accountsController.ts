@@ -169,7 +169,7 @@ const getTransForAccountsByNums = async (
 
     const otherRevenues = await categoryService.getCategoryStatistics(
       null,
-      CategoryWname.activitySalesRevenue
+      CategoryWname.otherRevenues
     );
 
     const activitySalesRevenue = await categoryService.getCategoryStatistics(
