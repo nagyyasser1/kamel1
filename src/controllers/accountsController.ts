@@ -5,10 +5,16 @@ import CustomError from "../utils/CustomError";
 import entryExists from "../utils/entryExists.util";
 import { EntryType } from "../utils/enums";
 import sumGroupOfAccounts from "../utils/sumGroupOfAccounts";
-import { AccountsWname, FPCategoriesCodes } from "../constants/accountsCodes";
+import {
+  AccountsWname,
+  FP_accounts_names,
+  FP_categories_codes,
+  FP_categories_names,
+} from "../constants/accountsCodes";
 import { Account } from "../types";
 import sumGroupOfAccountsWithCustomPercentage from "../utils/sumGroupOfAccountsWithCustomPercentage";
 import categoryService from "../services/categoryService";
+import sumFpAccounts from "../utils/sumFb";
 
 const createAccountCtr = async (
   req: Request,
@@ -278,7 +284,7 @@ const statementOfFinancialPositionCrl = async (
     const AccountsSummaries = await accountsService.statementFPositionSrvc();
     const CategorySummaries =
       await categoryService.getCategoryTransactionSummaryForCategories(
-        FPCategoriesCodes
+        FP_categories_codes
       );
 
     const accountsObject = AccountsSummaries.reduce((acc, account) => {
@@ -295,7 +301,92 @@ const statementOfFinancialPositionCrl = async (
       return cat;
     }, {} as any);
 
-    res.json({ accountsObject, categoriesObject });
+    const alkhusumAlthaabatuhTawiluhAlajil = sumFpAccounts([
+      accountsObject[FP_accounts_names.althanadatTawiluhAlajil],
+      accountsObject[FP_accounts_names.althanadatTawiluhAlajil],
+      accountsObject[FP_accounts_names.aldarayibAlmuajala],
+    ]);
+
+    const alasulAlthaabituhGhayrAlmalmusih = sumFpAccounts([
+      accountsObject[FP_accounts_names.fame],
+      accountsObject[FP_accounts_names.programs],
+      accountsObject[FP_accounts_names.patent],
+    ]);
+
+    const propertyRights = sumFpAccounts([
+      categoriesObject[FP_categories_names.capital],
+      categoriesObject[FP_categories_names.jariAlshuraka],
+      categoriesObject[FP_categories_names.alaribahAlmuhtajazuh],
+      categoriesObject[FP_categories_names.alaihtiatat],
+    ]);
+
+    const alasulAlmutaduluh = sumFpAccounts([
+      categoriesObject[FP_categories_names.clientsAbroad],
+      categoriesObject[FP_categories_names.clientsInside],
+      categoriesObject[FP_categories_names.inventory1],
+      categoriesObject[FP_categories_names.inventory2],
+      accountsObject[FP_accounts_names.hisabMadinatAkhari],
+      accountsObject[FP_accounts_names.arrestPapers],
+      accountsObject[FP_accounts_names.purchaseReturns],
+      accountsObject[FP_accounts_names.purchases],
+      accountsObject[FP_accounts_names.purchasesExpenses],
+      categoriesObject[FP_categories_names.theBox],
+      categoriesObject[FP_categories_names.theBanK],
+      categoriesObject[FP_categories_names.ancestor],
+      categoriesObject[FP_categories_names.covenant],
+    ]);
+
+    //
+    const alkhusumAlmutadawiluh = sumFpAccounts([
+      accountsObject[FP_accounts_names.ayradatMuqadamuh],
+      accountsObject[FP_accounts_names.awraqAldafe],
+      accountsObject[FP_accounts_names.otherAccountsReceivable],
+      accountsObject[FP_accounts_names.masrufatMustahiqih],
+      accountsObject[FP_accounts_names.alqurudQasiruhAlajil],
+      accountsObject[FP_accounts_names.daribuhAlmabieat],
+      categoriesObject[FP_categories_names.alMothsatat],
+      categoriesObject[FP_categories_names.almoredenInside],
+      categoriesObject[FP_categories_names.almoredenOutside],
+    ]);
+
+    // update some accounts
+    accountsObject[FP_accounts_names.lands].totalBalance =
+      accountsObject[FP_accounts_names.lands].totalBalance;
+
+    accountsObject[FP_accounts_names.buildingsAndRealEstate].totalBalance =
+      accountsObject[FP_accounts_names.buildingsAndRealEstate].totalBalance;
+
+    accountsObject[FP_accounts_names.furnitureAndFurnishings].totalBalance =
+      accountsObject[FP_accounts_names.furnitureAndFurnishings].totalBalance;
+
+    accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance =
+      accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance;
+
+    accountsObject[FP_accounts_names.cars].totalBalance =
+      accountsObject[FP_accounts_names.cars].totalBalance;
+
+    accountsObject[FP_accounts_names.otherAssets].totalBalance =
+      accountsObject[FP_accounts_names.otherAssets].totalBalance;
+
+    const alasulAlthaabituhAlmalmusah = sumFpAccounts([
+      accountsObject[FP_accounts_names.lands],
+      accountsObject[FP_accounts_names.buildingsAndRealEstate],
+      accountsObject[FP_accounts_names.furnitureAndFurnishings],
+      accountsObject[FP_accounts_names.machinesAndEquipment],
+      accountsObject[FP_accounts_names.cars],
+      accountsObject[FP_accounts_names.otherAssets],
+    ]);
+
+    res.json({
+      alasulAlthaabituhAlmalmusah,
+      alkhusumAlthaabatuhTawiluhAlajil,
+      alasulAlthaabituhGhayrAlmalmusih,
+      alasulAlmutaduluh,
+      propertyRights,
+      alkhusumAlmutadawiluh,
+      accountsObject,
+      categoriesObject,
+    });
   } catch (error) {
     next;
   }

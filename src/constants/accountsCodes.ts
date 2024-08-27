@@ -13,7 +13,7 @@ export const FP_accounts = [
   2101, 2102, 2103, 120501, 120801,
 ];
 
-export const AccountsWnameFP = {
+export const FP_accounts_names = {
   lands: 110101,
   buildingsAndRealEstate: 110102,
   furnitureAndFurnishings: 110103,
@@ -23,7 +23,6 @@ export const AccountsWnameFP = {
   fame: 110201,
   programs: 110202,
   patent: 110203,
-  arrestPapers: 220601,
   otherAccountsReceivable: 220707,
   ayradatMuqadamuh: 220501,
   masrufatMustahiqih: 220404,
@@ -33,14 +32,20 @@ export const AccountsWnameFP = {
   purchases: 120301,
   purchasesExpenses: 120701,
   cash: 1201,
+  qurudTawiluhAlajil: 2101,
+  althanadatTawiluhAlajil: 2102,
+  aldarayibAlmuajala: 2103,
+  hisabMadinatAkhari: 120801,
+  arrestPapers: 120501,
+  awraqAldafe: 220601,
 };
 
-export const FPCategoriesCodes = [
+export const FP_categories_codes = [
   120601, 120602, 121201, 121202, 120201, 120202, 120101, 120102, 54, 220101,
   220102, 31, 32, 33, 34,
 ];
 
-export const AccountsWnameFPCategory = {
+export const FP_categories_names = {
   inventory1: 120601,
   inventory2: 120602,
   clientsAbroad: 121201,
@@ -52,6 +57,10 @@ export const AccountsWnameFPCategory = {
   alMothsatat: 54,
   almoredenOutside: 220101,
   almoredenInside: 220102,
+  capital: 31,
+  jariAlshuraka: 32,
+  alaribahAlmuhtajazuh: 33,
+  alaihtiatat: 34,
 };
 
 export const AccountsWname = {
