@@ -60,7 +60,7 @@ const getCategoryById = async (id: string) => {
   });
 };
 
-const getCategoryStatistics = async (id?: string, code?: number) => {
+const getCategoryStatistics = async (id?: any, code?: number) => {
   const whereCondition: any = {};
 
   if (id) {
@@ -147,9 +147,18 @@ const getCategoryStatistics = async (id?: string, code?: number) => {
     };
   });
 
+  let categoryCurrentYearStatsBalance =
+    categoryCurrentYearStats.sentTotal - categoryCurrentYearStats.receivedTotal;
+
+  let categoryPreviousYearsStatsBalance =
+    categoryPreviousYearsStats.sentTotal -
+    categoryPreviousYearsStats.receivedTotal;
+
   return {
     currentYear: categoryCurrentYearStats,
     previousYears: categoryPreviousYearsStats,
+    totalBalance:
+      categoryCurrentYearStatsBalance + categoryPreviousYearsStatsBalance,
     accounts: accountsStatistics,
     details: statistics,
   };

@@ -7,6 +7,7 @@ import { EntryType } from "../utils/enums";
 import sumGroupOfAccounts from "../utils/sumGroupOfAccounts";
 import {
   AccountsWname,
+  CategoryWname,
   FP_accounts_names,
   FP_categories_codes,
   FP_categories_names,
@@ -162,21 +163,36 @@ const getTransForAccountsByNums = async (
       AccountsWname.purchasesExpenses,
     ]);
 
-    const inventoryAtTheEndOfThePeriod = sumGroupOfAccounts(summaries, [
-      AccountsWname.inventoryAtTheEndOfThePeriod,
-    ]);
-    //
+    // const inventoryAtTheEndOfThePeriod = sumGroupOfAccounts(summaries, [
+    //   AccountsWname.inventoryAtTheEndOfThePeriod,
+    // ]);
 
-    const otherRevenues = sumGroupOfAccounts(summaries, [
-      AccountsWname.otherRevenues1,
-      AccountsWname.otherRevenues2,
-    ]);
+    const inventoryAtTheEndOfThePeriod =
+      await categoryService.getCategoryStatistics(
+        null,
+        CategoryWname.inventoryAtTheEndOfThePeriod
+      );
 
-    const activitySalesRevenue = sumGroupOfAccounts(summaries, [
-      AccountsWname.activitySalesRevenue1,
-      AccountsWname.activitySalesRevenue2,
-      AccountsWname.activitySalesRevenue3,
-    ]);
+    // const otherRevenues = sumGroupOfAccounts(summaries, [
+    //   AccountsWname.otherRevenues1,
+    //   AccountsWname.otherRevenues2,
+    // ]);
+
+    const otherRevenues = await categoryService.getCategoryStatistics(
+      null,
+      CategoryWname.activitySalesRevenue
+    );
+
+    // const activitySalesRevenue = sumGroupOfAccounts(summaries, [
+    //   AccountsWname.activitySalesRevenue1,
+    //   AccountsWname.activitySalesRevenue2,
+    //   AccountsWname.activitySalesRevenue3,
+    // ]);
+
+    const activitySalesRevenue = await categoryService.getCategoryStatistics(
+      null,
+      CategoryWname.activitySalesRevenue
+    );
 
     const totalSellingAndDistributionExpenses = sumGroupOfAccounts(summaries, [
       AccountsWname.freeSamplesAndGifts,
