@@ -155,10 +155,10 @@ const getCategoryStatistics = async (id?: any, code?: number) => {
     categoryPreviousYearsStats.receivedTotal;
 
   return {
-    currentYear: categoryCurrentYearStats,
-    previousYears: categoryPreviousYearsStats,
     totalBalance:
       categoryCurrentYearStatsBalance + categoryPreviousYearsStatsBalance,
+    currentYear: categoryCurrentYearStats,
+    previousYears: categoryPreviousYearsStats,
     accounts: accountsStatistics,
     details: statistics,
   };
@@ -348,8 +348,136 @@ async function getCategoryTransactionSummaryForCategories(
   return results;
 }
 
+async function getCategoryTransactionSummary(categoryNumber?: number) {
+  // Get the current date
+  const currentDate = new Date();
+
+  // Calculate the start and end dates for the current year
+  const currentYearStart = new Date(currentDate.getFullYear(), 0, 1); // January 1st of the current year
+  const currentYearEnd = new Date(
+    currentDate.getFullYear(),
+    11,
+    31,
+    23,
+    59,
+    59,
+    999
+  ); // December 31st of the current year
+
+  // Calculate the start and end dates for the previous year
+  const previousYearStart = new Date(currentDate.getFullYear() - 1, 0, 1); // January 1st of the previous year
+  const previousYearEnd = new Date(
+    currentDate.getFullYear() - 1,
+    11,
+    31,
+    23,
+    59,
+    59,
+    999
+  ); // December 31st of the previous year
+
+  // Fetch all accounts that belong to the category
+  const accounts = await prisma.account.findMany({
+    where: {
+      category: {
+        number: categoryNumber,
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      number: true,
+      sentTransactions: true,
+      receivedTransactions: true,
+    },
+  });
+
+  const transactionSummary = await Promise.all(
+    accounts.map(async (account) => {
+      // Get total sent transactions and sum for the current year
+      const currentYearSent = await prisma.transaction.aggregate({
+        where: {
+          fromId: account.id,
+          createdAt: {
+            gte: currentYearStart,
+            lte: currentYearEnd,
+          },
+        },
+        _count: true,
+        _sum: {
+          amount: true,
+        },
+      });
+
+      // Get total sent transactions and sum for the previous year
+      const previousYearSent = await prisma.transaction.aggregate({
+        where: {
+          fromId: account.id,
+          createdAt: {
+            gte: previousYearStart,
+            lte: previousYearEnd,
+          },
+        },
+        _count: true,
+        _sum: {
+          amount: true,
+        },
+      });
+
+      // Get total received transactions and sum for the current year
+      const currentYearReceived = await prisma.transaction.aggregate({
+        where: {
+          toId: account.id,
+          createdAt: {
+            gte: currentYearStart,
+            lte: currentYearEnd,
+          },
+        },
+        _count: true,
+        _sum: {
+          amount: true,
+        },
+      });
+
+      // Get total received transactions and sum for the previous year
+      const previousYearReceived = await prisma.transaction.aggregate({
+        where: {
+          toId: account.id,
+          createdAt: {
+            gte: previousYearStart,
+            lte: previousYearEnd,
+          },
+        },
+        _count: true,
+        _sum: {
+          amount: true,
+        },
+      });
+
+      return {
+        accountName: account.name,
+        currentYear: {
+          sentTransactions: currentYearSent._count,
+          sentAmount: currentYearSent._sum.amount ?? 0,
+          receivedTransactions: currentYearReceived._count,
+          receivedAmount: currentYearReceived._sum.amount ?? 0,
+        },
+        previousYear: {
+          sentTransactions: previousYearSent._count,
+          sentAmount: previousYearSent._sum.amount ?? 0,
+          receivedTransactions: previousYearReceived._count,
+          receivedAmount: previousYearReceived._sum.amount ?? 0,
+        },
+      };
+    })
+  );
+
+  return transactionSummary;
+}
+
 export default {
   getCategoryTransactionSummaryForCategories,
+  getCategoryTransactionSummary,
   getCategoryStatistics,
   deleteCategory,
   updateCategory,

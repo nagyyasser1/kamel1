@@ -91,6 +91,7 @@ export const deleteCategory = async (
     next(error);
   }
 };
+
 export const categoryStatistics = async (
   req: Request,
   res: Response,
@@ -123,6 +124,41 @@ export const categoryStatistics = async (
       categoryId,
       categoryCode
     );
+    res.send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCategoryTransactionSummary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { code } = req.query;
+
+    if (!code)
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        message: "category 'code' must be provided in the query!",
+      });
+
+    // Convert code to number or undefined
+    const categoryCode =
+      typeof code === "string" ? parseInt(code, 10) : undefined;
+
+    if (categoryCode) {
+      if (isNaN(categoryCode as number)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          message: "Invalid code provided. It must be a number.",
+        });
+      }
+    }
+
+    const result = await categoryService.getCategoryTransactionSummary(
+      categoryCode
+    );
+
     res.send(result);
   } catch (error) {
     next(error);
