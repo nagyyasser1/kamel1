@@ -360,8 +360,7 @@ const statementOfFinancialPositionCrl = async (
 
     accountsObject[FP_accounts_names.cars].totalBalance *= 0.9;
 
-    accountsObject[FP_accounts_names.otherAssets].totalBalance *=
-      accountsObject[FP_accounts_names.otherAssets].totalBalance;
+    accountsObject[FP_accounts_names.otherAssets].totalBalance *= 0.9;
 
     const alasulAlthaabituhAlmalmusah = sumFpAccounts([
       accountsObject[FP_accounts_names.lands],

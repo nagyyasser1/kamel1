@@ -148,11 +148,11 @@ const getCategoryStatistics = async (id?: any, code?: number) => {
   });
 
   let categoryCurrentYearStatsBalance =
-    categoryCurrentYearStats.sentTotal - categoryCurrentYearStats.receivedTotal;
+    categoryCurrentYearStats.receivedTotal - categoryCurrentYearStats.sentTotal;
 
   let categoryPreviousYearsStatsBalance =
-    categoryPreviousYearsStats.sentTotal -
-    categoryPreviousYearsStats.receivedTotal;
+    categoryPreviousYearsStats.receivedTotal -
+    categoryPreviousYearsStats.sentTotal;
 
   return {
     totalBalance:
