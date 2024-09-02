@@ -348,19 +348,19 @@ const statementOfFinancialPositionCrl = async (
       categoriesObject[FP_categories_names.almoredenOutside],
     ]);
 
-    accountsObject[
-      FP_accounts_names.buildingsAndRealEstate
-    ].totalBalance *= 0.98;
+    // accountsObject[
+    //   FP_accounts_names.buildingsAndRealEstate
+    // ].totalBalance *= 0.98;
 
-    accountsObject[
-      FP_accounts_names.furnitureAndFurnishings
-    ].totalBalance *= 0.85;
+    // accountsObject[
+    //   FP_accounts_names.furnitureAndFurnishings
+    // ].totalBalance *= 0.85;
 
-    accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance *= 0.85;
+    // accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance *= 0.85;
 
-    accountsObject[FP_accounts_names.cars].totalBalance *= 0.9;
+    // accountsObject[FP_accounts_names.cars].totalBalance *= 0.9;
 
-    accountsObject[FP_accounts_names.otherAssets].totalBalance *= 0.9;
+    // accountsObject[FP_accounts_names.otherAssets].totalBalance *= 0.9;
 
     const alasulAlthaabituhAlmalmusah = sumFpAccounts([
       accountsObject[FP_accounts_names.lands],
