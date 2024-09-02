@@ -373,11 +373,13 @@ const statementOfFinancialPositionCrl = async (
 
     res.json({
       alasulAlthaabituhAlmalmusah,
-      alkhusumAlthaabatuhTawiluhAlajil,
+      alkhusumAlthaabatuhTawiluhAlajil: Math.abs(
+        alkhusumAlthaabatuhTawiluhAlajil
+      ),
       alasulAlthaabituhGhayrAlmalmusih,
       alasulAlmutaduluh,
-      propertyRights,
-      alkhusumAlmutadawiluh,
+      propertyRights: Math.abs(propertyRights),
+      alkhusumAlmutadawiluh: Math.abs(alkhusumAlmutadawiluh),
       accountsObject,
       categoriesObject,
     });
