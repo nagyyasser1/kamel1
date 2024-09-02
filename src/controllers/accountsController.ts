@@ -302,7 +302,7 @@ const statementOfFinancialPositionCrl = async (
 
     const alkhusumAlthaabatuhTawiluhAlajil = sumFpAccounts([
       accountsObject[FP_accounts_names.althanadatTawiluhAlajil],
-      accountsObject[FP_accounts_names.althanadatTawiluhAlajil],
+      accountsObject[FP_accounts_names.qurudTawiluhAlajil],
       accountsObject[FP_accounts_names.aldarayibAlmuajala],
     ]);
 
