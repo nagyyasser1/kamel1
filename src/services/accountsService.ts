@@ -273,8 +273,9 @@ export async function getTransactionsSummaryForArrayOfAccountsNumber() {
       });
 
       // Calculate balances
-      const thisYearBalance = thisYearSent._sum.amount || 0;
-      -(thisYearReceived._sum.amount || 0);
+      const thisYearBalance =
+        thisYearSent._sum.amount || 0 - (thisYearReceived._sum.amount || 0);
+
       const previousYearsBalance =
         (previousYearsSent._sum.amount || 0) -
         (previousYearsReceived._sum.amount || 0);
@@ -396,9 +397,11 @@ export async function statementFPositionSrvc() {
       // Calculate balances
       const thisYearBalance =
         (thisYearSent._sum.amount || 0) - (thisYearReceived._sum.amount || 0);
+
       const previousYearsBalance =
         (previousYearsSent._sum.amount || 0) -
         (previousYearsReceived._sum.amount || 0);
+
       const totalBalance = thisYearBalance + previousYearsBalance;
 
       return {
