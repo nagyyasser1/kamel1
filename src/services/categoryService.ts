@@ -455,7 +455,9 @@ async function getCategoryTransactionSummary(categoryNumber?: number) {
       });
 
       return {
-        accountName: account.name,
+        id: account.id,
+        number: account.number,
+        name: account.name,
         currentYear: {
           sentTransactions: currentYearSent._count,
           sentAmount: currentYearSent._sum.amount ?? 0,

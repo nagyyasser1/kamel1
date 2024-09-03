@@ -337,15 +337,15 @@ const statementOfFinancialPositionCrl = async (
 
     //
     const alkhusumAlmutadawiluh = sumFpAccounts([
-      accountsObject[FP_accounts_names.ayradatMuqadamuh],
-      accountsObject[FP_accounts_names.awraqAldafe],
-      accountsObject[FP_accounts_names.otherAccountsReceivable],
-      accountsObject[FP_accounts_names.masrufatMustahiqih],
-      accountsObject[FP_accounts_names.alqurudQasiruhAlajil],
-      accountsObject[FP_accounts_names.daribuhAlmabieat],
       categoriesObject[FP_categories_names.alMothsatat],
       categoriesObject[FP_categories_names.almoredenInside],
       categoriesObject[FP_categories_names.almoredenOutside],
+      accountsObject[FP_accounts_names.otherAccountsReceivable],
+      accountsObject[FP_accounts_names.awraqAldafe],
+      accountsObject[FP_accounts_names.ayradatMuqadamuh],
+      accountsObject[FP_accounts_names.masrufatMustahiqih],
+      accountsObject[FP_accounts_names.alqurudQasiruhAlajil],
+      accountsObject[FP_accounts_names.daribuhAlmabieat],
     ]);
 
     // accountsObject[

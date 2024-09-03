@@ -63,10 +63,11 @@ export const AccountsWname = {
   salesOutputTax: 220201,
 };
 
+//المزانيه العموميه "المركز المالي FB
 export const FP_accounts = [
   110101, 110102, 110103, 110104, 110105, 110106, 110201, 110202, 110203,
-  220601, 220701, 220501, 220401, 220301, 220201, 120401, 120301, 120701, 1201,
-  2101, 2102, 2103, 120501, 120801,
+  220701, 220501, 220401, 220301, 220201, 120401, 120301, 120701, 1201, 2101,
+  2102, 2103, 120501, 120801, 220601,
 ];
 
 export const FP_accounts_names = {
@@ -91,8 +92,8 @@ export const FP_accounts_names = {
   qurudTawiluhAlajil: 2101,
   althanadatTawiluhAlajil: 2102,
   aldarayibAlmuajala: 2103,
-  hisabMadinatAkhari: 120801,
   arrestPapers: 120501,
+  hisabMadinatAkhari: 120801,
   awraqAldafe: 220601,
 };
 
