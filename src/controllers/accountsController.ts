@@ -139,6 +139,7 @@ export const getTransactionsSummaryForCategories = async (
   }
 };
 
+// قائمه الدخل
 const getTransForAccountsByNums = async (
   req: Request,
   res: Response,
@@ -274,6 +275,7 @@ const getTransForAccountsByNums = async (
   }
 };
 
+// الميزانيه العموميه
 const statementOfFinancialPositionCrl = async (
   req: Request,
   res: Response,
@@ -327,8 +329,8 @@ const statementOfFinancialPositionCrl = async (
       accountsObject[FP_accounts_names.hisabMadinatAkhari],
       accountsObject[FP_accounts_names.arrestPapers],
       accountsObject[FP_accounts_names.purchaseReturns],
-      accountsObject[FP_accounts_names.purchases],
-      accountsObject[FP_accounts_names.purchasesExpenses],
+      // accountsObject[FP_accounts_names.purchases],
+      // accountsObject[FP_accounts_names.purchasesExpenses],
       categoriesObject[FP_categories_names.theBox],
       categoriesObject[FP_categories_names.theBanK],
       categoriesObject[FP_categories_names.ancestor],
