@@ -186,16 +186,16 @@ export async function getCategoryTransactionSummary(year: number) {
   return summary;
 }
 
-export async function getTransactionsSummaryForArrayOfAccountsNumber() {
-  const accountNums = ACCOUNTS_CODES_FOR_INCOME;
-
+export async function getTransactionsSummaryForArrayOfAccountsNumber(
+  accountNums: any
+) {
   // Define the start and end dates for this year and previous years
   const now = new Date();
   const thisYearStart = new Date(now.getFullYear(), 0, 1);
 
   // Query to get transactions summary for each account number
   const summaries = await Promise.all(
-    accountNums.map(async (accountNum) => {
+    accountNums.map(async (accountNum: any) => {
       const account = await prisma.account.findUnique({
         where: { number: accountNum },
         include: {

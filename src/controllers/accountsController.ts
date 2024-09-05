@@ -5,7 +5,7 @@ import CustomError from "../utils/CustomError";
 import entryExists from "../utils/entryExists.util";
 import { EntryType } from "../utils/enums";
 import sumGroupOfAccounts from "../utils/sumGroupOfAccounts";
-import {
+import ACCOUNTS_CODES_FOR_INCOME, {
   AccountsWname,
   CategoryWname,
   FP_accounts_names,
@@ -147,7 +147,9 @@ const getTransForAccountsByNums = async (
 ) => {
   try {
     const summaries =
-      await accountsService.getTransactionsSummaryForArrayOfAccountsNumber();
+      await accountsService.getTransactionsSummaryForArrayOfAccountsNumber(
+        ACCOUNTS_CODES_FOR_INCOME
+      );
 
     const NetSales =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
@@ -257,6 +259,32 @@ const getTransForAccountsByNums = async (
       return acc;
     }, {} as Record<string, Account>);
 
+    // updates
+    const costOfGoodsSold =
+      purchasesReturnedExpenses -
+      (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+
+    const totalIncome = NetSales - costOfGoodsSold;
+
+    const variousTotalRevenues =
+      NetSales +
+      (purchasesReturnedExpenses -
+        (inventoryAtTheEndOfThePeriod?.totalBalance || 0)) +
+      (activitySalesRevenue?.totalBalance || 0) +
+      (otherRevenues?.totalBalance || 0);
+
+    const netProfitOrLossBeforeTaxes =
+      NetSales +
+      costOfGoodsSold +
+      (activitySalesRevenue?.totalBalance || 0) +
+      (otherRevenues?.totalBalance || 0) -
+      (totalSellingAndDistributionExpenses -
+        totalGeneralAdministrativeAndOperatingExpenses -
+        AllotmentsAfter);
+
+    const netProfitOrLossAfterDeductingTaxes =
+      netProfitOrLossBeforeTaxes - salesOutputTax;
+
     res.json({
       NetSales,
       purchasesReturnedExpenses,
@@ -267,6 +295,11 @@ const getTransForAccountsByNums = async (
       totalGeneralAdministrativeAndOperatingExpenses,
       Allotments,
       AllotmentsAfter,
+      costOfGoodsSold,
+      totalIncome,
+      variousTotalRevenues,
+      netProfitOrLossBeforeTaxes,
+      netProfitOrLossAfterDeductingTaxes,
       salesOutputTax,
       accountsObject,
     });
@@ -373,6 +406,123 @@ const statementOfFinancialPositionCrl = async (
       accountsObject[FP_accounts_names.otherAssets],
     ]);
 
+    // update
+
+    const summaries =
+      await accountsService.getTransactionsSummaryForArrayOfAccountsNumber(
+        ACCOUNTS_CODES_FOR_INCOME
+      );
+
+    const netSales =
+      sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
+      sumGroupOfAccounts(summaries, [
+        AccountsWname.allowedDiscount,
+        AccountsWname.salesReturns,
+      ]);
+
+    const purchasesReturnedExpenses = sumGroupOfAccounts(summaries, [
+      AccountsWname.purchases,
+      AccountsWname.purchaseReturns,
+      AccountsWname.purchasesExpenses,
+    ]);
+
+    const inventoryAtTheEndOfThePeriod =
+      await categoryService.getCategoryStatistics(
+        null,
+        CategoryWname.inventoryAtTheEndOfThePeriod
+      );
+
+    const activitySalesRevenue = await categoryService.getCategoryStatistics(
+      null,
+      CategoryWname.activitySalesRevenue
+    );
+
+    const otherRevenues = await categoryService.getCategoryStatistics(
+      null,
+      CategoryWname.otherRevenues
+    );
+
+    const totalSellingAndDistributionExpenses = sumGroupOfAccounts(summaries, [
+      AccountsWname.freeSamplesAndGifts,
+      AccountsWname.propagandaAndAdvertising,
+      AccountsWname.sellingAgentsCommission,
+      AccountsWname.shippingAndDeliveryOfOrders,
+      AccountsWname.damagedAndFinishedGoods,
+      AccountsWname.inventoryAdjustments,
+      AccountsWname.packagingAndPackingExpenses,
+    ]);
+
+    const totalGeneralAdministrativeAndOperatingExpenses = sumGroupOfAccounts(
+      summaries,
+      [
+        AccountsWname.salariesOfExecutivesAndOfficials,
+        AccountsWname.travelAndTransportation,
+        AccountsWname.bankCommissions,
+        AccountsWname.accountingAuditAndConsultingExpenses,
+        AccountsWname.rewardsAndPerks,
+        AccountsWname.workPermits,
+        AccountsWname.travelTickets,
+        AccountsWname.compensationForLeavingService,
+        AccountsWname.badDebts,
+        AccountsWname.healthInsurance,
+        AccountsWname.currencyConversionDifferences,
+        AccountsWname.otherMiscellaneousExpenses,
+        AccountsWname.stationeryAndPublications,
+        AccountsWname.hospitalityAndReception,
+        AccountsWname.socialInsurance,
+        AccountsWname.trafficViolations,
+        AccountsWname.treatmentAndMedicalExamination,
+        AccountsWname.cleaningExpenses,
+        AccountsWname.governmentFees,
+        AccountsWname.carWash,
+        AccountsWname.carFuel,
+        AccountsWname.rentals,
+        AccountsWname.electricityAndWater,
+        AccountsWname.wagesAndSalaries,
+        AccountsWname.generalMaintenanceExpenses,
+        AccountsWname.telephoneMailInternet,
+      ]
+    );
+
+    const AllotmentsAfter = sumGroupOfAccountsWithCustomPercentage(summaries, [
+      {
+        accountCode: AccountsWname.transportationDepreciationExpense,
+        percentage: 10,
+      },
+      {
+        accountCode: AccountsWname.hardwareSoftwareDepreciationExpense,
+        percentage: 10,
+      },
+      {
+        accountCode: AccountsWname.furnitureFurnishingsDepreciationExpense,
+        percentage: 10,
+      },
+      {
+        accountCode: AccountsWname.depreciationExpenseForMachineryEquipment,
+        percentage: 10,
+      },
+    ]);
+
+    const salesOutputTax = sumGroupOfAccounts(summaries, [
+      AccountsWname.salesOutputTax,
+    ]);
+
+    const costOfGoodsSold =
+      purchasesReturnedExpenses -
+      (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+
+    const netProfitOrLossBeforeTaxes =
+      netSales +
+      costOfGoodsSold +
+      (activitySalesRevenue?.totalBalance || 0) +
+      (otherRevenues?.totalBalance || 0) -
+      (totalSellingAndDistributionExpenses -
+        totalGeneralAdministrativeAndOperatingExpenses -
+        AllotmentsAfter);
+
+    const netProfitOrLossAfterDeductingTaxes =
+      netProfitOrLossBeforeTaxes - salesOutputTax;
+
     res.json({
       alasulAlthaabituhAlmalmusah,
       alasulAlthaabituhGhayrAlmalmusih,
@@ -382,6 +532,8 @@ const statementOfFinancialPositionCrl = async (
       ),
       propertyRights: Math.abs(propertyRights),
       alkhusumAlmutadawiluh: Math.abs(alkhusumAlmutadawiluh),
+      netProfitOrLossBeforeTaxes,
+      netProfitOrLossAfterDeductingTaxes,
       accountsObject,
       categoriesObject,
     });
