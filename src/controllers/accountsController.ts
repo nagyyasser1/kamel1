@@ -328,7 +328,7 @@ const statementOfFinancialPositionCrl = async (
       categoriesObject[FP_categories_names.inventory2],
       accountsObject[FP_accounts_names.hisabMadinatAkhari],
       accountsObject[FP_accounts_names.arrestPapers],
-      accountsObject[FP_accounts_names.purchaseReturns],
+      // accountsObject[FP_accounts_names.purchaseReturns],
       // accountsObject[FP_accounts_names.purchases],
       // accountsObject[FP_accounts_names.purchasesExpenses],
       categoriesObject[FP_categories_names.theBox],
@@ -375,11 +375,11 @@ const statementOfFinancialPositionCrl = async (
 
     res.json({
       alasulAlthaabituhAlmalmusah,
+      alasulAlthaabituhGhayrAlmalmusih,
+      alasulAlmutaduluh,
       alkhusumAlthaabatuhTawiluhAlajil: Math.abs(
         alkhusumAlthaabatuhTawiluhAlajil
       ),
-      alasulAlthaabituhGhayrAlmalmusih,
-      alasulAlmutaduluh,
       propertyRights: Math.abs(propertyRights),
       alkhusumAlmutadawiluh: Math.abs(alkhusumAlmutadawiluh),
       accountsObject,
