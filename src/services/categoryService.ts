@@ -148,19 +148,19 @@ const getCategoryStatistics = async (id?: any, code?: number) => {
   });
 
   let categoryCurrentYearStatsBalance =
-    categoryCurrentYearStats.sentTotal - categoryCurrentYearStats.receivedTotal;
+    categoryCurrentYearStats.receivedTotal - categoryCurrentYearStats.sentTotal;
 
   let categoryPreviousYearsStatsBalance =
-    categoryPreviousYearsStats.sentTotal -
-    categoryPreviousYearsStats.receivedTotal;
+    categoryPreviousYearsStats.receivedTotal -
+    categoryPreviousYearsStats.sentTotal;
 
   return {
     totalBalance:
       categoryCurrentYearStatsBalance + categoryPreviousYearsStatsBalance,
     currentYear: categoryCurrentYearStats,
     previousYears: categoryPreviousYearsStats,
-    accounts: accountsStatistics,
-    details: statistics,
+    // accounts: accountsStatistics,
+    // details: statistics,
   };
 };
 
@@ -314,10 +314,10 @@ async function getCategoryTransactionSummaryForCategories(
           );
 
         const thisYearBalance =
-          thisYearTotalSentAmount - thisYearTotalReceivedAmount;
+          thisYearTotalReceivedAmount - thisYearTotalSentAmount;
 
         const previousYearsBalance =
-          previousYearsTotalSentAmount - previousYearsTotalReceivedAmount;
+          previousYearsTotalReceivedAmount - previousYearsTotalSentAmount;
 
         const totalBalance = thisYearBalance + previousYearsBalance;
 
