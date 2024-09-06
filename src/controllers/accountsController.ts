@@ -276,7 +276,7 @@ const getTransForAccountsByNums = async (
         AllotmentsAfter);
 
     const variousTotalRevenues =
-      netProfitOrLossBeforeTaxes + (otherRevenues?.totalBalance || 0);
+      NetSales - costOfGoodsSold + (otherRevenues?.totalBalance || 0);
 
     const netProfitOrLossAfterDeductingTaxes =
       netProfitOrLossBeforeTaxes - salesOutputTax;
