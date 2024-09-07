@@ -267,13 +267,11 @@ const getTransForAccountsByNums = async (
     const totalIncome = NetSales - costOfGoodsSold;
 
     const netProfitOrLossBeforeTaxes =
-      NetSales +
+      NetSales -
       costOfGoodsSold +
-      (activitySalesRevenue?.totalBalance || 0) +
       (otherRevenues?.totalBalance || 0) -
       (totalSellingAndDistributionExpenses -
-        totalGeneralAdministrativeAndOperatingExpenses -
-        AllotmentsAfter);
+        totalGeneralAdministrativeAndOperatingExpenses);
 
     const variousTotalRevenues =
       NetSales - costOfGoodsSold + (otherRevenues?.totalBalance || 0);
@@ -508,26 +506,22 @@ const statementOfFinancialPositionCrl = async (
       (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
 
     const netProfitOrLossBeforeTaxes =
-      netSales +
+      netSales -
       costOfGoodsSold +
-      (activitySalesRevenue?.totalBalance || 0) +
       (otherRevenues?.totalBalance || 0) -
       (totalSellingAndDistributionExpenses -
-        totalGeneralAdministrativeAndOperatingExpenses -
-        AllotmentsAfter);
+        totalGeneralAdministrativeAndOperatingExpenses);
 
     const netProfitOrLossAfterDeductingTaxes =
       netProfitOrLossBeforeTaxes - salesOutputTax;
 
     res.json({
+      alasulAlmutaduluh,
+      propertyRights,
       alasulAlthaabituhAlmalmusah,
       alasulAlthaabituhGhayrAlmalmusih,
-      alasulAlmutaduluh,
-      alkhusumAlthaabatuhTawiluhAlajil: Math.abs(
-        alkhusumAlthaabatuhTawiluhAlajil
-      ),
-      propertyRights: Math.abs(propertyRights),
-      alkhusumAlmutadawiluh: Math.abs(alkhusumAlmutadawiluh),
+      alkhusumAlthaabatuhTawiluhAlajil,
+      alkhusumAlmutadawiluh,
       netProfitOrLossBeforeTaxes,
       netProfitOrLossAfterDeductingTaxes,
       accountsObject,
