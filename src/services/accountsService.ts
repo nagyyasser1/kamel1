@@ -273,12 +273,14 @@ export async function getTransactionsSummaryForArrayOfAccountsNumber(
       });
 
       // Calculate balances
-      const thisYearBalance =
-        (thisYearReceived._sum.amount || 0) - (thisYearSent._sum.amount || 0);
+      const thisYearBalance = Math.abs(
+        (thisYearReceived._sum.amount || 0) - (thisYearSent._sum.amount || 0)
+      );
 
-      const previousYearsBalance =
+      const previousYearsBalance = Math.abs(
         (previousYearsReceived._sum.amount || 0) -
-        (previousYearsSent._sum.amount || 0);
+          (previousYearsSent._sum.amount || 0)
+      );
 
       const totalBalance = thisYearBalance + previousYearsBalance;
 
@@ -395,11 +397,14 @@ export async function statementFPositionSrvc() {
       });
 
       // Calculate balances
-      const thisYearBalance =
-        (thisYearReceived._sum.amount || 0) - (thisYearSent._sum.amount || 0);
-      const previousYearsBalance =
-        (previousYearsReceived._sum.amount || 0) -
-        (previousYearsSent._sum.amount || 0);
+      const thisYearBalance = Math.abs(
+        (thisYearReceived._sum.amount || 0) - (thisYearSent._sum.amount || 0)
+      );
+      const previousYearsBalance = Math.abs(
+        previousYearsReceived._sum.amount ||
+          0 - (previousYearsSent._sum.amount || 0)
+      );
+
       const totalBalance = thisYearBalance + previousYearsBalance;
 
       return {
