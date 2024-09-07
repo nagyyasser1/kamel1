@@ -153,10 +153,12 @@ const getTransForAccountsByNums = async (
 
     const NetSales =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
-      sumGroupOfAccounts(summaries, [
-        AccountsWname.allowedDiscount,
-        AccountsWname.salesReturns,
-      ]);
+      Math.abs(
+        sumGroupOfAccounts(summaries, [
+          AccountsWname.allowedDiscount,
+          AccountsWname.salesReturns,
+        ])
+      );
 
     const purchasesReturnedExpenses = sumGroupOfAccounts(summaries, [
       AccountsWname.purchases,
