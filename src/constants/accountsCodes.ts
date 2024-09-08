@@ -2,7 +2,7 @@ const ACCOUNTS_CODES_FOR_INCOME = [
   4101, 4102, 4103, 120301, 120701, 120401, 5101, 5102, 5103, 5104, 5105, 5106,
   5107, 5201, 5202, 5203, 5204, 5205, 5206, 5207, 5208, 5209, 5210, 5211, 5212,
   5213, 5214, 5215, 5216, 5217, 5218, 5219, 5301, 5302, 5303, 5304, 5305, 5306,
-  5307, 5401, 5402, 5403, 5404, 220201,
+  5307, 5401, 5402, 5403, 5404, 220201, 5501,
 ];
 
 export const CategoryWname = {
@@ -59,6 +59,8 @@ export const AccountsWname = {
   hardwareSoftwareDepreciationExpense: 5402,
   furnitureFurnishingsDepreciationExpense: 5403,
   depreciationExpenseForMachineryEquipment: 5404,
+
+  daribuhAldukhl: 5501,
 
   salesOutputTax: 220201,
 };

@@ -281,7 +281,45 @@ const getTransForAccountsByNums = async (
     const netProfitOrLossAfterDeductingTaxes =
       netProfitOrLossBeforeTaxes - salesOutputTax;
 
+    // new
+    const safi_almabieat =
+      sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
+      Math.abs(
+        sumGroupOfAccounts(summaries, [
+          AccountsWname.allowedDiscount,
+          AccountsWname.salesReturns,
+        ])
+      );
+
+    const safi_almushtariat = sumGroupOfAccounts(summaries, [
+      AccountsWname.purchases,
+      AccountsWname.purchaseReturns,
+      AccountsWname.purchasesExpenses,
+    ]);
+
+    const tukalifuh_almabieat =
+      safi_almushtariat + (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+
+    const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
+
+    const alribh_qabl_aldarayib =
+      mujmal_alribh +
+      (otherRevenues?.totalBalance || 0) -
+      (totalSellingAndDistributionExpenses +
+        totalGeneralAdministrativeAndOperatingExpenses);
+
+    const daribuh_aldukhl = sumGroupOfAccounts(summaries, [
+      AccountsWname.daribuhAldukhl,
+    ]);
+
+    const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl;
+
     res.json({
+      safi_almabieat,
+      tukalifuh_almabieat,
+      mujmal_alribh,
+      alribh_qabl_aldarayib,
+      safi_alribh,
       NetSales,
       purchasesReturnedExpenses,
       inventoryAtTheEndOfThePeriod,
