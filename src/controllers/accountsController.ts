@@ -282,6 +282,13 @@ const getTransForAccountsByNums = async (
       netProfitOrLossBeforeTaxes - salesOutputTax;
 
     // new
+    const almukhasasat = sumGroupOfAccounts(summaries, [
+      AccountsWname.transportationDepreciationExpense,
+      AccountsWname.hardwareSoftwareDepreciationExpense,
+      AccountsWname.furnitureFurnishingsDepreciationExpense,
+      AccountsWname.depreciationExpenseForMachineryEquipment,
+    ]);
+
     const safi_almabieat =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
       Math.abs(
@@ -306,13 +313,17 @@ const getTransForAccountsByNums = async (
       mujmal_alribh +
       (otherRevenues?.totalBalance || 0) -
       (totalSellingAndDistributionExpenses +
-        totalGeneralAdministrativeAndOperatingExpenses);
+        totalGeneralAdministrativeAndOperatingExpenses +
+        almukhasasat);
 
     const daribuh_aldukhl = sumGroupOfAccounts(summaries, [
       AccountsWname.daribuhAldukhl,
     ]);
 
-    const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl;
+    const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl; //
+
+    const ajamali_ayradat_mukhtalifuh =
+      mujmal_alribh + (otherRevenues?.totalBalance || 0);
 
     res.json({
       safi_almabieat,
@@ -320,6 +331,7 @@ const getTransForAccountsByNums = async (
       mujmal_alribh,
       alribh_qabl_aldarayib,
       safi_alribh,
+      ajamali_ayradat_mukhtalifuh,
       NetSales,
       purchasesReturnedExpenses,
       inventoryAtTheEndOfThePeriod,
@@ -552,7 +564,48 @@ const statementOfFinancialPositionCrl = async (
     const netProfitOrLossAfterDeductingTaxes =
       netProfitOrLossBeforeTaxes - salesOutputTax;
 
+    const safi_almushtariat = sumGroupOfAccounts(summaries, [
+      AccountsWname.purchases,
+      AccountsWname.purchaseReturns,
+      AccountsWname.purchasesExpenses,
+    ]);
+
+    const tukalifuh_almabieat =
+      safi_almushtariat + (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+
+    const safi_almabieat =
+      sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
+      Math.abs(
+        sumGroupOfAccounts(summaries, [
+          AccountsWname.allowedDiscount,
+          AccountsWname.salesReturns,
+        ])
+      );
+
+    const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
+
+    const almukhasasat = sumGroupOfAccounts(summaries, [
+      AccountsWname.transportationDepreciationExpense,
+      AccountsWname.hardwareSoftwareDepreciationExpense,
+      AccountsWname.furnitureFurnishingsDepreciationExpense,
+      AccountsWname.depreciationExpenseForMachineryEquipment,
+    ]);
+
+    const alribh_qabl_aldarayib =
+      mujmal_alribh +
+      (otherRevenues?.totalBalance || 0) -
+      (totalSellingAndDistributionExpenses +
+        totalGeneralAdministrativeAndOperatingExpenses +
+        almukhasasat);
+
+    const daribuh_aldukhl = sumGroupOfAccounts(summaries, [
+      AccountsWname.daribuhAldukhl,
+    ]);
+
+    const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl;
+
     res.json({
+      safi_alribh,
       alasulAlmutaduluh,
       propertyRights,
       alasulAlthaabituhAlmalmusah,
