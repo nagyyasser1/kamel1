@@ -224,31 +224,31 @@ const getTransForAccountsByNums = async (
       ]
     );
 
-    const Allotments = sumGroupOfAccounts(summaries, [
+    const AllotmentsAfter = sumGroupOfAccounts(summaries, [
       AccountsWname.transportationDepreciationExpense,
       AccountsWname.hardwareSoftwareDepreciationExpense,
       AccountsWname.furnitureFurnishingsDepreciationExpense,
       AccountsWname.depreciationExpenseForMachineryEquipment,
     ]);
 
-    const AllotmentsAfter = sumGroupOfAccountsWithCustomPercentage(summaries, [
-      {
-        accountCode: AccountsWname.transportationDepreciationExpense,
-        percentage: 10,
-      },
-      {
-        accountCode: AccountsWname.hardwareSoftwareDepreciationExpense,
-        percentage: 10,
-      },
-      {
-        accountCode: AccountsWname.furnitureFurnishingsDepreciationExpense,
-        percentage: 10,
-      },
-      {
-        accountCode: AccountsWname.depreciationExpenseForMachineryEquipment,
-        percentage: 10,
-      },
-    ]);
+    // const AllotmentsAfter = sumGroupOfAccountsWithCustomPercentage(summaries, [
+    //   {
+    //     accountCode: AccountsWname.transportationDepreciationExpense,
+    //     percentage: 10,
+    //   },
+    //   {
+    //     accountCode: AccountsWname.hardwareSoftwareDepreciationExpense,
+    //     percentage: 10,
+    //   },
+    //   {
+    //     accountCode: AccountsWname.furnitureFurnishingsDepreciationExpense,
+    //     percentage: 10,
+    //   },
+    //   {
+    //     accountCode: AccountsWname.depreciationExpenseForMachineryEquipment,
+    //     percentage: 10,
+    //   },
+    // ]);
 
     const salesOutputTax = sumGroupOfAccounts(summaries, [
       AccountsWname.salesOutputTax,
@@ -326,6 +326,7 @@ const getTransForAccountsByNums = async (
       mujmal_alribh + (otherRevenues?.totalBalance || 0);
 
     res.json({
+      almukhasasat,
       safi_almabieat,
       tukalifuh_almabieat,
       mujmal_alribh,
@@ -339,7 +340,6 @@ const getTransForAccountsByNums = async (
       activitySalesRevenue,
       totalSellingAndDistributionExpenses,
       totalGeneralAdministrativeAndOperatingExpenses,
-      Allotments,
       AllotmentsAfter,
       costOfGoodsSold,
       totalIncome,
