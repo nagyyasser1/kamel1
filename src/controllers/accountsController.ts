@@ -16,6 +16,7 @@ import { Account } from "../types";
 import sumGroupOfAccountsWithCustomPercentage from "../utils/sumGroupOfAccountsWithCustomPercentage";
 import categoryService from "../services/categoryService";
 import sumFpAccounts from "../utils/sumFb";
+import transactionsService from "../services/transactionsService";
 
 const createAccountCtr = async (
   req: Request,
@@ -403,7 +404,6 @@ const statementOfFinancialPositionCrl = async (
     const alasulAlmutaduluh = sumFpAccounts([
       categoriesObject[FP_categories_names.clientsAbroad],
       categoriesObject[FP_categories_names.clientsInside],
-      // categoriesObject[FP_categories_names.inventory1],
       categoriesObject[FP_categories_names.inventory2],
       accountsObject[FP_accounts_names.hisabMadinatAkhari],
       accountsObject[FP_accounts_names.arrestPapers],
@@ -425,20 +425,6 @@ const statementOfFinancialPositionCrl = async (
       accountsObject[FP_accounts_names.alqurudQasiruhAlajil],
       accountsObject[FP_accounts_names.daribuhAlmabieat],
     ]);
-
-    // accountsObject[
-    //   FP_accounts_names.buildingsAndRealEstate
-    // ].totalBalance *= 0.98;
-
-    // accountsObject[
-    //   FP_accounts_names.furnitureAndFurnishings
-    // ].totalBalance *= 0.85;
-
-    // accountsObject[FP_accounts_names.machinesAndEquipment].totalBalance *= 0.85;
-
-    // accountsObject[FP_accounts_names.cars].totalBalance *= 0.9;
-
-    // accountsObject[FP_accounts_names.otherAssets].totalBalance *= 0.9;
 
     const alasulAlthaabituhAlmalmusah = sumFpAccounts([
       accountsObject[FP_accounts_names.lands],
@@ -527,25 +513,6 @@ const statementOfFinancialPositionCrl = async (
       ]
     );
 
-    const AllotmentsAfter = sumGroupOfAccountsWithCustomPercentage(summaries, [
-      {
-        accountCode: AccountsWname.transportationDepreciationExpense,
-        percentage: 10,
-      },
-      {
-        accountCode: AccountsWname.hardwareSoftwareDepreciationExpense,
-        percentage: 10,
-      },
-      {
-        accountCode: AccountsWname.furnitureFurnishingsDepreciationExpense,
-        percentage: 10,
-      },
-      {
-        accountCode: AccountsWname.depreciationExpenseForMachineryEquipment,
-        percentage: 10,
-      },
-    ]);
-
     const salesOutputTax = sumGroupOfAccounts(summaries, [
       AccountsWname.salesOutputTax,
     ]);
@@ -622,6 +589,18 @@ const statementOfFinancialPositionCrl = async (
   }
 };
 
+// التحليل المالي
+const altahlil_almaliu_ctl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createAccountCtr,
   deleteAccountCtr,
@@ -630,4 +609,5 @@ export default {
   getTransactionsSummaryForCategories,
   getTransForAccountsByNums,
   statementOfFinancialPositionCrl,
+  altahlil_almaliu_ctl,
 };

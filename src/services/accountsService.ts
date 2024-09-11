@@ -1,3 +1,4 @@
+import getCurrentYear from "../utils/getCurrentYear";
 import ACCOUNTS_CODES_FOR_INCOME, {
   FP_accounts,
 } from "../constants/accountsCodes";
@@ -433,3 +434,70 @@ export async function statementFPositionSrvc() {
 
   return summaries.filter((summary) => summary !== null);
 }
+
+const getAccountBalances = async () => {
+  const { currentYear, startOfYear, endOfYear } = getCurrentYear();
+
+  const accounts = await prisma.account.findMany({
+    select: {
+      id: true,
+      name: true,
+      number: true,
+      sentTransactions: {
+        where: {
+          createdAt: {
+            gte: startOfYear,
+            lte: endOfYear,
+          },
+        },
+        select: {
+          amount: true,
+        },
+      },
+      receivedTransactions: {
+        where: {
+          createdAt: {
+            gte: startOfYear,
+            lte: endOfYear,
+          },
+        },
+        select: {
+          amount: true,
+        },
+      },
+    },
+  });
+
+  // Calculate balance for each account
+  const accountsArray = accounts.map((account) => {
+    const totalSent = account.sentTransactions.reduce(
+      (acc, transaction) => acc + transaction.amount,
+      0
+    );
+    const totalReceived = account.receivedTransactions.reduce(
+      (acc, transaction) => acc + transaction.amount,
+      0
+    );
+    const balance = totalReceived - totalSent;
+
+    return {
+      id: account.id,
+      name: account.name,
+      number: account.number,
+      balance: balance,
+    };
+  });
+
+  const accountsObject = accountsArray.reduce((acc, account) => {
+    if (account) {
+      acc[account?.number] = account;
+    }
+    return acc;
+  }, {} as Record<string, any>);
+
+  return { accountsArray, accountsObject };
+};
+
+export default {
+  getAccountBalances,
+};

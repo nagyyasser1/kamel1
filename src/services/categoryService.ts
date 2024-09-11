@@ -1,3 +1,4 @@
+import getCurrentYear from "../utils/getCurrentYear";
 import prisma from "../prisma";
 
 // Create a category
@@ -479,6 +480,192 @@ async function getCategoryTransactionSummary(categoryNumber?: number) {
   return transactionSummary;
 }
 
+const getCategoryBalances = async () => {
+  const { currentYear, startOfYear, endOfYear } = getCurrentYear();
+
+  // Fetch all categories along with their accounts and transactions
+  const categories = await prisma.category.findMany({
+    where: {
+      accounts: {
+        some: {},
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      number: true,
+      accounts: {
+        select: {
+          sentTransactions: {
+            where: {
+              createdAt: {
+                gte: startOfYear,
+                lte: endOfYear,
+              },
+            },
+            select: {
+              amount: true,
+            },
+          },
+          receivedTransactions: {
+            where: {
+              createdAt: {
+                gte: startOfYear,
+                lte: endOfYear,
+              },
+            },
+            select: {
+              amount: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Calculate balance for each category
+  const categoriesArray = categories.map((category) => {
+    let totalSent = 0;
+    let totalReceived = 0;
+
+    // Sum up the transactions for each account within the category
+    category.accounts.forEach((account) => {
+      totalSent += account.sentTransactions.reduce(
+        (acc, transaction) => acc + transaction.amount,
+        0
+      );
+      totalReceived += account.receivedTransactions.reduce(
+        (acc, transaction) => acc + transaction.amount,
+        0
+      );
+    });
+
+    const balance = totalReceived - totalSent;
+
+    return {
+      id: category.id,
+      name: category.name,
+      number: category.number,
+      balance: balance,
+    };
+  });
+
+  const categoriesObject = categoriesArray.reduce((cat, categroy) => {
+    if (categroy) {
+      cat[categroy?.number] = categroy;
+    }
+    return cat;
+  }, {} as any);
+
+  return { categoriesArray, categoriesObject };
+};
+
+const getCategoryBalancesTest = async () => {
+  const { currentYear, startOfYear, endOfYear } = getCurrentYear();
+
+  // Helper function to fetch categories along with their subcategories and balances
+  const fetchCategoryWithSubcategories = async (categoryId: string) => {
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: {
+        id: true,
+        name: true,
+        number: true,
+        parentId: true,
+        accounts: {
+          select: {
+            sentTransactions: {
+              where: {
+                createdAt: {
+                  gte: startOfYear,
+                  lte: endOfYear,
+                },
+              },
+              select: {
+                amount: true,
+              },
+            },
+            receivedTransactions: {
+              where: {
+                createdAt: {
+                  gte: startOfYear,
+                  lte: endOfYear,
+                },
+              },
+              select: {
+                amount: true,
+              },
+            },
+          },
+        },
+        subCategories: {
+          select: {
+            id: true,
+            name: true,
+            number: true,
+          },
+        },
+      },
+    });
+
+    // Calculate the balance for the current category's own accounts
+    let totalSent = 0;
+    let totalReceived = 0;
+
+    category?.accounts.forEach((account) => {
+      totalSent += account.sentTransactions.reduce(
+        (acc, transaction) => acc + transaction.amount,
+        0
+      );
+      totalReceived += account.receivedTransactions.reduce(
+        (acc, transaction) => acc + transaction.amount,
+        0
+      );
+    });
+
+    let balance = Math.abs(totalReceived) - Math.abs(totalSent);
+
+    // Fetch subcategories and calculate their balances recursively
+    const subCategoryBalances: any = await Promise.all(
+      category?.subCategories.map(async (subCategory) => {
+        return await fetchCategoryWithSubcategories(subCategory.id);
+      }) || []
+    );
+
+    // Add subcategories' balances to the parent category balance
+    subCategoryBalances.forEach((subCategory: any) => {
+      balance += subCategory.balance;
+    });
+
+    return {
+      id: category?.id,
+      name: category?.name,
+      number: category?.number,
+      balance,
+      subCategories: subCategoryBalances, // Subcategories with their balances
+    };
+  };
+
+  // Fetch top-level categories (those without a parent)
+  const topLevelCategories = await prisma.category.findMany({
+    where: {
+      parentId: null, // Top-level categories have no parent
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  // Fetch each top-level category along with its subcategories and calculate balance
+  const categoriesWithBalances = await Promise.all(
+    topLevelCategories.map(async (category) => {
+      return await fetchCategoryWithSubcategories(category.id);
+    })
+  );
+
+  return categoriesWithBalances;
+};
+
 export default {
   getCategoryTransactionSummaryForCategories,
   getCategoryTransactionSummary,
@@ -490,4 +677,6 @@ export default {
   createCategory,
   getCategories,
   getCategoryById,
+  getCategoryBalances,
+  getCategoryBalancesTest,
 };

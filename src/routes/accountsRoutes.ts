@@ -13,6 +13,7 @@ router.get("/", accountsController.getAllAccountsCtr);
 // router.use(authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateAccount, accountsController.createAccountCtr);
 router.get("/stats", accountsController.getTransactionsSummaryForCategories);
+// قائمه الدخل
 router.get("/stats/accounts", accountsController.getTransForAccountsByNums);
 // المزانيه العموميه
 router.get("/stats/fb", accountsController.statementOfFinancialPositionCrl);
