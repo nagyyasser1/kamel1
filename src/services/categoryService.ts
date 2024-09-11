@@ -480,6 +480,8 @@ async function getCategoryTransactionSummary(categoryNumber?: number) {
   return transactionSummary;
 }
 
+// new
+
 const getCategoryBalances = async () => {
   const { currentYear, startOfYear, endOfYear } = getCurrentYear();
 
@@ -666,6 +668,138 @@ const getCategoryBalancesTest = async () => {
   return categoriesWithBalances;
 };
 
+const getSubcategoryBalances = async (categoryNumber: number) => {
+  const { currentYear, startOfYear, endOfYear } = getCurrentYear();
+
+  // Helper function to fetch category and its subcategories, and calculate the balance based on its subcategories
+  const calculateCategoryBalance = async (categoryId: string) => {
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: {
+        id: true,
+        name: true,
+        subCategories: {
+          select: {
+            id: true,
+            name: true,
+            number: true,
+            accounts: {
+              select: {
+                sentTransactions: {
+                  where: {
+                    createdAt: {
+                      gte: startOfYear,
+                      lte: endOfYear,
+                    },
+                  },
+                  select: {
+                    amount: true,
+                  },
+                },
+                receivedTransactions: {
+                  where: {
+                    createdAt: {
+                      gte: startOfYear,
+                      lte: endOfYear,
+                    },
+                  },
+                  select: {
+                    amount: true,
+                  },
+                },
+              },
+            },
+            subCategories: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    let totalBalance = 0;
+
+    // Recursively calculate the balance for each subcategory
+    for (const subCategory of category?.subCategories || []) {
+      let subCategorySent = 0;
+      let subCategoryReceived = 0;
+
+      // Calculate balance for the current subcategory's accounts
+      subCategory.accounts.forEach((account) => {
+        subCategorySent += account.sentTransactions.reduce(
+          (acc, transaction) => acc + transaction.amount,
+          0
+        );
+        subCategoryReceived += account.receivedTransactions.reduce(
+          (acc, transaction) => acc + transaction.amount,
+          0
+        );
+      });
+
+      // Balance for the subcategory
+      const subCategoryBalance = Math.abs(
+        subCategoryReceived - subCategorySent
+      );
+
+      // Add the subcategory balance to the total
+      totalBalance += subCategoryBalance;
+
+      // Recursively calculate subcategory of subcategory
+      if (subCategory.subCategories.length > 0) {
+        const subSubCategoryBalance = await calculateCategoryBalance(
+          subCategory.id
+        );
+        totalBalance += subSubCategoryBalance.balance;
+      }
+    }
+
+    return {
+      id: category?.id,
+      name: category?.name,
+      balance: totalBalance,
+    };
+  };
+
+  // Find the category by its number
+  const category = await prisma.category.findUnique({
+    where: {
+      number: categoryNumber,
+    },
+    select: {
+      id: true,
+      name: true,
+      number: true,
+      subCategories: {
+        select: {
+          id: true,
+          name: true,
+          number: true,
+        },
+      },
+    },
+  });
+
+  if (!category) {
+    throw new Error(`Category with number ${categoryNumber} not found`);
+  }
+
+  // If the category has no subcategories, return a balance of 0
+  if (category.subCategories.length === 0) {
+    return {
+      id: category.id,
+      name: category.name,
+      balance: 0,
+    };
+  }
+
+  // Calculate balance for the category based on its subcategories
+  const result = await calculateCategoryBalance(category.id);
+
+  return result;
+};
+
 export default {
   getCategoryTransactionSummaryForCategories,
   getCategoryTransactionSummary,
@@ -679,4 +813,5 @@ export default {
   getCategoryById,
   getCategoryBalances,
   getCategoryBalancesTest,
+  getSubcategoryBalances,
 };

@@ -15,10 +15,16 @@ router.get("/categories", async (req, res) => {
   res.send(result);
 });
 
-router.get("/accounts", async (req, res) => {
-  const result = await accountsService.getAccountBalances();
-  res.send(result);
-});
+// router.get("/categories/:number", async (req, res) => {
+//   const { number } = req.params;
+//   const result = await categoryService.getSubcategoryBalances(parseInt(number));
+//   res.send(result);
+// });
+
+// router.get("/accounts", async (req, res) => {
+//   const result = await accountsService.getAccountBalances();
+//   res.send(result);
+// });
 
 router.use("/auth", authRoutes);
 router.use("/accounts", accountsRoutes);

@@ -23,7 +23,7 @@ export const getAllAccounts = async (categoryId?: string, name?: string) => {
     where.categoryId = categoryId;
   }
 
-  if (name) {
+  if (name && name.trim() !== "") {
     where.name = {
       contains: name,
       mode: "insensitive", // Case-insensitive search
@@ -500,4 +500,5 @@ const getAccountBalances = async () => {
 
 export default {
   getAccountBalances,
+  getAllAccounts,
 };
