@@ -623,7 +623,7 @@ const getCategoryBalancesTest = async () => {
       );
     });
 
-    let balance = Math.abs(totalReceived) - Math.abs(totalSent);
+    let balance = Math.abs(totalReceived - totalSent);
 
     // Fetch subcategories and calculate their balances recursively
     const subCategoryBalances: any = await Promise.all(
