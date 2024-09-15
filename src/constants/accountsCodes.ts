@@ -2,7 +2,7 @@ const ACCOUNTS_CODES_FOR_INCOME = [
   4101, 4102, 4103, 120301, 120701, 120401, 5101, 5102, 5103, 5104, 5105, 5106,
   5107, 5201, 5202, 5203, 5204, 5205, 5206, 5207, 5208, 5209, 5210, 5211, 5212,
   5213, 5214, 5215, 5216, 5217, 5218, 5219, 5301, 5302, 5303, 5304, 5305, 5306,
-  5307, 5401, 5402, 5403, 5404, 220201, 5501,
+  5307, 5401, 5402, 5403, 5404, 220201, 5501, 5405,
 ];
 
 export const CategoryWname = {
@@ -54,6 +54,7 @@ export const AccountsWname = {
   wagesAndSalaries: 5305,
   generalMaintenanceExpenses: 5306,
   telephoneMailInternet: 5307,
+  masrufAhlakMabani: 5405,
 
   transportationDepreciationExpense: 5401,
   hardwareSoftwareDepreciationExpense: 5402,
@@ -69,7 +70,7 @@ export const AccountsWname = {
 export const FP_accounts = [
   110101, 110102, 110103, 110104, 110105, 110106, 110201, 110202, 110203,
   220701, 220501, 220401, 220301, 220201, 120401, 120301, 120701, 1201, 2101,
-  2102, 2103, 120501, 120801, 220601,
+  5405, 2102, 2103, 120501, 120801, 220601,
 ];
 
 export const FP_accounts_names = {
@@ -99,6 +100,8 @@ export const FP_accounts_names = {
   arrestPapers: 120501,
   hisabMadinatAkhari: 120801,
   awraqAldafe: 220601,
+
+  masrufAhlakMabani: 5405,
 };
 
 export const FP_categories_codes = [
@@ -192,6 +195,7 @@ export const accounts = {
   hisabMadinatAkhari: 120801,
   awraqAldafe: 220601,
   khasmuktasib: 121001,
+  masrufAhlakMabani: 5405,
 };
 
 export const categories = {

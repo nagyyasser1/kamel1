@@ -230,26 +230,8 @@ const getTransForAccountsByNums = async (
       AccountsWname.hardwareSoftwareDepreciationExpense,
       AccountsWname.furnitureFurnishingsDepreciationExpense,
       AccountsWname.depreciationExpenseForMachineryEquipment,
+      AccountsWname.masrufAhlakMabani,
     ]);
-
-    // const AllotmentsAfter = sumGroupOfAccountsWithCustomPercentage(summaries, [
-    //   {
-    //     accountCode: AccountsWname.transportationDepreciationExpense,
-    //     percentage: 10,
-    //   },
-    //   {
-    //     accountCode: AccountsWname.hardwareSoftwareDepreciationExpense,
-    //     percentage: 10,
-    //   },
-    //   {
-    //     accountCode: AccountsWname.furnitureFurnishingsDepreciationExpense,
-    //     percentage: 10,
-    //   },
-    //   {
-    //     accountCode: AccountsWname.depreciationExpenseForMachineryEquipment,
-    //     percentage: 10,
-    //   },
-    // ]);
 
     const salesOutputTax = sumGroupOfAccounts(summaries, [
       AccountsWname.salesOutputTax,
@@ -404,7 +386,6 @@ const statementOfFinancialPositionCrl = async (
     const alasulAlmutaduluh = sumFpAccounts([
       categoriesObject[FP_categories_names.clientsAbroad],
       categoriesObject[FP_categories_names.clientsInside],
-      categoriesObject[FP_categories_names.inventory2],
       accountsObject[FP_accounts_names.hisabMadinatAkhari],
       accountsObject[FP_accounts_names.arrestPapers],
       categoriesObject[FP_categories_names.theBox],
@@ -415,7 +396,6 @@ const statementOfFinancialPositionCrl = async (
 
     //
     const alkhusumAlmutadawiluh = sumFpAccounts([
-      categoriesObject[FP_categories_names.alMothsatat],
       categoriesObject[FP_categories_names.almoredenInside],
       categoriesObject[FP_categories_names.almoredenOutside],
       accountsObject[FP_accounts_names.otherAccountsReceivable],
