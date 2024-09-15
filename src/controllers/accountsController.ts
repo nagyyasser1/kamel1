@@ -461,11 +461,6 @@ const statementOfFinancialPositionCrl = async (
         CategoryWname.inventoryAtTheEndOfThePeriod
       );
 
-    const activitySalesRevenue = await categoryService.getCategoryStatistics(
-      null,
-      CategoryWname.activitySalesRevenue
-    );
-
     const otherRevenues = await categoryService.getCategoryStatistics(
       null,
       CategoryWname.otherRevenues
@@ -589,18 +584,6 @@ const statementOfFinancialPositionCrl = async (
   }
 };
 
-// التحليل المالي
-const altahlil_almaliu_ctl = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-  } catch (error) {
-    next(error);
-  }
-};
-
 export default {
   createAccountCtr,
   deleteAccountCtr,
@@ -609,5 +592,4 @@ export default {
   getTransactionsSummaryForCategories,
   getTransForAccountsByNums,
   statementOfFinancialPositionCrl,
-  altahlil_almaliu_ctl,
 };

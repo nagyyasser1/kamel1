@@ -435,7 +435,7 @@ export async function statementFPositionSrvc() {
   return summaries.filter((summary) => summary !== null);
 }
 
-const getAccountBalances = async () => {
+const getAccountsBalances = async () => {
   const { currentYear, startOfYear, endOfYear } = getCurrentYear();
 
   const accounts = await prisma.account.findMany({
@@ -495,10 +495,73 @@ const getAccountBalances = async () => {
     return acc;
   }, {} as Record<string, any>);
 
-  return { accountsArray, accountsObject };
+  return { accountsObject };
+};
+
+const getAccountBalance = async (accountNumber: number) => {
+  const { currentYear, startOfYear } = getCurrentYear();
+
+  // Fetch the account by its number
+  const account = await prisma.account.findUnique({
+    where: { number: accountNumber },
+    select: {
+      id: true,
+      name: true,
+      sentTransactions: {
+        select: {
+          amount: true,
+          createdAt: true,
+        },
+      },
+      receivedTransactions: {
+        select: {
+          amount: true,
+          createdAt: true,
+        },
+      },
+    },
+  });
+
+  if (!account) {
+    throw new Error(`Account with number ${accountNumber} not found`);
+  }
+
+  let thisYearSent = 0;
+  let thisYearReceived = 0;
+  let previousYearsSent = 0;
+  let previousYearsReceived = 0;
+
+  // Calculate sent and received transactions for the current year and previous years
+  account.sentTransactions.forEach((transaction) => {
+    if (transaction.createdAt >= startOfYear) {
+      thisYearSent += transaction.amount;
+    } else {
+      previousYearsSent += transaction.amount;
+    }
+  });
+
+  account.receivedTransactions.forEach((transaction) => {
+    if (transaction.createdAt >= startOfYear) {
+      thisYearReceived += transaction.amount;
+    } else {
+      previousYearsReceived += transaction.amount;
+    }
+  });
+
+  // Calculate balances
+  const thisYearBalance = Math.abs(thisYearReceived - thisYearSent);
+  const previousYearsBalance = Math.abs(
+    previousYearsReceived - previousYearsSent
+  );
+
+  return {
+    thisYearBalance,
+    previousYearsBalance,
+  };
 };
 
 export default {
-  getAccountBalances,
+  getAccountBalance,
+  getAccountsBalances,
   getAllAccounts,
 };

@@ -85,13 +85,15 @@ export const FP_accounts_names = {
   otherAccountsReceivable: 220701,
   ayradatMuqadamuh: 220501,
   masrufatMustahiqih: 220401,
-  alqurudQasiruhAlajil: 220301,
   daribuhAlmabieat: 220201,
   purchaseReturns: 120401,
   purchases: 120301,
   purchasesExpenses: 120701,
   cash: 1201,
+
+  alqurudQasiruhAlajil: 220301,
   qurudTawiluhAlajil: 2101,
+
   althanadatTawiluhAlajil: 2102,
   aldarayibAlmuajala: 2103,
   arrestPapers: 120501,
@@ -180,15 +182,16 @@ export const accounts = {
   otherAccountsReceivable: 220701,
   ayradatMuqadamuh: 220501,
   masrufatMustahiqih: 220401,
-  alqurudQasiruhAlajil: 220301,
   daribuhAlmabieat: 220201,
   cash: 1201,
   qurudTawiluhAlajil: 2101,
+  alqurudQasiruhAlajil: 220301,
   althanadatTawiluhAlajil: 2102,
   aldarayibAlmuajala: 2103,
   arrestPapers: 120501,
   hisabMadinatAkhari: 120801,
   awraqAldafe: 220601,
+  khasmuktasib: 121001,
 };
 
 export const categories = {
@@ -210,5 +213,14 @@ export const categories = {
   inventoryAtTheEndOfThePeriod: 120602,
   activitySalesRevenue: 41,
   otherRevenues: 42,
+  masarifTaswiqayh: 51,
+  masarifAdarih: 52,
+  masarifTashghilayh: 53,
+  alasulAlthaabatuh: 11,
+  alasulAlmutadawiluh: 12,
+  alkhusumAlthaabatuh: 21,
+  alkhusumAlmutadawiluh: 22,
+  huquqAlmalakih: 3,
 };
+
 export default ACCOUNTS_CODES_FOR_INCOME;

@@ -482,16 +482,16 @@ async function getCategoryTransactionSummary(categoryNumber?: number) {
 
 // new
 
-const getCategoryBalances = async () => {
+const getCategoriesBalances = async () => {
   const { currentYear, startOfYear, endOfYear } = getCurrentYear();
 
   // Fetch all categories along with their accounts and transactions
   const categories = await prisma.category.findMany({
-    where: {
-      accounts: {
-        some: {},
-      },
-    },
+    // where: {
+    //   accounts: {
+    //     some: {},
+    //   },
+    // },
     select: {
       id: true,
       name: true,
@@ -542,7 +542,7 @@ const getCategoryBalances = async () => {
       );
     });
 
-    const balance = totalReceived - totalSent;
+    const balance = Math.abs(totalReceived - totalSent);
 
     return {
       id: category.id,
@@ -800,6 +800,264 @@ const getSubcategoryBalances = async (categoryNumber: number) => {
   return result;
 };
 
+const getSubcategoryBalancesTotal = async (categoryNumber: number) => {
+  // Helper function to fetch category and its subcategories, and calculate the balance based on its subcategories
+  const calculateCategoryBalance = async (categoryId: string) => {
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: {
+        id: true,
+        name: true,
+        subCategories: {
+          select: {
+            id: true,
+            name: true,
+            number: true,
+            accounts: {
+              select: {
+                sentTransactions: {
+                  select: {
+                    amount: true,
+                  },
+                },
+                receivedTransactions: {
+                  select: {
+                    amount: true,
+                  },
+                },
+              },
+            },
+            subCategories: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    let totalBalance = 0;
+
+    // Recursively calculate the balance for each subcategory
+    for (const subCategory of category?.subCategories || []) {
+      let subCategorySent = 0;
+      let subCategoryReceived = 0;
+
+      // Calculate balance for the current subcategory's accounts
+      subCategory.accounts.forEach((account) => {
+        subCategorySent += account.sentTransactions.reduce(
+          (acc, transaction) => acc + transaction.amount,
+          0
+        );
+        subCategoryReceived += account.receivedTransactions.reduce(
+          (acc, transaction) => acc + transaction.amount,
+          0
+        );
+      });
+
+      // Balance for the subcategory
+      const subCategoryBalance = Math.abs(
+        subCategoryReceived - subCategorySent
+      );
+
+      // Add the subcategory balance to the total
+      totalBalance += subCategoryBalance;
+
+      // Recursively calculate subcategory of subcategory
+      if (subCategory.subCategories.length > 0) {
+        const subSubCategoryBalance = await calculateCategoryBalance(
+          subCategory.id
+        );
+        totalBalance += subSubCategoryBalance.balance;
+      }
+    }
+
+    return {
+      id: category?.id,
+      name: category?.name,
+      balance: totalBalance,
+    };
+  };
+
+  // Find the category by its number
+  const category = await prisma.category.findUnique({
+    where: {
+      number: categoryNumber,
+    },
+    select: {
+      id: true,
+      name: true,
+      number: true,
+      subCategories: {
+        select: {
+          id: true,
+          name: true,
+          number: true,
+        },
+      },
+    },
+  });
+
+  if (!category) {
+    throw new Error(`Category with number ${categoryNumber} not found`);
+  }
+
+  // If the category has no subcategories, return a balance of 0
+  if (category.subCategories.length === 0) {
+    return {
+      id: category.id,
+      name: category.name,
+      balance: 0,
+    };
+  }
+
+  // Calculate balance for the category based on its subcategories
+  const result = await calculateCategoryBalance(category.id);
+
+  return result;
+};
+
+const getCategoryBalance = async (categoryNumber: number) => {
+  const { startOfYear } = getCurrentYear();
+
+  // Helper function to recursively calculate category and subcategory balances
+  const calculateCategoryBalance = async (categoryId: string) => {
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: {
+        id: true,
+        name: true,
+        subCategories: {
+          select: {
+            id: true,
+            name: true,
+            number: true,
+            accounts: {
+              select: {
+                sentTransactions: {
+                  select: {
+                    amount: true,
+                    createdAt: true,
+                  },
+                },
+                receivedTransactions: {
+                  select: {
+                    amount: true,
+                    createdAt: true,
+                  },
+                },
+              },
+            },
+            subCategories: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+        accounts: {
+          select: {
+            sentTransactions: {
+              select: {
+                amount: true,
+                createdAt: true,
+              },
+            },
+            receivedTransactions: {
+              select: {
+                amount: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    let thisYearSent = 0;
+    let thisYearReceived = 0;
+    let previousYearsSent = 0;
+    let previousYearsReceived = 0;
+
+    // Calculate balance for the category's own accounts
+    category?.accounts.forEach((account) => {
+      account.sentTransactions.forEach((transaction) => {
+        if (transaction.createdAt >= startOfYear) {
+          thisYearSent += transaction.amount;
+        } else {
+          previousYearsSent += transaction.amount;
+        }
+      });
+
+      account.receivedTransactions.forEach((transaction) => {
+        if (transaction.createdAt >= startOfYear) {
+          thisYearReceived += transaction.amount;
+        } else {
+          previousYearsReceived += transaction.amount;
+        }
+      });
+    });
+
+    // Recursively calculate balances for subcategories
+    for (const subCategory of category?.subCategories || []) {
+      const subCategoryBalance = await calculateCategoryBalance(subCategory.id);
+      thisYearSent += subCategoryBalance.thisYearSent;
+      thisYearReceived += subCategoryBalance.thisYearReceived;
+      previousYearsSent += subCategoryBalance.previousYearsSent;
+      previousYearsReceived += subCategoryBalance.previousYearsReceived;
+    }
+
+    return {
+      thisYearSent,
+      thisYearReceived,
+      previousYearsSent,
+      previousYearsReceived,
+    };
+  };
+
+  // Find the category by its number
+  const category = await prisma.category.findUnique({
+    where: {
+      number: categoryNumber,
+    },
+    select: {
+      id: true,
+      name: true,
+      number: true,
+      subCategories: {
+        select: {
+          id: true,
+          name: true,
+          number: true,
+        },
+      },
+    },
+  });
+
+  if (!category) {
+    throw new Error(`Category with number ${categoryNumber} not found`);
+  }
+
+  // Calculate total balance for the category and its subcategories
+  const totalBalance = await calculateCategoryBalance(category.id);
+
+  const thisYearBalance =
+    totalBalance.thisYearReceived - totalBalance.thisYearSent;
+  const previousYearsBalance =
+    totalBalance.previousYearsReceived - totalBalance.previousYearsSent;
+
+  return {
+    category: {
+      id: category.id,
+      name: category.name,
+      number: category.number,
+    },
+    thisYearBalance,
+    previousYearsBalance,
+  };
+};
+
 export default {
   getCategoryTransactionSummaryForCategories,
   getCategoryTransactionSummary,
@@ -811,7 +1069,9 @@ export default {
   createCategory,
   getCategories,
   getCategoryById,
-  getCategoryBalances,
+  getCategoriesBalances,
   getCategoryBalancesTest,
   getSubcategoryBalances,
+  getCategoryBalance,
+  getSubcategoryBalancesTotal,
 };
