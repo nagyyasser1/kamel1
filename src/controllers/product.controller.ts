@@ -61,6 +61,21 @@ const getAllProductsStats = async (req: Request, res: Response) => {
   }
 };
 
+const getAllProductsBySearch = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.query;
+
+    if (!name) {
+      return res.status(400).send("provide name in the query.");
+    }
+
+    const result = await ProductService.getProductByName(name as string);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete product" });
+  }
+};
+
 export default {
   createProduct,
   getAllProducts,
@@ -68,4 +83,5 @@ export default {
   updateProduct,
   deleteProduct,
   getAllProductsStats,
+  getAllProductsBySearch,
 };

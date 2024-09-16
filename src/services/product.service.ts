@@ -184,6 +184,21 @@ async function getProductBalance() {
   return result;
 }
 
+const getProductByName = async (name: string) => {
+  const where: any = {};
+
+  if (name && name.trim() !== "") {
+    where.name = {
+      contains: name,
+      mode: "insensitive", // Case-insensitive search
+    };
+  }
+
+  return await prisma.product.findMany({
+    where,
+  });
+};
+
 export default {
   createProduct,
   getAllProducts,
@@ -192,4 +207,5 @@ export default {
   deleteProduct,
   getAllProductsWithBalances,
   getProductBalance,
+  getProductByName,
 };

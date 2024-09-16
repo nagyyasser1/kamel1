@@ -9,6 +9,7 @@ router.post(
   productController.createProduct
 );
 router.get("/", productController.getAllProducts);
+router.get("/search", productController.getAllProductsBySearch);
 router.get("/stats", productController.getAllProductsStats);
 router.get("/:id", productController.getProductById);
 router.patch("/:id", productController.updateProduct);
