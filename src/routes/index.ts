@@ -3,6 +3,8 @@ import userRoutes from "./userRoutes";
 import authRoutes from "./authRoutes";
 import accountsRoutes from "./accountsRoutes";
 import categoryRoutes from "./categoryRoutes";
+import productRoutes from "./productRoutes";
+import productTransactionRoutes from "./productTransactionRoutes";
 import transactionsRoutes from "./transactoinsRoutes";
 import categoryService from "../services/categoryService";
 import accountsService from "../services/accountsService";
@@ -31,6 +33,8 @@ router.use("/accounts", accountsRoutes);
 router.use("/users", userRoutes);
 router.use("/category", categoryRoutes);
 router.use("/transactions", transactionsRoutes);
+router.use("/products", productRoutes);
+router.use("/product-transaction", productTransactionRoutes);
 
 // التحليل المالي
 router.get("/altahlil-almaliu", altahlilAlmaliuController);
