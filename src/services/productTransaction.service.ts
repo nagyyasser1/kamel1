@@ -52,142 +52,147 @@ async function getProductBalance() {
     59
   );
 
-  // Define start and end of last year
-  const lastYearStart = new Date(today.getFullYear() - 1, 0, 1, 0, 0, 0); // January 1st of last year
-  const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31, 23, 59, 59); // December 31st of last year
-
   // Define start and end of the current year
-  const thisYearStart = new Date(today.getFullYear(), 0, 1, 0, 0, 0); // January 1st, 00:00:00 of the current year
-  const thisYearEnd = new Date(today.getFullYear(), 11, 31, 23, 59, 59); // December 31st, 23:59:59 of the current year
+  const thisYearStart = new Date(today.getFullYear(), 0, 1, 0, 0, 0);
 
-  // Query for current day transactions
-  const currentDayTransactions = await prisma.account.findMany({
+  // Define end of yesterday
+  const yesterdayEnd = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 1,
+    23,
+    59,
+    59
+  );
+
+  // Query for transactions of today
+  const todayTransactions = await prisma.productTransaction.findMany({
     where: {
-      ProductTransaction: {
-        some: {},
+      createdAt: {
+        gte: todayStart,
+        lte: todayEnd,
       },
     },
-    include: {
-      ProductTransaction: {
-        where: {
-          createdAt: {
-            gte: todayStart,
-            lte: todayEnd,
-          },
-        },
+    select: {
+      accountId: true,
+      income: true,
+      outcome: true,
+      account: {
         select: {
-          income: true,
-          outcome: true,
+          id: true,
+          name: true,
+          number: true,
         },
       },
     },
   });
 
-  // Query for all day transactions
-  const allDayTransactions = await prisma.account.findMany({
+  // Query for transactions of this year until yesterday
+  const yearToYesterdayTransactions = await prisma.productTransaction.findMany({
     where: {
-      ProductTransaction: {
-        some: {
-          createdAt: {
-            gte: thisYearStart,
-            lte: thisYearEnd,
-          },
-        },
+      createdAt: {
+        gte: thisYearStart,
+        lte: yesterdayEnd,
       },
     },
-    include: {
-      ProductTransaction: {
-        select: {
-          income: true,
-          outcome: true,
-        },
-      },
+    select: {
+      accountId: true,
+      income: true,
+      outcome: true,
     },
   });
 
-  // Query for transactions of last year
-  const lastYearTransactions = await prisma.account.findMany({
+  // Query for all transactions this year (including today)
+  const allYearTransactions = await prisma.productTransaction.findMany({
     where: {
-      ProductTransaction: {
-        some: {
-          createdAt: {
-            gte: lastYearStart,
-            lte: lastYearEnd,
-          },
-        },
+      createdAt: {
+        gte: thisYearStart,
       },
     },
-    include: {
-      ProductTransaction: {
-        select: {
-          income: true,
-          outcome: true,
-        },
-      },
+    select: {
+      accountId: true,
+      income: true,
+      outcome: true,
     },
   });
 
-  // Format the result
-  const result = currentDayTransactions.map((product) => {
-    const currentIncome = product.ProductTransaction.reduce(
-      (sum, txn) => sum + txn.income,
-      0
+  // Query for last year's transactions
+  const lastYearTransactions = await prisma.productTransaction.findMany({
+    where: {
+      createdAt: {
+        lt: thisYearStart, // Before this year
+      },
+    },
+    select: {
+      accountId: true,
+      income: true,
+      outcome: true,
+    },
+  });
+
+  // Helper function to calculate totals for income and outcome
+  const calculateTotals = (transactions: any) => {
+    return transactions.reduce(
+      (totals: any, txn: any) => {
+        totals.income += txn.income || 0;
+        totals.outcome += txn.outcome || 0;
+        return totals;
+      },
+      { income: 0, outcome: 0 }
     );
-    const currentOutcome = product.ProductTransaction.reduce(
-      (sum, txn) => sum + txn.outcome,
-      0
+  };
+
+  // Group the results by accountId
+  const groupedResults = todayTransactions.map((todayProduct) => {
+    const { accountId, account } = todayProduct;
+
+    // Calculate totals for today
+    const todayTotals = calculateTotals(
+      todayTransactions.filter((txn) => txn.accountId === accountId)
     );
 
-    const allProduct = allDayTransactions.find((p) => p.id === product.id);
-    const allIncome =
-      allProduct?.ProductTransaction.reduce(
-        (sum, txn) => sum + txn.income,
-        0
-      ) || 0;
-    const allOutcome =
-      allProduct?.ProductTransaction.reduce(
-        (sum, txn) => sum + txn.outcome,
-        0
-      ) || 0;
-
-    const lastYearProduct = lastYearTransactions.find(
-      (p) => p.id === product.id
+    // Calculate totals for this year until yesterday
+    const yearToYesterdayTotals = calculateTotals(
+      yearToYesterdayTransactions.filter((txn) => txn.accountId === accountId)
     );
-    const lastYearIncome =
-      lastYearProduct?.ProductTransaction.reduce(
-        (sum, txn) => sum + txn.income,
-        0
-      ) || 0;
-    const lastYearOutcome =
-      lastYearProduct?.ProductTransaction.reduce(
-        (sum, txn) => sum + txn.outcome,
-        0
-      ) || 0;
+
+    // Calculate totals for all this year's transactions (including today)
+    const allYearTotals = calculateTotals(
+      allYearTransactions.filter((txn) => txn.accountId === accountId)
+    );
+
+    // Calculate totals for last year's transactions
+    const lastYearTotals = calculateTotals(
+      lastYearTransactions.filter((txn) => txn.accountId === accountId)
+    );
 
     return {
-      id: product.id,
-      name: product.name,
-      number: product.number,
+      id: account.id,
+      name: account.name,
+      number: account.number,
       current: {
-        income: currentIncome,
-        outcome: currentOutcome,
-        firstBalance: Math.abs(allIncome - allOutcome),
+        income: todayTotals.income, // Today's income
+        outcome: todayTotals.outcome, // Today's outcome
+        firstBalance: Math.abs(
+          yearToYesterdayTotals.income - yearToYesterdayTotals.outcome
+        ), // Balance until yesterday
         lastBalance:
-          Math.abs(allIncome - allOutcome) +
-          Math.abs(currentIncome - currentOutcome),
+          Math.abs(
+            yearToYesterdayTotals.income - yearToYesterdayTotals.outcome
+          ) + Math.abs(todayTotals.income - todayTotals.outcome), // Balance + today's transactions
       },
       all: {
-        income: allIncome,
-        outcome: allOutcome,
-        firstBalance: Math.abs(lastYearIncome - lastYearOutcome),
+        income: allYearTotals.income, // Total income for the year
+        outcome: allYearTotals.outcome, // Total outcome for the year
+        firstBalance: Math.abs(lastYearTotals.income - lastYearTotals.outcome), // Last year's balance
         lastBalance:
-          Math.abs(allIncome - allOutcome) +
-          Math.abs(currentIncome - currentOutcome),
+          Math.abs(lastYearTotals.income - lastYearTotals.outcome) +
+          Math.abs(allYearTotals.income - allYearTotals.outcome), // Last year's balance + this year's
       },
     };
   });
 
-  return result;
+  return groupedResults;
 }
 
 export default {
