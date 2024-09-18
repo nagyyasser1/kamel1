@@ -2,7 +2,7 @@ import prisma from "../prisma";
 
 // Types
 export interface TransactionInput {
-  productId: string;
+  accountId: string;
   income: number;
   outcome: number;
 }
@@ -18,17 +18,17 @@ const createTransaction = async (data: TransactionInput) => {
 const getAllTransactions = async () => {
   return prisma.productTransaction.findMany({
     include: {
-      product: true,
+      account: true,
     },
   });
 };
 
 // Get Transactions By Product ID
-const getTransactionsByProductId = async (productId: string) => {
+const getTransactionsByProductId = async (accountId: string) => {
   return prisma.productTransaction.findMany({
-    where: { productId },
+    where: { accountId },
     include: {
-      product: true,
+      account: true,
     },
   });
 };

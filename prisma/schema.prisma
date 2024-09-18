@@ -47,23 +47,16 @@ model Category {
 }
 
 model Account {
-  id                   String        @id @default(uuid())
-  name                 String        @unique
-  number               Int           @unique
+  id                   String               @id @default(uuid())
+  name                 String               @unique
+  number               Int                  @unique
   email                String?
   description          String?
   categoryId           String?
-  category             Category?     @relation("CategoryAccounts", fields: [categoryId], references: [id], onDelete: SetNull)
-  sentTransactions     Transaction[] @relation("SentTransactions")
-  receivedTransactions Transaction[] @relation("ReceivedTransactions")
-}
-
-model Product {
-  id     String @id @default(uuid())
-  name   String
-  number Int
-
-  ProductTransaction ProductTransaction[]
+  category             Category?            @relation("CategoryAccounts", fields: [categoryId], references: [id], onDelete: SetNull)
+  sentTransactions     Transaction[]        @relation("SentTransactions")
+  receivedTransactions Transaction[]        @relation("ReceivedTransactions")
+  ProductTransaction   ProductTransaction[]
 }
 
 model ProductTransaction {
@@ -72,8 +65,8 @@ model ProductTransaction {
   income  Int
   outcome Int
 
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
 
   createdAt DateTime @default(now())
 }

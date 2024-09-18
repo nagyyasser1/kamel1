@@ -110,7 +110,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     // 9.
     const nasabuh_altadawul =
-      alasulAlmutadawiluh.balance + alkhusumAlmutadawiluh.balance;
+      alasulAlmutadawiluh.balance / alkhusumAlmutadawiluh.balance;
 
     // 10.
     const nasabuh_altadawul_alsarie =
@@ -159,6 +159,22 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         qurudTawiluhAlajil.thisYearBalance) /
       (alasulAlmutadawiluh.balance + alasulAlthaabatuh.balance);
 
+    // 19.
+    const nasabah_almalkih =
+      huquqAlmalakih.balance /
+      (alasulAlmutadawiluh.balance + alasulAlthaabatuh.balance);
+
+    // 20.
+    const mutawasit_alaistithmar = huquqAlmalakih.balance / 2;
+
+    // 21.
+    const mueadal_aleayid_almuhasabii = undefined;
+
+    // 22.
+    const almuazinuh_alnaqdayh = undefined;
+
+    // 23.
+
     res.json({
       safi_almabieat,
       safi_almushtariat,
@@ -177,6 +193,9 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       mueadal_dawaran_alasul,
       aleayid_eali_alasul,
       nasabah_almadiunih,
+      nasabah_almalkih,
+      mutawasit_alaistithmar,
+      mueadal_aleayid_almuhasabii,
     });
   } catch (error) {
     next(error);

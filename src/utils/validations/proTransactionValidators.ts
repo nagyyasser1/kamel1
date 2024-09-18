@@ -5,7 +5,7 @@ import { STATUS_CODES } from "../../constants/statusCodes";
 const createProductTransSchema = Joi.object({
   income: Joi.number().required(),
   outcome: Joi.number().required(),
-  productId: Joi.string().required(),
+  accountId: Joi.string().required(),
   createdAt: Joi.date().optional(),
 });
 

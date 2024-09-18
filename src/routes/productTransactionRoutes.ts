@@ -10,6 +10,7 @@ router.post(
   productTransactionController.createTransaction
 );
 router.get("/", productTransactionController.getAllTransactions);
+router.get("/stats", productTransactionController.getStats);
 router.get("/:id", productTransactionController.getTransactionsByProductId);
 router.patch("/:id", productTransactionController.updateTransaction);
 router.delete("/:id", productTransactionController.deleteTransaction);

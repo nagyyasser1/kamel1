@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import ProductTransactionService from "../services/productTransaction.service";
 
 // Controller to create a transaction
@@ -61,10 +61,20 @@ const deleteTransaction = async (req: Request, res: Response) => {
   }
 };
 
+const getStats = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const stats = await ProductTransactionService.getProductBalance();
+    res.send(stats);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createTransaction,
   getAllTransactions,
   getTransactionsByProductId,
   updateTransaction,
   deleteTransaction,
+  getStats,
 };
