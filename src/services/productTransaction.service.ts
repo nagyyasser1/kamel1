@@ -65,6 +65,20 @@ async function getProductBalance() {
     59
   );
 
+  // Query all accounts (to ensure we don't miss any with no transactions today)
+  const allAccounts = await prisma.account.findMany({
+    where: {
+      ProductTransaction: {
+        some: {},
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      number: true,
+    },
+  });
+
   // Query for transactions of today
   const todayTransactions = await prisma.productTransaction.findMany({
     where: {
@@ -77,13 +91,6 @@ async function getProductBalance() {
       accountId: true,
       income: true,
       outcome: true,
-      account: {
-        select: {
-          id: true,
-          name: true,
-          number: true,
-        },
-      },
     },
   });
 
@@ -142,26 +149,23 @@ async function getProductBalance() {
     );
   };
 
-  // Group the results by accountId
-  const groupedResults = todayTransactions.map((todayProduct) => {
-    const { accountId, account } = todayProduct;
+  // Group the results by accountId, making sure all accounts are included
+  const groupedResults = allAccounts.map((account) => {
+    const accountId = account.id;
 
-    // Calculate totals for today
+    // Filter transactions for this specific account
     const todayTotals = calculateTotals(
       todayTransactions.filter((txn) => txn.accountId === accountId)
     );
 
-    // Calculate totals for this year until yesterday
     const yearToYesterdayTotals = calculateTotals(
       yearToYesterdayTransactions.filter((txn) => txn.accountId === accountId)
     );
 
-    // Calculate totals for all this year's transactions (including today)
     const allYearTotals = calculateTotals(
       allYearTransactions.filter((txn) => txn.accountId === accountId)
     );
 
-    // Calculate totals for last year's transactions
     const lastYearTotals = calculateTotals(
       lastYearTransactions.filter((txn) => txn.accountId === accountId)
     );
