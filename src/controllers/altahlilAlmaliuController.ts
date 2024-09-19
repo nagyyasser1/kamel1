@@ -116,6 +116,9 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const nasabuh_altadawul_alsarie =
       alasulAlmutadawiluh.balance / alkhusumAlmutadawiluh.balance;
 
+    // 11.
+    const nasabuh_alnaqdih = 404;
+
     // 13.
     const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
 
@@ -171,32 +174,82 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const mueadal_aleayid_almuhasabii = undefined;
 
     // 22.
-    const almuazinuh_alnaqdayh = undefined;
+    const almuazinuh_alnaqdayh = 404;
 
     // 23.
+    const mueadal_dawaran_almadinin = 404;
 
-    res.json({
-      safi_almabieat,
-      safi_almushtariat,
-      tukalifuh_almabieat,
-      alribh_altashghiliu,
-      safi_aldukhl,
-      altadafuq_alnaqdiu_min_alqurud,
-      ras_almal_almustathmir,
-      ajamali_altamwil,
-      nasabuh_altadawul,
-      ras_almal_aleamil,
-      nasabuh_altadawul_alsarie,
-      hamish_mujmal_alribh,
-      hamish_alribh_altashghilii,
-      hamish_safi_alribh,
-      mueadal_dawaran_alasul,
-      aleayid_eali_alasul,
-      nasabah_almadiunih,
-      nasabah_almalkih,
-      mutawasit_alaistithmar,
-      mueadal_aleayid_almuhasabii,
-    });
+    // 24.
+    const mutawasit_almadinin = 404;
+
+    // 25.
+    const mutawasit_fatrih_altahsil = 404;
+
+    res.send([
+      [
+        safi_almabieat,
+        tukalifuh_almabieat,
+        safi_almushtariat,
+        alribh_altashghiliu,
+        safi_aldukhl,
+        ras_almal_almustathmir,
+        ajamali_altamwil,
+        altadafuq_alnaqdiu_min_alqurud,
+      ],
+      [
+        nasabuh_altadawul,
+        nasabuh_altadawul_alsarie,
+        nasabuh_alnaqdih,
+        ras_almal_aleamil,
+      ],
+      [
+        hamish_mujmal_alribh,
+        hamish_alribh_altashghilii,
+        hamish_safi_alribh,
+        mueadal_dawaran_alasul,
+        aleayid_eali_alasul,
+      ],
+      [
+        nasabah_almalkih,
+        nasabah_almadiunih,
+        mueadal_aleayid_almuhasabii,
+        mutawasit_alaistithmar,
+        almuazinuh_alnaqdayh,
+      ],
+      [
+        mueadal_dawaran_almadinin,
+        mutawasit_almadinin,
+        mutawasit_fatrih_altahsil,
+      ],
+    ]);
+
+    // res.json({
+    //   safi_almabieat,
+    //   safi_almushtariat,
+    //   tukalifuh_almabieat,
+    //   alribh_altashghiliu,
+    //   safi_aldukhl,
+    //   altadafuq_alnaqdiu_min_alqurud,
+    //   ras_almal_almustathmir,
+    //   ajamali_altamwil,
+    //   nasabuh_altadawul,
+    //   nasabuh_alnaqdih,
+    //   ras_almal_aleamil,
+    //   nasabuh_altadawul_alsarie,
+    //   hamish_mujmal_alribh,
+    //   hamish_alribh_altashghilii,
+    //   hamish_safi_alribh,
+    //   mueadal_dawaran_alasul,
+    //   aleayid_eali_alasul,
+    //   nasabah_almadiunih,
+    //   nasabah_almalkih,
+    //   mutawasit_alaistithmar,
+    //   mueadal_aleayid_almuhasabii,
+    //   almuazinuh_alnaqdayh,
+    //   mueadal_dawaran_almadinin,
+    //   mutawasit_almadinin,
+    //   mutawasit_fatrih_altahsil,
+    // });
   } catch (error) {
     next(error);
   }
