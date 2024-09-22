@@ -1,5 +1,6 @@
 import { Router } from "express";
 import userRoutes from "./userRoutes";
+import reportRoutes from "./report.routes";
 import authRoutes from "./authRoutes";
 import accountsRoutes from "./accountsRoutes";
 import categoryRoutes from "./categoryRoutes";
@@ -30,6 +31,7 @@ router.get("/accountsarray", async (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/accounts", accountsRoutes);
 router.use("/users", userRoutes);
+router.use("/reports", reportRoutes);
 router.use("/category", categoryRoutes);
 router.use("/transactions", transactionsRoutes);
 router.use("/product-transaction", productTransactionRoutes);

@@ -56,6 +56,14 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       categories.inventoryAtTheEndOfThePeriod
     );
 
+    const inventory2 = await categoryService.getSubcategoryBalances(
+      categories.inventory2
+    );
+
+    const inventory1 = await categoryService.getSubcategoryBalances(
+      categories.inventory1
+    );
+
     const ayradat_akhari = await categoryService.getSubcategoryBalances(
       categories.otherRevenues
     );
@@ -73,6 +81,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       accountsObject[accounts.sales].balance -
       (accountsObject[accounts.allowedDiscount].balance -
         accountsObject[accounts.salesReturns].balance);
+
     // 2.
     const safi_almushtariat =
       accountsObject[accounts.purchases].balance +
@@ -81,8 +90,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       accountsObject[accounts.khasmuktasib].balance;
 
     // 3.
-    const tukalifuh_almabieat =
-      safi_almushtariat - makhzun_akhir_alfatrih?.balance;
+    const tukalifuh_almabieat = safi_almushtariat - inventory2.balance;
 
     // 4.
     const alribh_altashghiliu = safi_almabieat - tukalifuh_almabieat;

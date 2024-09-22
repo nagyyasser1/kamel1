@@ -82,3 +82,9 @@ model Transaction {
   to          Account  @relation("ReceivedTransactions", fields: [toId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 }
+
+model Report {
+  id          String @id @default(uuid())
+  type        String @default("all")
+  description String
+}
