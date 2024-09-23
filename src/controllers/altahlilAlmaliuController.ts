@@ -100,10 +100,11 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     );
 
     // 3.
-    const tukalifuh_almabieat =
+    const tukalifuh_almabieat = Math.abs(
       inventory2.previousYearsBalance +
-      safi_almushtariat -
-      inventory2.thisYearBalance;
+        safi_almushtariat -
+        inventory2.thisYearBalance
+    );
 
     // 4.
     const alribh_altashghiliu = safi_almabieat - tukalifuh_almabieat;
@@ -138,17 +139,17 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     // 10.
     const nasabuh_altadawul_alsarie =
-      alasulAlmutadawiluh.thisYearBalance -
-      inventory2.thisYearBalance -
-      masrufat_muqadamih.thisYearBalance /
-        alkhusumAlmutadawiluh.thisYearBalance;
+      (alasulAlmutadawiluh.thisYearBalance -
+        inventory2.thisYearBalance -
+        masrufat_muqadamih.thisYearBalance) /
+      alkhusumAlmutadawiluh.thisYearBalance;
 
     // 11.
     const nasabuh_alnaqdih =
-      theBox.thisYearBalance +
-      theBanK.thisYearBalance +
-      accountsObject[accounts.arrestPapers].balance /
-        accountsObject[accounts.awraqAldafe].balance;
+      (theBox.thisYearBalance +
+        theBanK.thisYearBalance +
+        accountsObject[accounts.arrestPapers].balance) /
+      accountsObject[accounts.awraqAldafe].balance;
 
     // 13.
     const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
@@ -187,7 +188,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       alasulAlmutadawiluhTotla.previousYearsBalance +
       alasulAlthaabatuh.previousYearsBalance;
 
-    const mutawasit_alasul = alasulCurrent + alasulPrev / 2;
+    const mutawasit_alasul = (alasulCurrent + alasulPrev) / 2;
 
     const mueadal_dawaran_alasul = safi_almabieat / mutawasit_alasul;
 
