@@ -148,7 +148,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const nasabuh_alnaqdih =
       (theBox.thisYearBalance +
         theBanK.thisYearBalance +
-        accountsObject[accounts.arrestPapers].balance) /
+        Math.abs(accountsObject[accounts.arrestPapers].balance)) /
       accountsObject[accounts.awraqAldafe].balance;
 
     // 13.
@@ -248,7 +248,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       mueadal_dawaran_alasul: parseFloat(mueadal_dawaran_alasul.toFixed(3)),
       aleayid_eali_alasul: parseFloat(aleayid_eali_alasul.toFixed(3)),
       nasabah_almadiunih,
-      nasabah_almalkih,
+      nasabah_almalkih: parseFloat(nasabah_almalkih.toFixed(3)),
       mutawasit_alaistithmar,
       mueadal_aleayid_almuhasabii,
       almuazinuh_alnaqdayh,
