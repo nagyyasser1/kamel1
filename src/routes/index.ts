@@ -13,15 +13,15 @@ import altahlilAlmaliuController from "../controllers/altahlilAlmaliuController"
 const router = Router();
 
 router.get("/categories", async (req, res) => {
-  const result = await categoryService.getCategoryBalancesTest();
+  const result = await categoryService.getCategoriesBalances();
   res.send(result);
 });
 
-// router.get("/categories/:number", async (req, res) => {
-//   const { number } = req.params;
-//   const result = await categoryService.getSubcategoryBalances(parseInt(number));
-//   res.send(result);
-// });
+router.get("/categories/:number", async (req, res) => {
+  const { number } = req.params;
+  const result = await categoryService.getCategoryBalance(parseInt(number));
+  res.send(result);
+});
 
 router.get("/accountsarray", async (req, res) => {
   const result = await accountsService.getAccountsBalances();

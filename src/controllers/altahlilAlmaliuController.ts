@@ -7,64 +7,73 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { accountsObject } = await accountsService.getAccountsBalances();
 
-    const alasulAlthaabatuh = await categoryService.getSubcategoryBalances(
+    const alasulAlthaabatuh = await categoryService.getCategoryBalance(
       categories.alasulAlthaabatuh
     );
 
-    const alasulAlthaabatuhTotal =
-      await categoryService.getSubcategoryBalancesTotal(
-        categories.alasulAlthaabatuh
-      );
+    const alasulAlthaabatuhTotal = await categoryService.getCategoryBalance(
+      categories.alasulAlthaabatuh
+    );
 
-    const alasulAlmutadawiluh = await categoryService.getSubcategoryBalances(
+    const inventory2 = await categoryService.getCategoryBalance(
+      categories.inventory2
+    );
+
+    const alasulAlmutadawiluh = await categoryService.getCategoryBalance(
       categories.alasulAlmutadawiluh
     );
 
-    const alasulAlmutadawiluhTotla =
-      await categoryService.getSubcategoryBalancesTotal(
-        categories.alasulAlmutadawiluh
-      );
+    const alasulAlmutadawiluhTotla = await categoryService.getCategoryBalance(
+      categories.alasulAlmutadawiluh
+    );
 
-    const alkhusumAlmutadawiluh = await categoryService.getSubcategoryBalances(
+    const alkhusumAlmutadawiluh = await categoryService.getCategoryBalance(
       categories.alkhusumAlmutadawiluh
     );
 
-    const alkhusumAlthaabatuh = await categoryService.getSubcategoryBalances(
+    const alkhusumAlthaabatuh = await categoryService.getCategoryBalance(
       categories.alkhusumAlthaabatuh
     );
 
     const alkhusum =
-      alkhusumAlmutadawiluh.balance + alkhusumAlthaabatuh.balance;
+      alkhusumAlmutadawiluh.thisYearBalance +
+      alkhusumAlthaabatuh.thisYearBalance;
 
-    const masarifAdarih = await categoryService.getSubcategoryBalances(
+    const masarifAdarih = await categoryService.getCategoryBalance(
       categories.masarifAdarih
     );
 
-    const masarifTaswiqayh = await categoryService.getSubcategoryBalances(
+    const masarifTaswiqayh = await categoryService.getCategoryBalance(
       categories.masarifTaswiqayh
     );
 
-    const masarifTashghilayh = await categoryService.getSubcategoryBalances(
+    const theBanK = await categoryService.getCategoryBalance(
+      categories.theBanK
+    );
+
+    const theBox = await categoryService.getCategoryBalance(categories.theBox);
+
+    const masarifTashghilayh = await categoryService.getCategoryBalance(
       categories.masarifTashghilayh
     );
 
-    const huquqAlmalakih = await categoryService.getSubcategoryBalances(
+    const huquqAlmalakih = await categoryService.getCategoryBalance(
       categories.huquqAlmalakih
     );
 
-    const makhzun_akhir_alfatrih = await categoryService.getSubcategoryBalances(
+    const masrufat_muqadamih = await categoryService.getCategoryBalance(
+      categories.masrufat_muqadamih
+    );
+
+    const makhzun_akhir_alfatrih = await categoryService.getCategoryBalance(
       categories.inventoryAtTheEndOfThePeriod
     );
 
-    const inventory2 = await categoryService.getSubcategoryBalances(
-      categories.inventory2
-    );
-
-    const inventory1 = await categoryService.getSubcategoryBalances(
+    const inventory1 = await categoryService.getCategoryBalance(
       categories.inventory1
     );
 
-    const ayradat_akhari = await categoryService.getSubcategoryBalances(
+    const ayradat_akhari = await categoryService.getCategoryBalance(
       categories.otherRevenues
     );
 
@@ -83,20 +92,24 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         accountsObject[accounts.salesReturns].balance);
 
     // 2.
-    const safi_almushtariat =
+    const safi_almushtariat = Math.abs(
       accountsObject[accounts.purchases].balance +
-      accountsObject[accounts.purchasesExpenses].balance -
-      accountsObject[accounts.purchaseReturns].balance -
-      accountsObject[accounts.khasmuktasib].balance;
+        accountsObject[accounts.purchasesExpenses].balance -
+        accountsObject[accounts.purchaseReturns].balance -
+        accountsObject[accounts.khasmuktasib].balance
+    );
 
     // 3.
-    const tukalifuh_almabieat = safi_almushtariat - inventory2.balance;
+    const tukalifuh_almabieat =
+      inventory2.previousYearsBalance +
+      safi_almushtariat -
+      inventory2.thisYearBalance;
 
     // 4.
     const alribh_altashghiliu = safi_almabieat - tukalifuh_almabieat;
 
     // 5.
-    const safi_aldukhl = alribh_altashghiliu - masarifAdarih?.balance;
+    const safi_aldukhl = alribh_altashghiliu - masarifAdarih?.thisYearBalance;
 
     // 6.
     const altadafuq_alnaqdiu_min_alqurud =
@@ -107,25 +120,35 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     // 7.
     const ras_almal_aleamil =
-      alasulAlmutadawiluh?.balance - alkhusumAlmutadawiluh.balance;
+      alasulAlmutadawiluh?.thisYearBalance -
+      inventory2.thisYearBalance -
+      alkhusumAlmutadawiluh.thisYearBalance;
 
     const ras_almal_almustathmir =
-      alasulAlthaabatuh?.balance - ras_almal_aleamil;
+      alasulAlthaabatuh?.thisYearBalance - ras_almal_aleamil;
 
     // 8.
     const ajamali_altamwil =
-      alkhusumAlthaabatuh?.balance + huquqAlmalakih?.balance;
+      alkhusumAlthaabatuh?.thisYearBalance + huquqAlmalakih?.thisYearBalance;
 
     // 9.
     const nasabuh_altadawul =
-      alasulAlmutadawiluh.balance / alkhusumAlmutadawiluh.balance;
+      (alasulAlmutadawiluh.thisYearBalance - inventory2.thisYearBalance) /
+      alkhusumAlmutadawiluh.thisYearBalance;
 
     // 10.
     const nasabuh_altadawul_alsarie =
-      alasulAlmutadawiluh.balance / alkhusumAlmutadawiluh.balance;
+      alasulAlmutadawiluh.thisYearBalance -
+      inventory2.thisYearBalance -
+      masrufat_muqadamih.thisYearBalance /
+        alkhusumAlmutadawiluh.thisYearBalance;
 
     // 11.
-    const nasabuh_alnaqdih = 404;
+    const nasabuh_alnaqdih =
+      theBox.thisYearBalance +
+      theBanK.thisYearBalance +
+      accountsObject[accounts.arrestPapers].balance /
+        accountsObject[accounts.awraqAldafe].balance;
 
     // 13.
     const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
@@ -137,16 +160,15 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       accountsObject[accounts.sales].balance +
       accountsObject[accounts.salesReturns].balance +
       accountsObject[accounts.purchaseReturns].balance -
-      makhzun_akhir_alfatrih.balance;
+      makhzun_akhir_alfatrih.thisYearBalance;
 
     const alribh_altashghiliu_qabl_aldarayib =
       safi_almabieat -
       tukalifuh_albidaeuh_almubaeuh +
-      ayradat_akhari.balance -
-      (masarifAdarih.balance + masarifTaswiqayh.balance);
+      ayradat_akhari.thisYearBalance -
+      (masarifAdarih.thisYearBalance + masarifTaswiqayh.thisYearBalance);
 
-    const hamish_alribh_altashghilii =
-      alribh_altashghiliu_qabl_aldarayib / safi_almabieat;
+    const hamish_alribh_altashghilii = alribh_altashghiliu / safi_almabieat;
 
     // 15.
     const safi_alribh =
@@ -156,8 +178,16 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const hamish_safi_alribh = safi_alribh / safi_almabieat;
 
     // 16.
-    const mutawasit_alasul =
-      alasulAlmutadawiluhTotla.balance / alasulAlthaabatuhTotal.balance / 2;
+
+    const alasulCurrent =
+      alasulAlmutadawiluhTotla.thisYearBalance +
+      alasulAlthaabatuh.thisYearBalance;
+
+    const alasulPrev =
+      alasulAlmutadawiluhTotla.previousYearsBalance +
+      alasulAlthaabatuh.previousYearsBalance;
+
+    const mutawasit_alasul = alasulCurrent + alasulPrev / 2;
 
     const mueadal_dawaran_alasul = safi_almabieat / mutawasit_alasul;
 
@@ -168,15 +198,15 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const nasabah_almadiunih =
       (qurudQasiruhAlajil.thisYearBalance +
         qurudTawiluhAlajil.thisYearBalance) /
-      (alasulAlmutadawiluh.balance + alasulAlthaabatuh.balance);
+      (alasulAlmutadawiluh.thisYearBalance + alasulAlthaabatuh.thisYearBalance);
 
     // 19.
     const nasabah_almalkih =
-      huquqAlmalakih.balance /
-      (alasulAlmutadawiluh.balance + alasulAlthaabatuh.balance);
+      huquqAlmalakih.thisYearBalance /
+      (alasulAlmutadawiluh.thisYearBalance + alasulAlthaabatuh.thisYearBalance);
 
     // 20.
-    const mutawasit_alaistithmar = huquqAlmalakih.balance / 2;
+    const mutawasit_alaistithmar = huquqAlmalakih.thisYearBalance / 2;
 
     // 21.
     const mueadal_aleayid_almuhasabii = 404;
@@ -193,6 +223,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     // 25.
     const mutawasit_fatrih_altahsil = 404;
 
+    // parseFloat(value.toFixed(3))
     res.json({
       safi_almabieat,
       safi_almushtariat,
@@ -202,15 +233,19 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       altadafuq_alnaqdiu_min_alqurud,
       ras_almal_almustathmir,
       ajamali_altamwil,
-      nasabuh_altadawul,
-      nasabuh_alnaqdih,
+      nasabuh_altadawul: parseFloat(nasabuh_altadawul.toFixed(3)),
+      nasabuh_altadawul_alsarie: parseFloat(
+        nasabuh_altadawul_alsarie.toFixed(3)
+      ),
+      nasabuh_alnaqdih: parseFloat(nasabuh_alnaqdih.toFixed(3)),
       ras_almal_aleamil,
-      nasabuh_altadawul_alsarie,
-      hamish_mujmal_alribh,
-      hamish_alribh_altashghilii,
-      hamish_safi_alribh,
-      mueadal_dawaran_alasul,
-      aleayid_eali_alasul,
+      hamish_mujmal_alribh: parseFloat(hamish_mujmal_alribh.toFixed(3)),
+      hamish_alribh_altashghilii: parseFloat(
+        hamish_alribh_altashghilii.toFixed(3)
+      ),
+      hamish_safi_alribh: parseFloat(hamish_safi_alribh.toFixed(3)),
+      mueadal_dawaran_alasul: parseFloat(mueadal_dawaran_alasul.toFixed(3)),
+      aleayid_eali_alasul: parseFloat(aleayid_eali_alasul.toFixed(3)),
       nasabah_almadiunih,
       nasabah_almalkih,
       mutawasit_alaistithmar,
