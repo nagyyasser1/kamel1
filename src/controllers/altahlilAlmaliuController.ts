@@ -207,7 +207,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     // 19.
     const nasabah_almalkih = huquqAlmalakih.thisYearBalance / alasulCurrent;
 
-    // To-do
     // 20.
     const mutawasit_alaistithmar =
       (ras_almal.thisYearBalance + ras_almal.previousYearsBalance) / 2;
