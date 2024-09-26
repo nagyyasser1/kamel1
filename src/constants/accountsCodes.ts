@@ -199,9 +199,11 @@ export const accounts = {
 };
 
 export const categories = {
+  ras_almal: 31,
   masrufat_muqadamih: 56,
   inventory1: 120601,
   inventory2: 120602,
+  clients: 1212,
   clientsAbroad: 121201,
   clientsInside: 121202,
   ancestor: 120201,

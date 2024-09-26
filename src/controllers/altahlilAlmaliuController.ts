@@ -23,10 +23,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       categories.alasulAlmutadawiluh
     );
 
-    const alasulAlmutadawiluhTotla = await categoryService.getCategoryBalance(
-      categories.alasulAlmutadawiluh
-    );
-
     const alkhusumAlmutadawiluh = await categoryService.getCategoryBalance(
       categories.alkhusumAlmutadawiluh
     );
@@ -69,12 +65,20 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       categories.inventoryAtTheEndOfThePeriod
     );
 
+    const ras_almal = await categoryService.getCategoryBalance(
+      categories.ras_almal
+    );
+
     const inventory1 = await categoryService.getCategoryBalance(
       categories.inventory1
     );
 
     const ayradat_akhari = await categoryService.getCategoryBalance(
       categories.otherRevenues
+    );
+
+    const clients = await categoryService.getCategoryBalance(
+      categories.clients
     );
 
     const qurudTawiluhAlajil = await accountsService.getAccountBalance(
@@ -181,11 +185,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     // 16.
 
     const alasulCurrent =
-      alasulAlmutadawiluhTotla.thisYearBalance +
-      alasulAlthaabatuh.thisYearBalance;
+      alasulAlmutadawiluh.thisYearBalance + alasulAlthaabatuh.thisYearBalance;
 
     const alasulPrev =
-      alasulAlmutadawiluhTotla.previousYearsBalance +
+      alasulAlmutadawiluh.previousYearsBalance +
       alasulAlthaabatuh.previousYearsBalance;
 
     const mutawasit_alasul = (alasulCurrent + alasulPrev) / 2;
@@ -199,32 +202,38 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const nasabah_almadiunih =
       (qurudQasiruhAlajil.thisYearBalance +
         qurudTawiluhAlajil.thisYearBalance) /
-      (alasulAlmutadawiluh.thisYearBalance + alasulAlthaabatuh.thisYearBalance);
+      alasulCurrent;
 
     // 19.
-    const nasabah_almalkih =
-      huquqAlmalakih.thisYearBalance /
-      (alasulAlmutadawiluh.thisYearBalance + alasulAlthaabatuh.thisYearBalance);
+    const nasabah_almalkih = huquqAlmalakih.thisYearBalance / alasulCurrent;
 
+    // To-do
     // 20.
-    const mutawasit_alaistithmar = huquqAlmalakih.thisYearBalance / 2;
+    const mutawasit_alaistithmar =
+      (ras_almal.thisYearBalance + ras_almal.previousYearsBalance) / 2;
 
     // 21.
-    const mueadal_aleayid_almuhasabii = 404;
+    const mutawasit_alribh = safi_alribh / 2;
+
+    const mueadal_aleayid_almuhasabii =
+      mutawasit_alribh / mutawasit_alaistithmar;
 
     // 22.
-    const almuazinuh_alnaqdayh = 404;
+    const almuazinuh_alnaqdayh =
+      theBox.thisYearBalance + theBox.previousYearsBalance;
 
     // 23.
-    const mueadal_dawaran_almadinin = 404;
+    const mutawasit_almadinin =
+      (clients.thisYearBalance + clients.previousYearsBalance) / 2;
 
-    // 24.
-    const mutawasit_almadinin = 404;
+    const mueadal_dawaran_almadinin =
+      (Math.abs(accountsObject[accounts.arrestPapers].balance) +
+        clients.thisYearBalance) /
+      mutawasit_almadinin;
 
     // 25.
-    const mutawasit_fatrih_altahsil = 404;
+    const mutawasit_fatrih_altahsil = mueadal_dawaran_almadinin / 365;
 
-    // parseFloat(value.toFixed(3))
     res.json({
       safi_almabieat,
       safi_almushtariat,
@@ -247,14 +256,20 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       hamish_safi_alribh: parseFloat(hamish_safi_alribh.toFixed(3)),
       mueadal_dawaran_alasul: parseFloat(mueadal_dawaran_alasul.toFixed(3)),
       aleayid_eali_alasul: parseFloat(aleayid_eali_alasul.toFixed(3)),
-      nasabah_almadiunih,
+      nasabah_almadiunih: parseFloat(nasabah_almadiunih.toFixed(3)),
       nasabah_almalkih: parseFloat(nasabah_almalkih.toFixed(3)),
-      mutawasit_alaistithmar,
-      mueadal_aleayid_almuhasabii,
+      mutawasit_alaistithmar: parseFloat(mutawasit_alaistithmar.toFixed(3)),
+      mueadal_aleayid_almuhasabii: parseFloat(
+        mueadal_aleayid_almuhasabii.toFixed(3)
+      ),
       almuazinuh_alnaqdayh,
-      mueadal_dawaran_almadinin,
-      mutawasit_almadinin,
-      mutawasit_fatrih_altahsil,
+      mueadal_dawaran_almadinin: parseFloat(
+        mueadal_dawaran_almadinin.toFixed(3)
+      ),
+      mutawasit_almadinin: parseFloat(mutawasit_almadinin.toFixed(3)),
+      mutawasit_fatrih_altahsil: parseFloat(
+        mutawasit_fatrih_altahsil.toFixed(3)
+      ),
     });
   } catch (error) {
     next(error);
