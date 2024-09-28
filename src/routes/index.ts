@@ -9,6 +9,8 @@ import transactionsRoutes from "./transactoinsRoutes";
 import categoryService from "../services/categoryService";
 import accountsService from "../services/accountsService";
 import altahlilAlmaliuController from "../controllers/altahlilAlmaliuController";
+import altaghayurFiHuquqAlmalakih from "../controllers/altaghayurFiHuquqAlmalakih";
+import altadafuqAlnaqdiuCtl from "../controllers/altadafuqAlnaqdiuCtl";
 
 const router = Router();
 
@@ -38,5 +40,9 @@ router.use("/product-transaction", productTransactionRoutes);
 
 // التحليل المالي
 router.get("/altahlil-almaliu", altahlilAlmaliuController);
+// التغير في حقوق الملكيه
+router.get("/altaghayur-fi-huquq-almalakih", altaghayurFiHuquqAlmalakih);
+// التدفق النقدي المباشر والغير مباشر
+router.get("/altadafuq-alnaqdiu", altadafuqAlnaqdiuCtl);
 
 export default router;

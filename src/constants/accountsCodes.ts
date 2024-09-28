@@ -196,6 +196,7 @@ export const accounts = {
   awraqAldafe: 220601,
   khasmuktasib: 121001,
   masrufAhlakMabani: 5405,
+  arbahRasimalia: 4201,
 };
 
 export const categories = {
@@ -211,6 +212,7 @@ export const categories = {
   theBox: 120101,
   theBanK: 120102,
   alMothsatat: 54,
+  almoreden: 2201,
   almoredenOutside: 220101,
   almoredenInside: 220102,
   capital: 31,
@@ -228,6 +230,7 @@ export const categories = {
   alkhusumAlthaabatuh: 21,
   alkhusumAlmutadawiluh: 22,
   huquqAlmalakih: 3,
+  masrufatMustahaqa: 2204,
 };
 
 export default ACCOUNTS_CODES_FOR_INCOME;
