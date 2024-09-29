@@ -3,7 +3,7 @@ import Joi, { ValidationError, ValidationResult } from "joi";
 import { STATUS_CODES } from "../../constants/statusCodes";
 
 const createReportSchema = Joi.object({
-  type: Joi.string().optional(),
+  type: Joi.string().required(),
   description: Joi.string().required(),
 });
 

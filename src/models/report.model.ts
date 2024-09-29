@@ -6,8 +6,13 @@ const createReport = async (data: { type: string; description: string }) => {
   });
 };
 
-const getReports = async () => {
-  return await prisma.report.findMany();
+const getReports = async (type: string) => {
+  let where: any = {};
+
+  if (type) {
+    where.type = type;
+  }
+  return await prisma.report.findMany({ where });
 };
 
 const getReportById = async (id: string) => {

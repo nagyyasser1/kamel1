@@ -11,9 +11,11 @@ const createReport = async (req: Request, res: Response) => {
   }
 };
 
-const getReports = async (_req: Request, res: Response) => {
+const getReports = async (req: Request, res: Response) => {
   try {
-    const reports = await reportService.getAllReports();
+    const { type } = req.query;
+
+    const reports = await reportService.getAllReports(type as any);
     return res.status(200).json(reports);
   } catch (error) {
     return res.status(500).json({ message: "Failed to get reports", error });

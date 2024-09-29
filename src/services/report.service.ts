@@ -4,8 +4,8 @@ const createReport = async (type: string, description: string) => {
   return await reportModel.createReport({ type, description });
 };
 
-const getAllReports = async () => {
-  return await reportModel.getReports();
+const getAllReports = async (type: string) => {
+  return await reportModel.getReports(type);
 };
 
 const getReport = async (id: string) => {
