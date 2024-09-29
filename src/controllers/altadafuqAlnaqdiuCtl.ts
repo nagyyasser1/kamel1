@@ -141,6 +141,15 @@ const altadafuqAlnaqdiuCtl = async (
       ras_almalBase.thisYearBalance - ras_almalBase.previousYearsBalance
     );
 
+    const alziyadah_alnaqs_fi_alaihtiatii = 404;
+
+    const safi_altadafuqat_alnaqdayh_min_aliainshitih_altamwilih = 404;
+
+    const naqdih_bialkhazinih = 404;
+
+    const naqdih_bialbunuk = 404;
+
+    const rasid_alnaqdayh_awil_aleam = 404;
     res.json({
       //one
       safi_alribh,
@@ -159,6 +168,13 @@ const altadafuqAlnaqdiuCtl = async (
       safi_altadafuqat_alnaqdayh_min_alaistithmar,
       //four
       ras_almal,
+      alziyadah_alnaqs_fi_alaihtiatii,
+      safi_altadafuqat_alnaqdayh_min_aliainshitih_altamwilih,
+      //five
+      rasid_alnaqdayh_awil_aleam,
+      //six
+      naqdih_bialkhazinih,
+      naqdih_bialbunuk,
     });
   } catch (error) {
     next(error);
