@@ -155,19 +155,8 @@ export const getCategoryTransactionSummary = async (
         message: "category 'code' must be provided in the query!",
       });
 
-    // Convert code to number or undefined
-    const categoryCode = typeof code === "string" ? code : undefined;
-
-    if (categoryCode) {
-      if (categoryCode) {
-        return res.status(STATUS_CODES.BAD_REQUEST).json({
-          message: "Invalid code provided. It must be a number.",
-        });
-      }
-    }
-
     const result = await categoryService.getCategoryTransactionSummary(
-      categoryCode
+      code as string
     );
 
     res.send(result);
