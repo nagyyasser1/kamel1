@@ -9,9 +9,10 @@ const router = Router();
 
 // router.use(authMiddleware);
 router.get("/", accountsController.getAllAccountsCtr);
-
+router.get("/test", accountsController.getAllAccountsNumsController);
 // router.use(authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateAccount, accountsController.createAccountCtr);
+// ميزان المراجعه
 router.get("/stats", accountsController.getTransactionsSummaryForCategories);
 // قائمه الدخل
 router.get("/stats/accounts", accountsController.getTransForAccountsByNums);

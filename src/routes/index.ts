@@ -8,12 +8,16 @@ import productTransactionRoutes from "./productTransactionRoutes";
 import transactionsRoutes from "./transactoinsRoutes";
 import categoryService from "../services/categoryService";
 import accountsService from "../services/accountsService";
-import altahlilAlmaliuController from "../controllers/altahlilAlmaliuController";
-import altaghayurFiHuquqAlmalakih from "../controllers/altaghayurFiHuquqAlmalakih";
-import altadafuqAlnaqdiuCtl from "../controllers/altadafuqAlnaqdiuCtl";
+import altahlilAlmaliuController from "../controllers/reports/altahlilAlmaliuController";
+import altaghayurFiHuquqAlmalakih from "../controllers/reports/altaghayurFiHuquqAlmalakih";
+import altadafuqAlnaqdiuCtl from "../controllers/reports/altadafuqAlnaqdiuCtl";
+import qayimat_aldakhlController from "../controllers/reports/qayimatAldakhlController";
+import mizanAlmarajieihController from "../controllers/reports/mizanAlmarajieihController";
+import almizanihAleumumihController from "../controllers/reports/almizanihAleumumihController";
 
 const router = Router();
 
+// testing
 router.get("/categories", async (req, res) => {
   const result = await categoryService.getCategoriesBalances();
   res.send(result);
@@ -21,7 +25,7 @@ router.get("/categories", async (req, res) => {
 
 router.get("/categories/:number", async (req, res) => {
   const { number } = req.params;
-  const result = await categoryService.getCategoryBalance(parseInt(number));
+  const result = await categoryService.getCategoryBalance(number);
   res.send(result);
 });
 
@@ -30,6 +34,7 @@ router.get("/accountsarray", async (req, res) => {
   res.send(result);
 });
 
+// main api endpoints
 router.use("/auth", authRoutes);
 router.use("/accounts", accountsRoutes);
 router.use("/users", userRoutes);
@@ -38,11 +43,13 @@ router.use("/category", categoryRoutes);
 router.use("/transactions", transactionsRoutes);
 router.use("/product-transaction", productTransactionRoutes);
 
-// التحليل المالي
+// reports ( pages )
+router.get("/daftar-aliaistadh", mizanAlmarajieihController);
+router.get("/mizan-almarajieih", mizanAlmarajieihController);
+router.get("/almizanih-aleumumih", almizanihAleumumihController);
+router.get("/qayimat-aldakhl", qayimat_aldakhlController);
 router.get("/altahlil-almaliu", altahlilAlmaliuController);
-// التغير في حقوق الملكيه
 router.get("/altaghayur-fi-huquq-almalakih", altaghayurFiHuquqAlmalakih);
-// التدفق النقدي المباشر والغير مباشر
 router.get("/altadafuq-alnaqdiu", altadafuqAlnaqdiuCtl);
 
 export default router;

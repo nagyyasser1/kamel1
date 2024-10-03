@@ -1,6 +1,6 @@
-import accountsService from "../services/accountsService";
-import { accounts, categories } from "../constants/accountsCodes";
-import categoryService from "../services/categoryService";
+import accountsService from "../../services/accountsService";
+import { accounts, categories } from "../../constants/accountsCodes";
+import categoryService from "../../services/categoryService";
 import { NextFunction, Request, Response } from "express";
 
 const altaghayurFiHuquqAlmalakih = async (
@@ -31,20 +31,22 @@ const altaghayurFiHuquqAlmalakih = async (
       categories.ras_almal
     );
 
-    const safi_almabieat =
-      accountsObject[accounts.sales].balance -
-      (accountsObject[accounts.allowedDiscount].balance -
-        accountsObject[accounts.salesReturns].balance);
+    const safi_almabieat = Math.abs(
+      (accountsObject[accounts.sales]?.balance || 0) -
+        ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
+          (accountsObject[accounts.salesReturns]?.balance || 0))
+    );
 
     const masarifTaswiqayh = await categoryService.getCategoryBalance(
       categories.masarifTaswiqayh
     );
 
-    const tukalifuh_albidaeuh_almubaeuh =
-      accountsObject[accounts.sales].balance +
-      accountsObject[accounts.salesReturns].balance +
-      accountsObject[accounts.purchaseReturns].balance -
-      makhzun_akhir_alfatrih.thisYearBalance;
+    const tukalifuh_albidaeuh_almubaeuh = Math.abs(
+      (accountsObject[accounts.sales]?.balance || 0) +
+        (accountsObject[accounts.salesReturns]?.balance || 0) +
+        (accountsObject[accounts.purchaseReturns]?.balance || 0) -
+        (makhzun_akhir_alfatrih.thisYearBalance || 0)
+    );
 
     const alribh_altashghiliu_qabl_aldarayib =
       safi_almabieat -
@@ -54,7 +56,7 @@ const altaghayurFiHuquqAlmalakih = async (
 
     const safi_alribh =
       alribh_altashghiliu_qabl_aldarayib -
-      accountsObject[accounts.salesOutputTax].balance;
+      (accountsObject[accounts.salesOutputTax]?.balance || 0);
 
     const mashubat_shakhsayh = 404;
 

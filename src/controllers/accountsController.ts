@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { STATUS_CODES } from "../constants/statusCodes";
-import * as accountsService from "../services/accountsService";
+import accountsService from "../services/accountsService";
 import CustomError from "../utils/CustomError";
 import entryExists from "../utils/entryExists.util";
 import { EntryType } from "../utils/enums";
@@ -9,14 +9,11 @@ import ACCOUNTS_CODES_FOR_INCOME, {
   AccountsWname,
   CategoryWname,
   FP_accounts_names,
-  FP_categories_codes,
   FP_categories_names,
 } from "../constants/accountsCodes";
 import { Account } from "../types";
-import sumGroupOfAccountsWithCustomPercentage from "../utils/sumGroupOfAccountsWithCustomPercentage";
 import categoryService from "../services/categoryService";
 import sumFpAccounts from "../utils/sumFb";
-import transactionsService from "../services/transactionsService";
 
 const createAccountCtr = async (
   req: Request,
@@ -116,6 +113,7 @@ const getAccountById = async (
   }
 };
 
+// ميزان المراجعه
 export const getTransactionsSummaryForCategories = async (
   req: Request,
   res: Response,
@@ -168,18 +166,15 @@ const getTransForAccountsByNums = async (
     ]);
 
     const inventoryAtTheEndOfThePeriod =
-      await categoryService.getCategoryStatistics(
-        null,
+      await categoryService.getCategoryBalance(
         CategoryWname.inventoryAtTheEndOfThePeriod
       );
 
-    const otherRevenues = await categoryService.getCategoryStatistics(
-      null,
+    const otherRevenues = await categoryService.getCategoryBalance(
       CategoryWname.otherRevenues
     );
 
-    const activitySalesRevenue = await categoryService.getCategoryStatistics(
-      null,
+    const activitySalesRevenue = await categoryService.getCategoryBalance(
       CategoryWname.activitySalesRevenue
     );
 
@@ -247,19 +242,19 @@ const getTransForAccountsByNums = async (
     // updates
     const costOfGoodsSold =
       purchasesReturnedExpenses -
-      (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+      (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
 
     const totalIncome = NetSales - costOfGoodsSold;
 
     const netProfitOrLossBeforeTaxes =
       NetSales -
       costOfGoodsSold +
-      (otherRevenues?.totalBalance || 0) -
+      (otherRevenues?.thisYearBalance || 0) -
       (totalSellingAndDistributionExpenses -
         totalGeneralAdministrativeAndOperatingExpenses);
 
     const variousTotalRevenues =
-      NetSales - costOfGoodsSold + (otherRevenues?.totalBalance || 0);
+      NetSales - costOfGoodsSold + (otherRevenues?.thisYearBalance || 0);
 
     const netProfitOrLossAfterDeductingTaxes =
       netProfitOrLossBeforeTaxes - salesOutputTax;
@@ -288,13 +283,13 @@ const getTransForAccountsByNums = async (
     ]);
 
     const tukalifuh_almabieat =
-      safi_almushtariat + (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+      safi_almushtariat + (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
 
     const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
 
     const alribh_qabl_aldarayib =
       mujmal_alribh +
-      (otherRevenues?.totalBalance || 0) -
+      (otherRevenues?.thisYearBalance || 0) -
       (totalSellingAndDistributionExpenses +
         totalGeneralAdministrativeAndOperatingExpenses +
         almukhasasat);
@@ -306,7 +301,7 @@ const getTransForAccountsByNums = async (
     const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl; //
 
     const ajamali_ayradat_mukhtalifuh =
-      mujmal_alribh + (otherRevenues?.totalBalance || 0);
+      mujmal_alribh + (otherRevenues?.thisYearBalance || 0);
 
     res.json({
       almukhasasat,
@@ -346,11 +341,9 @@ const statementOfFinancialPositionCrl = async (
   try {
     const AccountsSummaries = await accountsService.statementFPositionSrvc();
     const CategorySummaries =
-      await categoryService.getCategoryTransactionSummaryForCategories(
-        FP_categories_codes
-      );
+      await categoryService.getCategoryTransactionSummaryForAllCategories();
 
-    const accountsObject = AccountsSummaries.reduce((acc, account) => {
+    const accountsObject = AccountsSummaries.reduce((acc, account: any) => {
       if (account) {
         acc[account?.accountCode] = account;
       }
@@ -415,8 +408,6 @@ const statementOfFinancialPositionCrl = async (
       accountsObject[FP_accounts_names.otherAssets],
     ]);
 
-    // update
-
     const summaries =
       await accountsService.getTransactionsSummaryForArrayOfAccountsNumber(
         ACCOUNTS_CODES_FOR_INCOME
@@ -436,13 +427,11 @@ const statementOfFinancialPositionCrl = async (
     ]);
 
     const inventoryAtTheEndOfThePeriod =
-      await categoryService.getCategoryStatistics(
-        null,
+      await categoryService.getCategoryBalance(
         CategoryWname.inventoryAtTheEndOfThePeriod
       );
 
-    const otherRevenues = await categoryService.getCategoryStatistics(
-      null,
+    const otherRevenues = await categoryService.getCategoryBalance(
       CategoryWname.otherRevenues
     );
 
@@ -494,12 +483,12 @@ const statementOfFinancialPositionCrl = async (
 
     const costOfGoodsSold =
       purchasesReturnedExpenses -
-      (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+      (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
 
     const netProfitOrLossBeforeTaxes =
       netSales -
       costOfGoodsSold +
-      (otherRevenues?.totalBalance || 0) -
+      (otherRevenues?.thisYearBalance || 0) -
       (totalSellingAndDistributionExpenses -
         totalGeneralAdministrativeAndOperatingExpenses);
 
@@ -513,7 +502,7 @@ const statementOfFinancialPositionCrl = async (
     ]);
 
     const tukalifuh_almabieat =
-      safi_almushtariat + (inventoryAtTheEndOfThePeriod?.totalBalance || 0);
+      safi_almushtariat + (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
 
     const safi_almabieat =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
@@ -535,7 +524,7 @@ const statementOfFinancialPositionCrl = async (
 
     const alribh_qabl_aldarayib =
       mujmal_alribh +
-      (otherRevenues?.totalBalance || 0) -
+      (otherRevenues?.thisYearBalance || 0) -
       (totalSellingAndDistributionExpenses +
         totalGeneralAdministrativeAndOperatingExpenses +
         almukhasasat);
@@ -564,6 +553,20 @@ const statementOfFinancialPositionCrl = async (
   }
 };
 
+const getAllAccountsNumsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await accountsService.getAllAccountsNums();
+
+    res.send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createAccountCtr,
   deleteAccountCtr,
@@ -572,4 +575,5 @@ export default {
   getTransactionsSummaryForCategories,
   getTransForAccountsByNums,
   statementOfFinancialPositionCrl,
+  getAllAccountsNumsController,
 };

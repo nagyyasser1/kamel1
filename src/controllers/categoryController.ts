@@ -10,7 +10,7 @@ export const createCategory = async (
 ) => {
   try {
     const categoryExists = await categoryService.getCategoryByNumber(
-      Number(req.body?.number)
+      req.body?.number
     );
     if (categoryExists) {
       throw new CustomError(
@@ -41,6 +41,19 @@ export const getCategories = async (
     }
 
     res.status(STATUS_CODES.OK).json(categories);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getCategoriesWithNumsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await categoryService.getCategoriesWithNums();
+    res.send(result);
   } catch (error) {
     next(error);
   }
@@ -109,11 +122,10 @@ export const categoryStatistics = async (
     const categoryId = typeof id === "string" ? id : undefined;
 
     // Convert code to number or undefined
-    const categoryCode =
-      typeof code === "string" ? parseInt(code, 10) : undefined;
+    const categoryCode = typeof code === "string" ? code : undefined;
 
     if (categoryCode) {
-      if (isNaN(categoryCode as number)) {
+      if (categoryCode as string) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           message: "Invalid code provided. It must be a number.",
         });
@@ -144,11 +156,10 @@ export const getCategoryTransactionSummary = async (
       });
 
     // Convert code to number or undefined
-    const categoryCode =
-      typeof code === "string" ? parseInt(code, 10) : undefined;
+    const categoryCode = typeof code === "string" ? code : undefined;
 
     if (categoryCode) {
-      if (isNaN(categoryCode as number)) {
+      if (categoryCode) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           message: "Invalid code provided. It must be a number.",
         });
@@ -163,4 +174,8 @@ export const getCategoryTransactionSummary = async (
   } catch (error) {
     next(error);
   }
+};
+
+export default {
+  getCategoriesWithNumsController,
 };

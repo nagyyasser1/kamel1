@@ -1,6 +1,6 @@
-import accountsService from "../services/accountsService";
-import { accounts, categories } from "../constants/accountsCodes";
-import categoryService from "../services/categoryService";
+import accountsService from "../../services/accountsService";
+import { accounts, categories } from "../../constants/accountsCodes";
+import categoryService from "../../services/categoryService";
 import { NextFunction, Request, Response } from "express";
 
 const altadafuqAlnaqdiuCtl = async (

@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  //url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
@@ -38,7 +38,7 @@ model PasswordReset {
 model Category {
   id            String     @id @default(uuid())
   name          String
-  number        Int        @unique
+  number        String     @unique
   status        Boolean    @default(false)
   parentId      String?
   parent        Category?  @relation("CategorySubcategories", fields: [parentId], references: [id], onDelete: Cascade)
@@ -49,7 +49,7 @@ model Category {
 model Account {
   id                   String               @id @default(uuid())
   name                 String               @unique
-  number               Int                  @unique
+  number               String               @unique
   email                String?
   description          String?
   categoryId           String?

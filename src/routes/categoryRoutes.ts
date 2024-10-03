@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {
+import categoryController, {
   createCategory,
   getCategories,
   getCategoryById,
@@ -18,7 +18,7 @@ const router = Router();
 // router.use(authMiddleware, authorizeMiddleware(USER_ROLES.ADMIN));
 router.post("/", validateCreateCategory, createCategory);
 router.get("/", getCategories);
-// router.get("/stats", categoryStatistics);
+router.get("/test", categoryController.getCategoriesWithNumsController);
 router.get("/stats", getCategoryTransactionSummary);
 router.get("/:id", getCategoryById);
 router.put("/:id", updateCategory);

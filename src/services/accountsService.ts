@@ -4,19 +4,19 @@ import ACCOUNTS_CODES_FOR_INCOME, {
 } from "../constants/accountsCodes";
 import prisma from "../prisma";
 
-export const createAccount = async (data: any) => {
+const createAccount = async (data: any) => {
   return await prisma.account.create({
     data,
   });
 };
 
-export const deleteAccount = async (id: string) => {
+const deleteAccount = async (id: string) => {
   return await prisma.account.delete({
     where: { id },
   });
 };
 
-export const getAllAccounts = async (categoryId?: string, name?: string) => {
+const getAllAccounts = async (categoryId?: string, name?: string) => {
   const where: any = {};
 
   if (categoryId) {
@@ -38,7 +38,7 @@ export const getAllAccounts = async (categoryId?: string, name?: string) => {
   });
 };
 
-export const getAccountById = async (id: string) => {
+const getAccountById = async (id: string) => {
   return await prisma.account.findUnique({
     where: { id },
     include: {
@@ -49,19 +49,19 @@ export const getAccountById = async (id: string) => {
   });
 };
 
-export const getAccountByName = async (name: string) => {
+const getAccountByName = async (name: string) => {
   return await prisma.account.findUnique({
     where: { name },
   });
 };
 
-export const getAccountByNumber = async (number: number) => {
+const getAccountByNumber = async (number: string) => {
   return await prisma.account.findUnique({
     where: { number },
   });
 };
 
-export async function getCategoryTransactionSummary(year: number) {
+async function getCategoryTransactionSummary(year: number) {
   const categories = await prisma.category.findMany({
     where: {
       accounts: {
@@ -187,7 +187,7 @@ export async function getCategoryTransactionSummary(year: number) {
   return summary;
 }
 
-export async function getTransactionsSummaryForArrayOfAccountsNumber(
+async function getTransactionsSummaryForArrayOfAccountsNumber(
   accountNums: any
 ) {
   // Define the start and end dates for this year and previous years
@@ -311,7 +311,7 @@ export async function getTransactionsSummaryForArrayOfAccountsNumber(
   return summaries.filter((summary) => summary !== null);
 }
 
-export async function statementFPositionSrvc() {
+async function statementFPositionSrvc() {
   const accountNums = FP_accounts;
 
   // Define the start and end dates for this year and previous years
@@ -320,7 +320,7 @@ export async function statementFPositionSrvc() {
 
   // Query to get transactions summary for each account number
   const summaries = await Promise.all(
-    accountNums.map(async (accountNum) => {
+    accountNums.map(async (accountNum: any) => {
       const account = await prisma.account.findUnique({
         where: { number: accountNum },
         include: {
@@ -330,7 +330,26 @@ export async function statementFPositionSrvc() {
       });
 
       if (!account) {
-        return null; // Handle case where account is not found
+        return {
+          id: "",
+          accountName: "",
+          accountCode: "account.number",
+          totalBalance: 0,
+          thisYear: {
+            totalSentTransactions: 0,
+            totalSentAmount: 0,
+            totalReceivedTransactions: 0,
+            totalReceivedAmount: 0,
+            balance: 0,
+          },
+          previousYears: {
+            totalSentTransactions: 0,
+            totalSentAmount: 0,
+            totalReceivedTransactions: 0,
+            totalReceivedAmount: 0,
+            balance: 0,
+          },
+        };
       }
 
       // Aggregate this year's sent transactions
@@ -498,7 +517,7 @@ const getAccountsBalances = async () => {
   return { accountsObject };
 };
 
-const getAccountBalance = async (accountNumber: number) => {
+const getAccountBalance = async (accountNumber: any) => {
   const { currentYear, startOfYear } = getCurrentYear();
 
   // Fetch the account by its number
@@ -523,7 +542,11 @@ const getAccountBalance = async (accountNumber: number) => {
   });
 
   if (!account) {
-    throw new Error(`Account with number ${accountNumber} not found`);
+    console.log(`Account with number ${accountNumber} not found`);
+    return {
+      thisYearBalance: 0,
+      previousYearsBalance: 0,
+    };
   }
 
   let thisYearSent = 0;
@@ -532,7 +555,7 @@ const getAccountBalance = async (accountNumber: number) => {
   let previousYearsReceived = 0;
 
   // Calculate sent and received transactions for the current year and previous years
-  account.sentTransactions.forEach((transaction) => {
+  account?.sentTransactions.forEach((transaction) => {
     if (transaction.createdAt >= startOfYear) {
       thisYearSent += transaction.amount;
     } else {
@@ -540,7 +563,7 @@ const getAccountBalance = async (accountNumber: number) => {
     }
   });
 
-  account.receivedTransactions.forEach((transaction) => {
+  account?.receivedTransactions.forEach((transaction) => {
     if (transaction.createdAt >= startOfYear) {
       thisYearReceived += transaction.amount;
     } else {
@@ -560,8 +583,28 @@ const getAccountBalance = async (accountNumber: number) => {
   };
 };
 
+const getAllAccountsNums = async () => {
+  const accounts = await prisma.account.findMany({
+    select: {
+      name: true,
+      number: true,
+    },
+  });
+
+  return accounts;
+};
+
 export default {
   getAccountBalance,
   getAccountsBalances,
   getAllAccounts,
+  getCategoryTransactionSummary,
+  getAllAccountsNums,
+  statementFPositionSrvc,
+  getTransactionsSummaryForArrayOfAccountsNumber,
+  getAccountById,
+  createAccount,
+  deleteAccount,
+  getAccountByName,
+  getAccountByNumber,
 };

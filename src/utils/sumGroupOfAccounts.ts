@@ -1,4 +1,4 @@
-const sumGroupOfAccounts = (base: any[], target: number[]): number => {
+const sumGroupOfAccounts = (base: any[], target: string[]): number => {
   // Filter the base array to include only the accounts that exist in the target array
   const filteredAccounts = base.filter((baseAccount) =>
     target.some(

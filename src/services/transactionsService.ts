@@ -101,7 +101,7 @@ export const getAllTransactionsByDay = async () => {
   });
 };
 
-const getCategoryBalanceByNumber = async (categoryNumber: number) => {
+const getCategoryBalanceByNumber = async (categoryNumber: string) => {
   const { currentYear } = getCurrentYear();
 
   const transactions = await prisma.transaction.findMany({
@@ -150,7 +150,7 @@ const getCategoryBalanceByNumber = async (categoryNumber: number) => {
   return balance;
 };
 
-const getAccountBalanceByNumber = async (accountNumber: number) => {
+const getAccountBalanceByNumber = async (accountNumber: any) => {
   const { currentYear } = getCurrentYear();
 
   const transactions = await prisma.transaction.findMany({
@@ -191,7 +191,7 @@ const getAccountBalanceByNumber = async (accountNumber: number) => {
   return balance;
 };
 
-const getAccountsBalanceByNumbers = async (accountNumbers: number[]) => {
+const getAccountsBalanceByNumbers = async (accountNumbers: any[]) => {
   const { currentYear } = getCurrentYear();
 
   const transactions = await prisma.transaction.findMany({
@@ -222,7 +222,7 @@ const getAccountsBalanceByNumbers = async (accountNumbers: number[]) => {
   return balance;
 };
 
-const getCategoriesBalance = async (categoryNumbers: number[]) => {
+const getCategoriesBalance = async (categoryNumbers: any[]) => {
   // First, find all account numbers that belong to the given categories
   const accounts = await prisma.account.findMany({
     where: {
@@ -245,7 +245,7 @@ const getCategoriesBalance = async (categoryNumbers: number[]) => {
   return balance;
 };
 
-const getAccountsWithBalance = async (accountNumbers: number[]) => {
+const getAccountsWithBalance = async (accountNumbers: any[]) => {
   const { currentYear } = getCurrentYear();
 
   // Fetch account details
@@ -318,7 +318,7 @@ const getAccountsWithBalance = async (accountNumbers: number[]) => {
   return balances;
 };
 
-const getCategoriesWithBalance = async (categoryNumbers: number[]) => {
+const getCategoriesWithBalance = async (categoryNumbers: string[]) => {
   const { currentYear } = getCurrentYear();
 
   // Fetch categories

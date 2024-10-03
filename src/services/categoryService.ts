@@ -4,7 +4,7 @@ import prisma from "../prisma";
 // Create a category
 const createCategory = async (data: {
   name: string;
-  number: number;
+  number: string;
   parentId?: string;
 }) => {
   return prisma.category.create({
@@ -46,6 +46,16 @@ const getCategories = async () => {
   });
 };
 
+const getCategoriesWithNums = async () => {
+  const categories = await prisma.category.findMany({
+    select: {
+      name: true,
+      number: true,
+    },
+  });
+  return categories;
+};
+
 // Get a category by ID
 const getCategoryById = async (id: string) => {
   return prisma.category.findUnique({
@@ -61,7 +71,7 @@ const getCategoryById = async (id: string) => {
   });
 };
 
-const getCategoryStatistics = async (id?: any, code?: number) => {
+const getCategoryStatistics = async (id?: any, code?: string) => {
   const whereCondition: any = {};
 
   if (id) {
@@ -166,7 +176,7 @@ const getCategoryStatistics = async (id?: any, code?: number) => {
 };
 
 // Get a category by Number
-const getCategoryByNumber = async (number: number) => {
+const getCategoryByNumber = async (number: string) => {
   return prisma.category.findUnique({
     where: { number },
     include: {
@@ -193,7 +203,7 @@ const getCategoryThatHaveAccounts = async () => {
 // Update a category
 const updateCategory = async (
   id: string,
-  data: { name?: string; number?: number }
+  data: { name?: string; number?: string }
 ) => {
   return prisma.category.update({
     where: { id },
@@ -228,130 +238,124 @@ const deleteCategory = async (id: string) => {
   });
 };
 
-async function getCategoryTransactionSummaryForCategories(
-  categoryNumbers: number[]
-) {
+async function getCategoryTransactionSummaryForAllCategories() {
   const currentYear = new Date().getFullYear();
   const startOfCurrentYear = new Date(`${currentYear}-01-01`);
   const startOfNextYear = new Date(`${currentYear + 1}-01-01`);
 
-  const results = await Promise.all(
-    categoryNumbers.map(async (categoryNumber) => {
-      const category = await prisma.category.findUnique({
-        where: {
-          number: categoryNumber,
-        },
+  // Fetch all categories and their related accounts and transactions
+  const categories = await prisma.category.findMany({
+    select: {
+      id: true,
+      name: true,
+      number: true,
+      accounts: {
         select: {
-          id: true,
-          name: true,
-          number: true,
-          accounts: {
+          sentTransactions: {
             select: {
-              sentTransactions: {
-                select: {
-                  amount: true,
-                  createdAt: true,
-                },
-              },
-              receivedTransactions: {
-                select: {
-                  amount: true,
-                  createdAt: true,
-                },
-              },
+              amount: true,
+              createdAt: true,
+            },
+          },
+          receivedTransactions: {
+            select: {
+              amount: true,
+              createdAt: true,
             },
           },
         },
-      });
+      },
+    },
+  });
 
-      if (category) {
-        const { id, name, number, accounts } = category;
+  const results = await Promise.all(
+    categories.map(async (category) => {
+      const { id, name, number, accounts } = category;
 
-        const thisYearSentTransactions = accounts.flatMap((account) =>
-          account.sentTransactions.filter(
-            (tx) =>
-              tx.createdAt >= startOfCurrentYear &&
-              tx.createdAt < startOfNextYear
-          )
-        );
+      const thisYearSentTransactions = accounts.flatMap((account) =>
+        account.sentTransactions.filter(
+          (tx) =>
+            tx.createdAt >= startOfCurrentYear && tx.createdAt < startOfNextYear
+        )
+      );
 
-        const previousYearsSentTransactions = accounts.flatMap((account) =>
-          account.sentTransactions.filter(
-            (tx) => tx.createdAt < startOfCurrentYear
-          )
-        );
+      const previousYearsSentTransactions = accounts.flatMap((account) =>
+        account.sentTransactions.filter(
+          (tx) => tx.createdAt < startOfCurrentYear
+        )
+      );
 
-        const thisYearReceivedTransactions = accounts.flatMap((account) =>
-          account.receivedTransactions.filter(
-            (tx) =>
-              tx.createdAt >= startOfCurrentYear &&
-              tx.createdAt < startOfNextYear
-          )
-        );
+      const thisYearReceivedTransactions = accounts.flatMap((account) =>
+        account.receivedTransactions.filter(
+          (tx) =>
+            tx.createdAt >= startOfCurrentYear && tx.createdAt < startOfNextYear
+        )
+      );
 
-        const previousYearsReceivedTransactions = accounts.flatMap((account) =>
-          account.receivedTransactions.filter(
-            (tx) => tx.createdAt < startOfCurrentYear
-          )
-        );
+      const previousYearsReceivedTransactions = accounts.flatMap((account) =>
+        account.receivedTransactions.filter(
+          (tx) => tx.createdAt < startOfCurrentYear
+        )
+      );
 
-        const thisYearTotalSentAmount = thisYearSentTransactions.reduce(
+      const thisYearTotalSentAmount = thisYearSentTransactions.reduce(
+        (sum, tx) => sum + tx.amount,
+        0
+      );
+
+      const thisYearTotalReceivedAmount = thisYearReceivedTransactions.reduce(
+        (sum, tx) => sum + tx.amount,
+        0
+      );
+
+      const previousYearsTotalSentAmount = previousYearsSentTransactions.reduce(
+        (sum, tx) => sum + tx.amount,
+        0
+      );
+
+      const previousYearsTotalReceivedAmount =
+        previousYearsReceivedTransactions.reduce(
           (sum, tx) => sum + tx.amount,
           0
         );
 
-        const thisYearTotalReceivedAmount = thisYearReceivedTransactions.reduce(
-          (sum, tx) => sum + tx.amount,
-          0
-        );
+      const thisYearBalance = Math.abs(
+        thisYearTotalReceivedAmount - thisYearTotalSentAmount
+      );
 
-        const previousYearsTotalSentAmount =
-          previousYearsSentTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+      const previousYearsBalance = Math.abs(
+        previousYearsTotalReceivedAmount - previousYearsTotalSentAmount
+      );
 
-        const previousYearsTotalReceivedAmount =
-          previousYearsReceivedTransactions.reduce(
-            (sum, tx) => sum + tx.amount,
-            0
-          );
+      const totalBalance = thisYearBalance + previousYearsBalance;
 
-        const thisYearBalance = Math.abs(
-          thisYearTotalReceivedAmount - thisYearTotalSentAmount
-        );
-
-        const previousYearsBalance = Math.abs(
-          previousYearsTotalReceivedAmount - previousYearsTotalSentAmount
-        );
-
-        const totalBalance = thisYearBalance + previousYearsBalance;
-
-        return {
-          id,
-          categoryName: name,
-          categoryNumber: number,
-          totalBalance,
-          thisYear: {
-            totalSentTransactions: thisYearSentTransactions.length,
-            totalSentAmount: thisYearTotalSentAmount,
-            totalReceivedTransactions: thisYearReceivedTransactions.length,
-            totalReceivedAmount: thisYearTotalReceivedAmount,
-            balance: thisYearBalance,
-          },
-          previousYears: {
-            totalSentTransactions: previousYearsSentTransactions.length,
-            totalSentAmount: previousYearsTotalSentAmount,
-            totalReceivedTransactions: previousYearsReceivedTransactions.length,
-            totalReceivedAmount: previousYearsTotalReceivedAmount,
-            balance: previousYearsBalance,
-          },
-        };
-      }
+      return {
+        id,
+        categoryName: name,
+        categoryNumber: number,
+        totalBalance,
+        thisYear: {
+          totalSentTransactions: thisYearSentTransactions.length,
+          totalSentAmount: thisYearTotalSentAmount,
+          totalReceivedTransactions: thisYearReceivedTransactions.length,
+          totalReceivedAmount: thisYearTotalReceivedAmount,
+          balance: thisYearBalance,
+        },
+        previousYears: {
+          totalSentTransactions: previousYearsSentTransactions.length,
+          totalSentAmount: previousYearsTotalSentAmount,
+          totalReceivedTransactions: previousYearsReceivedTransactions.length,
+          totalReceivedAmount: previousYearsTotalReceivedAmount,
+          balance: previousYearsBalance,
+        },
+      };
     })
   );
 
   return results;
 }
 
-async function getCategoryTransactionSummary(categoryNumber?: number) {
+async function getCategoryTransactionSummary(categoryNumber?: string) {
   // Get the current date
   const currentDate = new Date();
 
@@ -586,7 +590,7 @@ const getCategoriesBalances = async () => {
   return categoriesWithBalances;
 };
 
-const getCategoryBalance = async (categoryNumber: number) => {
+const getCategoryBalance = async (categoryNumber: string) => {
   const { startOfYear } = getCurrentYear();
 
   // Helper function to recursively calculate category and subcategory balances
@@ -704,32 +708,41 @@ const getCategoryBalance = async (categoryNumber: number) => {
   });
 
   if (!category) {
-    throw new Error(`Category with number ${categoryNumber} not found`);
+    console.log(`Category with number ${categoryNumber} not found`);
+    return {
+      category: {
+        id: 0,
+        name: "",
+        number: "",
+      },
+      thisYearBalance: 0,
+      previousYearsBalance: 0,
+    };
+  } else {
+    // Calculate total balance for the category and its subcategories
+    const totalBalance = await calculateCategoryBalance(category.id);
+
+    const thisYearBalance = Math.abs(
+      totalBalance.thisYearReceived - totalBalance.thisYearSent
+    );
+    const previousYearsBalance = Math.abs(
+      totalBalance.previousYearsReceived - totalBalance.previousYearsSent
+    );
+
+    return {
+      category: {
+        id: category.id,
+        name: category.name,
+        number: category.number,
+      },
+      thisYearBalance,
+      previousYearsBalance,
+    };
   }
-
-  // Calculate total balance for the category and its subcategories
-  const totalBalance = await calculateCategoryBalance(category.id);
-
-  const thisYearBalance = Math.abs(
-    totalBalance.thisYearReceived - totalBalance.thisYearSent
-  );
-  const previousYearsBalance = Math.abs(
-    totalBalance.previousYearsReceived - totalBalance.previousYearsSent
-  );
-
-  return {
-    category: {
-      id: category.id,
-      name: category.name,
-      number: category.number,
-    },
-    thisYearBalance,
-    previousYearsBalance,
-  };
 };
 
 export default {
-  getCategoryTransactionSummaryForCategories,
+  getCategoryTransactionSummaryForAllCategories,
   getCategoryTransactionSummary,
   getCategoryStatistics,
   deleteCategory,
@@ -741,4 +754,5 @@ export default {
   getCategoryById,
   getCategoriesBalances,
   getCategoryBalance,
+  getCategoriesWithNums,
 };
