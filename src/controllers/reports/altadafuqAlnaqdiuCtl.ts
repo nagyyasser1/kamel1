@@ -81,8 +81,8 @@ const altadafuqAlnaqdiuCtl = async (
     //1
     const safi_almabieat =
       (sales.currentYear?.balance || 0) -
-      (allowedDiscount.currentYear?.balance || 0) -
-      (salesReturns.currentYear?.balance || 0);
+      ((allowedDiscount.currentYear?.balance || 0) +
+        (salesReturns.currentYear?.balance || 0));
 
     const tukalifuh_albidaeuh_almubaeuh =
       (sales.currentYear?.balance || 0) +

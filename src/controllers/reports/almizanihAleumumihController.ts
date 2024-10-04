@@ -92,7 +92,7 @@ const almizanihAleumumihController = async (
 
     const safi_almabieat =
       (accountsObject[accounts.sales]?.currentYear?.balance || 0) -
-      ((accountsObject[accounts.allowedDiscount]?.currentYear?.balance || 0) -
+      ((accountsObject[accounts.allowedDiscount]?.currentYear?.balance || 0) +
         (accountsObject[accounts.salesReturns]?.currentYear?.balance || 0));
 
     const purchasesReturnedExpenses =

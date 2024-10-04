@@ -46,12 +46,13 @@ const qayimat_aldakhlController = async (
 
     const safi_almabieat =
       (accountsObject[accounts.sales]?.currentYear.balance || 0) -
-      ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) -
+      ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
         (accountsObject[accounts.salesReturns]?.currentYear.balance || 0));
+
     const purchasesReturnedExpenses =
       (accountsObject[accounts.purchases]?.currentYear.balance || 0) +
-      (accountsObject[accounts.purchaseReturns]?.currentYear.balance || 0);
-    accountsObject[accounts.purchasesExpenses]?.currentYear.balance || 0;
+        (accountsObject[accounts.purchaseReturns]?.currentYear.balance || 0) +
+        accountsObject[accounts.purchasesExpenses]?.currentYear.balance || 0;
 
     const costOfGoodsSold =
       purchasesReturnedExpenses -
@@ -108,9 +109,10 @@ const qayimat_aldakhlController = async (
       ajamali_ayradat_mukhtalifuh,
       NetSales: safi_almabieat,
       purchasesReturnedExpenses,
-      inventoryAtTheEndOfThePeriod,
-      otherRevenues,
-      activitySalesRevenue,
+      inventoryAtTheEndOfThePeriod:
+        inventoryAtTheEndOfThePeriod.thisYearBalance,
+      otherRevenues: otherRevenues.thisYearBalance,
+      activitySalesRevenue: activitySalesRevenue.thisYearBalance,
       totalSellingAndDistributionExpenses,
       totalGeneralAdministrativeAndOperatingExpenses,
       AllotmentsAfter: almukhasasat.thisYearBalance,
