@@ -451,7 +451,8 @@ async function statementFPositionSrvc() {
 }
 
 const getAccountsBalances = async () => {
-  const { currentYear, startOfYear, endOfYear } = getCurrentYear();
+  const { startOfYear, endOfYear, previousStartOfYear, previousEndOfYear } =
+    getCurrentYear();
 
   const accounts = await prisma.account.findMany({
     select: {
@@ -460,46 +461,105 @@ const getAccountsBalances = async () => {
       number: true,
       sentTransactions: {
         where: {
-          createdAt: {
-            gte: startOfYear,
-            lte: endOfYear,
-          },
+          OR: [
+            {
+              createdAt: {
+                gte: startOfYear,
+                lte: endOfYear,
+              },
+            },
+            {
+              createdAt: {
+                gte: previousStartOfYear,
+                lte: previousEndOfYear,
+              },
+            },
+          ],
         },
         select: {
           amount: true,
+          createdAt: true,
         },
       },
       receivedTransactions: {
         where: {
-          createdAt: {
-            gte: startOfYear,
-            lte: endOfYear,
-          },
+          OR: [
+            {
+              createdAt: {
+                gte: startOfYear,
+                lte: endOfYear,
+              },
+            },
+            {
+              createdAt: {
+                gte: previousStartOfYear,
+                lte: previousEndOfYear,
+              },
+            },
+          ],
         },
         select: {
           amount: true,
+          createdAt: true,
         },
       },
     },
   });
 
-  // Calculate balance for each account
+  // Calculate balances for current and previous years
   const accountsArray = accounts.map((account) => {
-    const totalSent = account.sentTransactions.reduce(
-      (acc, transaction) => acc + transaction.amount,
-      0
-    );
-    const totalReceived = account.receivedTransactions.reduce(
-      (acc, transaction) => acc + transaction.amount,
-      0
-    );
-    const balance = totalReceived - totalSent;
+    const currentYearSent = account.sentTransactions
+      .filter(
+        (transaction) =>
+          transaction.createdAt >= startOfYear &&
+          transaction.createdAt <= endOfYear
+      )
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
+
+    const previousYearsSent = account.sentTransactions
+      .filter(
+        (transaction) =>
+          transaction.createdAt >= previousStartOfYear &&
+          transaction.createdAt <= previousEndOfYear
+      )
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
+
+    const currentYearReceived = account.receivedTransactions
+      .filter(
+        (transaction) =>
+          transaction.createdAt >= startOfYear &&
+          transaction.createdAt <= endOfYear
+      )
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
+
+    const previousYearsReceived = account.receivedTransactions
+      .filter(
+        (transaction) =>
+          transaction.createdAt >= previousStartOfYear &&
+          transaction.createdAt <= previousEndOfYear
+      )
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
+
+    const currentYearBalance = currentYearReceived - currentYearSent;
+    const previousYearsBalance = previousYearsReceived - previousYearsSent;
+
+    const totalBalance = currentYearBalance + previousYearsBalance;
 
     return {
       id: account.id,
       name: account.name,
       number: account.number,
-      balance: balance,
+      balance: totalBalance,
+      currentYear: {
+        balance: currentYearBalance,
+        currentYearReceived,
+        currentYearSent,
+      },
+      previousYears: {
+        balance: previousYearsBalance,
+        previousYearsReceived,
+        previousYearsSent,
+      },
     };
   });
 
