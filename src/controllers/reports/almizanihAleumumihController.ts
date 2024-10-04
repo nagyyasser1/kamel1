@@ -34,13 +34,13 @@ const almizanihAleumumihController = async (
       categories.almasrufat
     );
 
-    // const alkhusumAlmutadawiluh = await categoryService.getCategoryBalance(
-    //   categories.alkhusumAlmutadawiluh
-    // );
+    const alkhusumAlmutadawiluh = await categoryService.getCategoryBalance(
+      categories.alkhusumAlmutadawiluh
+    );
 
-    // const inventory1 = await categoryService.getCategoryBalance(
-    //   categories.inventory1
-    // );
+    const inventory1 = await categoryService.getCategoryBalance(
+      categories.inventory1
+    );
 
     const inventory2 = await categoryService.getCategoryBalance(
       categories.inventory2
@@ -176,18 +176,17 @@ const almizanihAleumumihController = async (
       huquqAlmalakih,
       almasrufat,
       safi_alribh,
-      // inventory1,
-      // inventory2,
-      // alasulAlmutaduluh,
-      // propertyRights,
-      // alasulAlthaabituhAlmalmusah,
-      // alasulAlthaabituhGhayrAlmalmusih,
-      // alkhusumAlthaabatuhTawiluhAlajil: alkhusumAlthaabatuh,
-      // alkhusumAlmutadawiluh,
-      // netProfitOrLossBeforeTaxes,
-      // netProfitOrLossAfterDeductingTaxes,
-      // accountsObject,
-      // categoriesObject,
+      inventory1,
+      alasulAlmutaduluh,
+      propertyRights,
+      alasulAlthaabituhAlmalmusah,
+      alasulAlthaabituhGhayrAlmalmusih,
+      alkhusumAlthaabatuhTawiluhAlajil: alkhusumAlthaabatuh,
+      alkhusumAlmutadawiluh,
+      netProfitOrLossBeforeTaxes,
+      netProfitOrLossAfterDeductingTaxes,
+      accountsObject,
+      categoriesObject,
     });
   } catch (error) {
     next(error);
