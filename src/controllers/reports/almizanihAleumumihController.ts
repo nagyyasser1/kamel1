@@ -91,14 +91,14 @@ const almizanihAleumumihController = async (
     );
 
     const safi_almabieat =
-      (accountsObject[accounts.sales]?.balance || 0) -
-      ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
-        (accountsObject[accounts.salesReturns]?.balance || 0));
+      (accountsObject[accounts.sales]?.currentYear?.balance || 0) -
+      ((accountsObject[accounts.allowedDiscount]?.currentYear?.balance || 0) -
+        (accountsObject[accounts.salesReturns]?.currentYear?.balance || 0));
 
     const purchasesReturnedExpenses =
-      (accountsObject[accounts.purchases]?.balance || 0) +
-      (accountsObject[accounts.purchaseReturns]?.balance || 0);
-    accountsObject[accounts.purchasesExpenses]?.balance || 0;
+      (accountsObject[accounts.purchases]?.currentYear?.balance || 0) +
+      (accountsObject[accounts.purchaseReturns]?.currentYear?.balance || 0);
+    accountsObject[accounts.purchasesExpenses]?.currentYear?.balance || 0;
 
     const inventoryAtTheEndOfThePeriod =
       await categoryService.getCategoryBalance(
@@ -116,7 +116,7 @@ const almizanihAleumumihController = async (
       masarifAdarih.thisYearBalance;
 
     const salesOutputTax =
-      accountsObject[accounts.salesOutputTax]?.balance || 0;
+      accountsObject[accounts.salesOutputTax]?.currentYear?.balance || 0;
 
     const costOfGoodsSold =
       purchasesReturnedExpenses -
@@ -133,10 +133,10 @@ const almizanihAleumumihController = async (
       netProfitOrLossBeforeTaxes - salesOutputTax;
 
     const safi_almushtariat =
-      (accountsObject[accounts.purchases]?.balance || 0) +
-      (accountsObject[accounts.purchasesExpenses]?.balance || 0) -
-      (accountsObject[accounts.purchaseReturns]?.balance || 0) -
-      (accountsObject[accounts.khasmuktasib]?.balance || 0);
+      (accountsObject[accounts.purchases]?.currentYear?.balance || 0) +
+      (accountsObject[accounts.purchasesExpenses]?.currentYear?.balance || 0) -
+      (accountsObject[accounts.purchaseReturns]?.currentYear?.balance || 0) -
+      (accountsObject[accounts.khasmuktasib]?.currentYear?.balance || 0);
 
     const tukalifuh_almabieat =
       safi_almushtariat + (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
@@ -151,13 +151,13 @@ const almizanihAleumumihController = async (
         almukhasasat.thisYearBalance);
 
     const daribuh_aldukhl =
-      accountsObject[accounts.daribuhAldukhl]?.balance || 0;
+      accountsObject[accounts.daribuhAldukhl]?.currentYear?.balance || 0;
 
     const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl;
 
     const alasulFinal =
       alasul.thisYearBalance -
-      (inventory2.thisYearBalance + purchases.thisYearBalance);
+      (inventory2.thisYearBalance + (purchases.currentYear?.balance || 0));
 
     const alkhusumFinal =
       alkhusum.thisYearBalance -

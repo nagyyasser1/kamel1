@@ -32,18 +32,18 @@ const altaghayurFiHuquqAlmalakih = async (
     );
 
     const safi_almabieat =
-      (accountsObject[accounts.sales]?.balance || 0) -
-      ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
-        (accountsObject[accounts.salesReturns]?.balance || 0));
+      (accountsObject[accounts.sales]?.currentYear?.balance || 0) -
+      ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) -
+        (accountsObject[accounts.salesReturns]?.currentYear.balance || 0));
 
     const masarifTaswiqayh = await categoryService.getCategoryBalance(
       categories.masarifTaswiqayh
     );
 
     const tukalifuh_albidaeuh_almubaeuh =
-      (accountsObject[accounts.sales]?.balance || 0) +
-      (accountsObject[accounts.salesReturns]?.balance || 0) +
-      (accountsObject[accounts.purchaseReturns]?.balance || 0) -
+      (accountsObject[accounts.sales]?.currentYear?.balance || 0) +
+      (accountsObject[accounts.salesReturns]?.currentYear?.balance || 0) +
+      (accountsObject[accounts.purchaseReturns]?.currentYear?.balance || 0) -
       (makhzun_akhir_alfatrih.thisYearBalance || 0);
 
     const alribh_altashghiliu_qabl_aldarayib =
@@ -54,7 +54,7 @@ const altaghayurFiHuquqAlmalakih = async (
 
     const safi_alribh =
       alribh_altashghiliu_qabl_aldarayib -
-      (accountsObject[accounts.salesOutputTax]?.balance || 0);
+      (accountsObject[accounts.salesOutputTax]?.currentYear?.balance || 0);
 
     const mashubat_shakhsayh = 404;
 

@@ -80,14 +80,14 @@ const altadafuqAlnaqdiuCtl = async (
     /**Equations */
     //1
     const safi_almabieat =
-      sales.thisYearBalance -
-      allowedDiscount.thisYearBalance -
-      salesReturns.thisYearBalance;
+      (sales.currentYear?.balance || 0) -
+      (allowedDiscount.currentYear?.balance || 0) -
+      (salesReturns.currentYear?.balance || 0);
 
     const tukalifuh_albidaeuh_almubaeuh =
-      sales.thisYearBalance +
-      salesReturns.thisYearBalance +
-      purchaseReturns.thisYearBalance -
+      (sales.currentYear?.balance || 0) +
+      (salesReturns.currentYear?.balance || 0) +
+      (purchaseReturns.currentYear?.balance || 0) -
       makhzun_akhir_alfatrih.thisYearBalance;
 
     const alribh_altashghiliu_qabl_aldarayib =
@@ -97,7 +97,8 @@ const altadafuqAlnaqdiuCtl = async (
       (masarifAdarih.thisYearBalance + masarifTaswiqayh.thisYearBalance);
 
     const safi_alribh =
-      alribh_altashghiliu_qabl_aldarayib - salesOutputTax.thisYearBalance;
+      alribh_altashghiliu_qabl_aldarayib -
+      (salesOutputTax.currentYear?.balance || 0);
 
     const ahlak_alasul_althaabitih =
       alMothsatat.thisYearBalance + alMothsatat.previousYearsBalance;
@@ -124,8 +125,8 @@ const altadafuqAlnaqdiuCtl = async (
       al_makhzun + almoreden + aleumala + jari_alshuraka + masrufat_mustahaqa;
 
     const arbah_rasi_malia =
-      arbahRasimaliaBase.thisYearBalance -
-      arbahRasimaliaBase.previousYearsBalance;
+      (arbahRasimaliaBase.currentYear?.balance || 0) -
+      (arbahRasimaliaBase.currentYear?.balance || 0);
 
     const madfueat_lishira_asul_thabatih = 404;
 

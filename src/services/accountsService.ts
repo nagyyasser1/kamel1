@@ -549,16 +549,16 @@ const getAccountsBalances = async () => {
       id: account.id,
       name: account.name,
       number: account.number,
-      balance: totalBalance,
+      balance: totalBalance || 0,
       currentYear: {
-        balance: currentYearBalance,
-        currentYearReceived,
-        currentYearSent,
+        balance: currentYearBalance || 0,
+        currentYearReceived: currentYearReceived || 0,
+        currentYearSent: currentYearSent || 0,
       },
       previousYears: {
-        balance: previousYearsBalance,
-        previousYearsReceived,
-        previousYearsSent,
+        balance: previousYearsBalance || 0,
+        previousYearsReceived: previousYearsReceived || 0,
+        previousYearsSent: previousYearsSent || 0,
       },
     };
   });
@@ -630,10 +630,22 @@ const getAccountBalance = async (accountNumber: any) => {
   // Calculate balances
   const thisYearBalance = thisYearReceived - thisYearSent;
   const previousYearsBalance = previousYearsReceived - previousYearsSent;
+  const totalBalance = thisYearBalance + previousYearsBalance;
 
   return {
-    thisYearBalance,
-    previousYearsBalance,
+    id: account.id || "",
+    name: account.name || "",
+    balance: totalBalance || 0,
+    currentYear: {
+      balance: thisYearBalance || 0,
+      thisYearReceived: thisYearReceived || 0,
+      thisYearSent: thisYearSent || 0,
+    },
+    previousYear: {
+      balance: previousYearsBalance || 0,
+      previousYearsReceived: previousYearsReceived || 0,
+      previousYearsSent: previousYearsSent || 0,
+    },
   };
 };
 
