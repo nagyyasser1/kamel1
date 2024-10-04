@@ -600,8 +600,19 @@ const getAccountBalance = async (accountNumber: any) => {
   if (!account) {
     console.log(`Account with number ${accountNumber} not found`);
     return {
-      thisYearBalance: 0,
-      previousYearsBalance: 0,
+      id: "",
+      name: "",
+      balance: 0,
+      currentYear: {
+        balance: 0,
+        thisYearReceived: 0,
+        thisYearSent: 0,
+      },
+      previousYears: {
+        balance: 0,
+        previousYearsReceived: 0,
+        previousYearsSent: 0,
+      },
     };
   }
 
@@ -641,7 +652,7 @@ const getAccountBalance = async (accountNumber: any) => {
       thisYearReceived: thisYearReceived || 0,
       thisYearSent: thisYearSent || 0,
     },
-    previousYear: {
+    previousYears: {
       balance: previousYearsBalance || 0,
       previousYearsReceived: previousYearsReceived || 0,
       previousYearsSent: previousYearsSent || 0,

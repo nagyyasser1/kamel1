@@ -161,7 +161,7 @@ const almizanihAleumumihController = async (
 
     const alkhusumFinal =
       alkhusum.thisYearBalance -
-      (sales.thisYearBalance, alMothsatat.thisYearBalance);
+      (sales.currentYear.balance, alMothsatat.thisYearBalance);
 
     res.json({
       alasulFinal,
