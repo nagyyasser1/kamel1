@@ -99,7 +99,7 @@ const qayimat_aldakhlController = async (
       netProfitOrLossBeforeTaxes - salesOutputTax;
 
     res.json({
-      almukhasasat,
+      almukhasasat: almukhasasat.thisYearBalance,
       safi_almabieat,
       tukalifuh_almabieat,
       mujmal_alribh,
@@ -113,7 +113,7 @@ const qayimat_aldakhlController = async (
       activitySalesRevenue,
       totalSellingAndDistributionExpenses,
       totalGeneralAdministrativeAndOperatingExpenses,
-      AllotmentsAfter: almukhasasat,
+      AllotmentsAfter: almukhasasat.thisYearBalance,
       costOfGoodsSold,
       totalIncome,
       variousTotalRevenues,
