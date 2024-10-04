@@ -155,6 +155,12 @@ const almizanihAleumumihController = async (
 
     const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl;
 
+    const ajamali_alasul_althaabitih =
+      alasulAlthaabituhAlmalmusah.thisYearBalance +
+      alasulAlthaabituhGhayrAlmalmusih.thisYearBalance;
+
+    const ajamaliu_aliailtizamat_tawiluh_alajil =
+      alkhusumAlthaabatuh.thisYearBalance + propertyRights.thisYearBalance;
     const alasulFinal =
       alasul.thisYearBalance -
       (inventory2.thisYearBalance + (purchases.currentYear?.balance || 0));
@@ -173,16 +179,19 @@ const almizanihAleumumihController = async (
       alasul,
       alkhusum,
       alayaradat,
-      huquqAlmalakih,
+      ajamaliu_aliailtizamat_tawiluh_alajil,
+      huquqAlmalakih: huquqAlmalakih.thisYearBalance,
       almasrufat,
       safi_alribh,
       inventory1,
-      alasulAlmutaduluh,
+      alasulAlmutaduluh: alasulAlmutaduluh.thisYearBalance,
       propertyRights,
-      alasulAlthaabituhAlmalmusah,
-      alasulAlthaabituhGhayrAlmalmusih,
-      alkhusumAlthaabatuhTawiluhAlajil: alkhusumAlthaabatuh,
-      alkhusumAlmutadawiluh,
+      ajamali_alasul_althaabitih,
+      alasulAlthaabituhAlmalmusah: alasulAlthaabituhAlmalmusah.thisYearBalance,
+      alasulAlthaabituhGhayrAlmalmusih:
+        alasulAlthaabituhGhayrAlmalmusih.thisYearBalance,
+      alkhusumAlthaabatuhTawiluhAlajil: alkhusumAlthaabatuh.thisYearBalance,
+      alkhusumAlmutadawiluh: alkhusumAlmutadawiluh.thisYearBalance,
       netProfitOrLossBeforeTaxes,
       netProfitOrLossAfterDeductingTaxes,
       accountsObject,
