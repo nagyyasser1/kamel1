@@ -185,7 +185,7 @@ const almizanihAleumumihController = async (
       safi_alribh,
       inventory1,
       alasulAlmutaduluh: alasulAlmutaduluh.thisYearBalance,
-      propertyRights,
+      propertyRights: propertyRights.thisYearBalance,
       ajamali_alasul_althaabitih,
       alasulAlthaabituhAlmalmusah: alasulAlthaabituhAlmalmusah.thisYearBalance,
       alasulAlthaabituhGhayrAlmalmusih:
