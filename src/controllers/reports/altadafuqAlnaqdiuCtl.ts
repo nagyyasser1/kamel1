@@ -55,8 +55,8 @@ const altadafuqAlnaqdiuCtl = async (
     );
 
     /**Accounts Balances */
-    const salesOutputTax = await accountsService.getAccountBalance(
-      accounts.salesOutputTax
+    const daribuhAlmabieat = await accountsService.getAccountBalance(
+      accounts.daribuhAlmabieat
     );
 
     const sales = await accountsService.getAccountBalance(accounts.sales);
@@ -98,7 +98,7 @@ const altadafuqAlnaqdiuCtl = async (
 
     const safi_alribh =
       alribh_altashghiliu_qabl_aldarayib -
-      (salesOutputTax.currentYear?.balance || 0);
+      (daribuhAlmabieat.currentYear?.balance || 0);
 
     const ahlak_alasul_althaabitih =
       alMothsatat.thisYearBalance + alMothsatat.previousYearsBalance;

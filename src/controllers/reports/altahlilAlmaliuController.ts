@@ -169,7 +169,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     // 15.
     const safi_alribh =
       alribh_altashghiliu_qabl_aldarayib -
-      (accountsObject[accounts.salesOutputTax]?.currentYear.balance || 0);
+      (accountsObject[accounts.daribuhAlmabieat]?.currentYear.balance || 0);
 
     const hamish_safi_alribh = safi_alribh / safi_almabieat;
 

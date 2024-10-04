@@ -34,6 +34,14 @@ router.get("/accountsarray", async (req, res) => {
   res.send(result);
 });
 
+router.get("/test/account/:number", async (req, res) => {
+  const { number } = req.params;
+
+  const result = await accountsService.getAccountBalance(number);
+
+  res.send(result);
+});
+
 // main api endpoints
 router.use("/auth", authRoutes);
 router.use("/accounts", accountsRoutes);

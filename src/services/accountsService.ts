@@ -1,7 +1,4 @@
 import getCurrentYear from "../utils/getCurrentYear";
-import ACCOUNTS_CODES_FOR_INCOME, {
-  FP_accounts,
-} from "../constants/accountsCodes";
 import prisma from "../prisma";
 
 const createAccount = async (data: any) => {
@@ -309,147 +306,6 @@ async function getTransactionsSummaryForArrayOfAccountsNumber(
   return summaries.filter((summary) => summary !== null);
 }
 
-async function statementFPositionSrvc() {
-  const accountNums = FP_accounts;
-
-  // Define the start and end dates for this year and previous years
-  const now = new Date();
-  const thisYearStart = new Date(now.getFullYear(), 0, 1);
-
-  // Query to get transactions summary for each account number
-  const summaries = await Promise.all(
-    accountNums.map(async (accountNum: any) => {
-      const account = await prisma.account.findUnique({
-        where: { number: accountNum },
-        include: {
-          sentTransactions: true,
-          receivedTransactions: true,
-        },
-      });
-
-      if (!account) {
-        return {
-          id: "",
-          accountName: "",
-          accountCode: "account.number",
-          totalBalance: 0,
-          thisYear: {
-            totalSentTransactions: 0,
-            totalSentAmount: 0,
-            totalReceivedTransactions: 0,
-            totalReceivedAmount: 0,
-            balance: 0,
-          },
-          previousYears: {
-            totalSentTransactions: 0,
-            totalSentAmount: 0,
-            totalReceivedTransactions: 0,
-            totalReceivedAmount: 0,
-            balance: 0,
-          },
-        };
-      }
-
-      // Aggregate this year's sent transactions
-      const thisYearSent = await prisma.transaction.aggregate({
-        where: {
-          fromId: account.id,
-          createdAt: {
-            gte: thisYearStart,
-          },
-        },
-        _sum: {
-          amount: true,
-        },
-        _count: {
-          id: true,
-        },
-      });
-
-      // Aggregate this year's received transactions
-      const thisYearReceived = await prisma.transaction.aggregate({
-        where: {
-          toId: account.id,
-          createdAt: {
-            gte: thisYearStart,
-          },
-        },
-        _sum: {
-          amount: true,
-        },
-        _count: {
-          id: true,
-        },
-      });
-
-      // Aggregate previous years' sent transactions
-      const previousYearsSent = await prisma.transaction.aggregate({
-        where: {
-          fromId: account.id,
-          createdAt: {
-            lt: thisYearStart,
-          },
-        },
-        _sum: {
-          amount: true,
-        },
-        _count: {
-          id: true,
-        },
-      });
-
-      // Aggregate previous years' received transactions
-      const previousYearsReceived = await prisma.transaction.aggregate({
-        where: {
-          toId: account.id,
-          createdAt: {
-            lt: thisYearStart,
-          },
-        },
-        _sum: {
-          amount: true,
-        },
-        _count: {
-          id: true,
-        },
-      });
-
-      // Calculate balances
-      const thisYearBalance =
-        (thisYearReceived._sum.amount || 0) - (thisYearSent._sum.amount || 0);
-
-      const previousYearsBalance =
-        previousYearsReceived._sum.amount ||
-        0 - (previousYearsSent._sum.amount || 0);
-
-      const totalBalance = thisYearBalance + previousYearsBalance;
-
-      return {
-        id: account.id,
-        accountName: account.name,
-        accountCode: account.number,
-        totalBalance: totalBalance,
-        thisYear: {
-          totalSentTransactions: thisYearSent._count.id || 0,
-          totalSentAmount: thisYearSent._sum.amount || 0,
-          totalReceivedTransactions: thisYearReceived._count.id || 0,
-          totalReceivedAmount: thisYearReceived._sum.amount || 0,
-          balance: thisYearBalance,
-        },
-        previousYears: {
-          totalSentTransactions: previousYearsSent._count.id || 0,
-          totalSentAmount: previousYearsSent._sum.amount || 0,
-          totalReceivedTransactions: previousYearsReceived._count.id || 0,
-          totalReceivedAmount: previousYearsReceived._sum.amount || 0,
-          balance: previousYearsBalance,
-        },
-      };
-    })
-  );
-
-  return summaries.filter((summary) => summary !== null);
-}
-
 const getAccountsBalances = async () => {
   const { startOfYear, endOfYear, previousStartOfYear, previousEndOfYear } =
     getCurrentYear();
@@ -677,7 +533,6 @@ export default {
   getAllAccounts,
   getCategoryTransactionSummary,
   getAllAccountsNums,
-  statementFPositionSrvc,
   getTransactionsSummaryForArrayOfAccountsNumber,
   getAccountById,
   createAccount,

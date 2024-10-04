@@ -54,7 +54,7 @@ const altaghayurFiHuquqAlmalakih = async (
 
     const safi_alribh =
       alribh_altashghiliu_qabl_aldarayib -
-      (accountsObject[accounts.salesOutputTax]?.currentYear?.balance || 0);
+      (accountsObject[accounts.daribuhAlmabieat]?.currentYear?.balance || 0);
 
     const mashubat_shakhsayh = 404;
 
