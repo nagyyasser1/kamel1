@@ -8,7 +8,7 @@ export const createTransactionSchema = Joi.object({
   amount: Joi.number().required(),
   number: Joi.number().required(),
   description: Joi.string().required(),
-  createdAt: Joi.date().optional(),
+  date: Joi.date().optional(),
 });
 
 export const updateTransactionSchema = Joi.object({

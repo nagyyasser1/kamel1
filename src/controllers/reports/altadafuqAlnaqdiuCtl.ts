@@ -99,31 +99,26 @@ const altadafuqAlnaqdiuCtl = async (
     const safi_alribh =
       alribh_altashghiliu_qabl_aldarayib - salesOutputTax.thisYearBalance;
 
-    const ahlak_alasul_althaabitih = Math.abs(
-      alMothsatat.thisYearBalance + alMothsatat.previousYearsBalance
-    );
+    const ahlak_alasul_althaabitih =
+      alMothsatat.thisYearBalance + alMothsatat.previousYearsBalance;
 
     const arbah_khasayir_altashghil = safi_alribh + alMothsatat.thisYearBalance;
 
-    const al_makhzun = Math.abs(
-      almakhzun.thisYearBalance - almakhzun.previousYearsBalance
-    );
+    const al_makhzun =
+      almakhzun.thisYearBalance - almakhzun.previousYearsBalance;
 
-    const masrufat_mustahaqa = Math.abs(
-      masrufatMustahaqa.thisYearBalance - masrufatMustahaqa.previousYearsBalance
-    );
+    const masrufat_mustahaqa =
+      masrufatMustahaqa.thisYearBalance -
+      masrufatMustahaqa.previousYearsBalance;
 
-    const aleumala = Math.abs(
-      clients.thisYearBalance - clients.previousYearsBalance
-    );
+    const aleumala = clients.thisYearBalance - clients.previousYearsBalance;
 
-    const almoreden = Math.abs(
-      almoredenBase.thisYearBalance - almoredenBase.previousYearsBalance
-    );
+    const almoreden =
+      almoredenBase.thisYearBalance - almoredenBase.previousYearsBalance;
 
-    const jari_alshuraka = Math.abs(
-      jariAlshurakaBase.thisYearBalance - jariAlshurakaBase.previousYearsBalance
-    );
+    const jari_alshuraka =
+      jariAlshurakaBase.thisYearBalance -
+      jariAlshurakaBase.previousYearsBalance;
 
     const safi_altadafuqat_alnaqdayh =
       al_makhzun + almoreden + aleumala + jari_alshuraka + masrufat_mustahaqa;
@@ -137,9 +132,8 @@ const altadafuqAlnaqdiuCtl = async (
     const safi_altadafuqat_alnaqdayh_min_alaistithmar =
       arbah_rasi_malia + madfueat_lishira_asul_thabatih;
 
-    const ras_almal = Math.abs(
-      ras_almalBase.thisYearBalance - ras_almalBase.previousYearsBalance
-    );
+    const ras_almal =
+      ras_almalBase.thisYearBalance - ras_almalBase.previousYearsBalance;
 
     const alziyadah_alnaqs_fi_alaihtiatii = 404;
 

@@ -158,14 +158,12 @@ const getCategoryStatistics = async (id?: any, code?: string) => {
     };
   });
 
-  let categoryCurrentYearStatsBalance = Math.abs(
-    categoryCurrentYearStats.receivedTotal - categoryCurrentYearStats.sentTotal
-  );
+  let categoryCurrentYearStatsBalance =
+    categoryCurrentYearStats.receivedTotal - categoryCurrentYearStats.sentTotal;
 
-  let categoryPreviousYearsStatsBalance = Math.abs(
+  let categoryPreviousYearsStatsBalance =
     categoryPreviousYearsStats.receivedTotal -
-      categoryPreviousYearsStats.sentTotal
-  );
+    categoryPreviousYearsStats.sentTotal;
 
   return {
     totalBalance:
@@ -319,13 +317,11 @@ async function getCategoryTransactionSummaryForAllCategories() {
           0
         );
 
-      const thisYearBalance = Math.abs(
-        thisYearTotalReceivedAmount - thisYearTotalSentAmount
-      );
+      const thisYearBalance =
+        thisYearTotalReceivedAmount - thisYearTotalSentAmount;
 
-      const previousYearsBalance = Math.abs(
-        previousYearsTotalReceivedAmount - previousYearsTotalSentAmount
-      );
+      const previousYearsBalance =
+        previousYearsTotalReceivedAmount - previousYearsTotalSentAmount;
 
       const totalBalance = thisYearBalance + previousYearsBalance;
 
@@ -461,21 +457,34 @@ async function getCategoryTransactionSummary(categoryNumber?: string) {
         },
       });
 
+      const thisYearBalance =
+        (currentYearReceived._sum.amount || 0) -
+        (currentYearSent._sum.amount || 0);
+
+      const previousYearsBalance =
+        (previousYearReceived._sum.amount || 0) -
+        (previousYearSent._sum.amount || 0);
+
+      const totalBalance = previousYearsBalance + thisYearBalance;
+
       return {
         id: account.id,
         number: account.number,
         name: account.name,
+        totalBalance,
         currentYear: {
+          balance: thisYearBalance,
           sentTransactions: currentYearSent._count,
-          sentAmount: currentYearSent._sum.amount ?? 0,
+          sentAmount: currentYearSent._sum.amount || 0,
           receivedTransactions: currentYearReceived._count,
-          receivedAmount: currentYearReceived._sum.amount ?? 0,
+          receivedAmount: currentYearReceived._sum.amount || 0,
         },
         previousYear: {
+          balance: previousYearsBalance,
           sentTransactions: previousYearSent._count,
-          sentAmount: previousYearSent._sum.amount ?? 0,
+          sentAmount: previousYearSent._sum.amount || 0,
           receivedTransactions: previousYearReceived._count,
-          receivedAmount: previousYearReceived._sum.amount ?? 0,
+          receivedAmount: previousYearReceived._sum.amount || 0,
         },
       };
     })
@@ -547,7 +556,7 @@ const getCategoriesBalances = async () => {
       );
     });
 
-    let balance = Math.abs(totalReceived - totalSent);
+    let balance = totalReceived - totalSent;
 
     // Fetch subcategories and calculate their balances recursively
     const subCategoryBalances: any = await Promise.all(
@@ -722,12 +731,11 @@ const getCategoryBalance = async (categoryNumber: string) => {
     // Calculate total balance for the category and its subcategories
     const totalBalance = await calculateCategoryBalance(category.id);
 
-    const thisYearBalance = Math.abs(
-      totalBalance.thisYearReceived - totalBalance.thisYearSent
-    );
-    const previousYearsBalance = Math.abs(
-      totalBalance.previousYearsReceived - totalBalance.previousYearsSent
-    );
+    const thisYearBalance =
+      totalBalance.thisYearReceived - totalBalance.thisYearSent;
+
+    const previousYearsBalance =
+      totalBalance.previousYearsReceived - totalBalance.previousYearsSent;
 
     return {
       category: {

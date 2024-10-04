@@ -20,9 +20,41 @@ const almizanihAleumumihController = async (
       return cat;
     }, {} as any);
 
-    const alkhusumAlmutadawiluh = await categoryService.getCategoryBalance(
-      categories.alkhusumAlmutadawiluh
+    const alasul = await categoryService.getCategoryBalance(categories.alasul);
+    const alkhusum = await categoryService.getCategoryBalance(
+      categories.alkhusum
     );
+    const huquqAlmalakih = await categoryService.getCategoryBalance(
+      categories.huquqAlmalakih
+    );
+    const alayaradat = await categoryService.getCategoryBalance(
+      categories.alayaradat
+    );
+    const almasrufat = await categoryService.getCategoryBalance(
+      categories.almasrufat
+    );
+
+    // const alkhusumAlmutadawiluh = await categoryService.getCategoryBalance(
+    //   categories.alkhusumAlmutadawiluh
+    // );
+
+    // const inventory1 = await categoryService.getCategoryBalance(
+    //   categories.inventory1
+    // );
+
+    const inventory2 = await categoryService.getCategoryBalance(
+      categories.inventory2
+    );
+
+    const alMothsatat = await categoryService.getCategoryBalance(
+      categories.alMothsatat
+    );
+
+    const purchases = await accountsService.getAccountBalance(
+      accounts.purchases
+    );
+
+    const sales = await accountsService.getAccountBalance(accounts.sales);
 
     const alkhusumAlthaabatuh = await categoryService.getCategoryBalance(
       categories.alkhusumAlthaabatuh
@@ -58,11 +90,10 @@ const almizanihAleumumihController = async (
       categories.masarifAdarih
     );
 
-    const safi_almabieat = Math.abs(
+    const safi_almabieat =
       (accountsObject[accounts.sales]?.balance || 0) -
-        ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
-          (accountsObject[accounts.salesReturns]?.balance || 0))
-    );
+      ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
+        (accountsObject[accounts.salesReturns]?.balance || 0));
 
     const purchasesReturnedExpenses =
       (accountsObject[accounts.purchases]?.balance || 0) +
@@ -82,7 +113,7 @@ const almizanihAleumumihController = async (
       masarifTaswiqayh.thisYearBalance;
 
     const totalGeneralAdministrativeAndOperatingExpenses =
-      masarifAdarih.thisYearBalance + masarifTaswiqayh.thisYearBalance;
+      masarifAdarih.thisYearBalance;
 
     const salesOutputTax =
       accountsObject[accounts.salesOutputTax]?.balance || 0;
@@ -101,12 +132,12 @@ const almizanihAleumumihController = async (
     const netProfitOrLossAfterDeductingTaxes =
       netProfitOrLossBeforeTaxes - salesOutputTax;
 
-    const safi_almushtariat = Math.abs(
+    const safi_almushtariat =
       (accountsObject[accounts.purchases]?.balance || 0) +
-        (accountsObject[accounts.purchasesExpenses]?.balance || 0) -
-        (accountsObject[accounts.purchaseReturns]?.balance || 0) -
-        (accountsObject[accounts.khasmuktasib]?.balance || 0)
-    );
+      (accountsObject[accounts.purchasesExpenses]?.balance || 0) -
+      (accountsObject[accounts.purchaseReturns]?.balance || 0) -
+      (accountsObject[accounts.khasmuktasib]?.balance || 0);
+
     const tukalifuh_almabieat =
       safi_almushtariat + (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
 
@@ -124,18 +155,39 @@ const almizanihAleumumihController = async (
 
     const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl;
 
+    const alasulFinal =
+      alasul.thisYearBalance -
+      (inventory2.thisYearBalance + purchases.thisYearBalance);
+
+    const alkhusumFinal =
+      alkhusum.thisYearBalance -
+      (sales.thisYearBalance, alMothsatat.thisYearBalance);
+
     res.json({
+      alasulFinal,
+      alkhusumFinal,
+      inventory2,
+      purchases,
+      sales,
+      alMothsatat,
+      alasul,
+      alkhusum,
+      alayaradat,
+      huquqAlmalakih,
+      almasrufat,
       safi_alribh,
-      alasulAlmutaduluh,
-      propertyRights,
-      alasulAlthaabituhAlmalmusah,
-      alasulAlthaabituhGhayrAlmalmusih,
-      alkhusumAlthaabatuhTawiluhAlajil: alkhusumAlthaabatuh,
-      alkhusumAlmutadawiluh,
-      netProfitOrLossBeforeTaxes,
-      netProfitOrLossAfterDeductingTaxes,
-      accountsObject,
-      categoriesObject,
+      // inventory1,
+      // inventory2,
+      // alasulAlmutaduluh,
+      // propertyRights,
+      // alasulAlthaabituhAlmalmusah,
+      // alasulAlthaabituhGhayrAlmalmusih,
+      // alkhusumAlthaabatuhTawiluhAlajil: alkhusumAlthaabatuh,
+      // alkhusumAlmutadawiluh,
+      // netProfitOrLossBeforeTaxes,
+      // netProfitOrLossAfterDeductingTaxes,
+      // accountsObject,
+      // categoriesObject,
     });
   } catch (error) {
     next(error);

@@ -152,12 +152,10 @@ const getTransForAccountsByNums = async (
 
     const NetSales =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
-      Math.abs(
-        sumGroupOfAccounts(summaries, [
-          AccountsWname.allowedDiscount,
-          AccountsWname.salesReturns,
-        ])
-      );
+      sumGroupOfAccounts(summaries, [
+        AccountsWname.allowedDiscount,
+        AccountsWname.salesReturns,
+      ]);
 
     const purchasesReturnedExpenses = sumGroupOfAccounts(summaries, [
       AccountsWname.purchases,
@@ -269,13 +267,10 @@ const getTransForAccountsByNums = async (
 
     const safi_almabieat =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
-      Math.abs(
-        sumGroupOfAccounts(summaries, [
-          AccountsWname.allowedDiscount,
-          AccountsWname.salesReturns,
-        ])
-      );
-
+      sumGroupOfAccounts(summaries, [
+        AccountsWname.allowedDiscount,
+        AccountsWname.salesReturns,
+      ]);
     const safi_almushtariat = sumGroupOfAccounts(summaries, [
       AccountsWname.purchases,
       AccountsWname.purchaseReturns,
@@ -506,13 +501,10 @@ const statementOfFinancialPositionCrl = async (
 
     const safi_almabieat =
       sumGroupOfAccounts(summaries, [AccountsWname.sales]) -
-      Math.abs(
-        sumGroupOfAccounts(summaries, [
-          AccountsWname.allowedDiscount,
-          AccountsWname.salesReturns,
-        ])
-      );
-
+      sumGroupOfAccounts(summaries, [
+        AccountsWname.allowedDiscount,
+        AccountsWname.salesReturns,
+      ]);
     const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
 
     const almukhasasat = sumGroupOfAccounts(summaries, [
@@ -567,6 +559,21 @@ const getAllAccountsNumsController = async (
   }
 };
 
+const getAccountsBalances = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { accountsObject } = await accountsService.getAccountsBalances();
+
+    const accountsArray: any = Object.values(accountsObject);
+
+    res.send(accountsArray);
+  } catch (error) {
+    next(error);
+  }
+};
 export default {
   createAccountCtr,
   deleteAccountCtr,
@@ -576,4 +583,5 @@ export default {
   getTransForAccountsByNums,
   statementOfFinancialPositionCrl,
   getAllAccountsNumsController,
+  getAccountsBalances,
 };

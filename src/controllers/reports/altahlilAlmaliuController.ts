@@ -86,27 +86,21 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     );
 
     // 1.
-    const safi_almabieat = Math.abs(
+    const safi_almabieat =
       (accountsObject[accounts.sales]?.balance || 0) -
-        ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
-          (accountsObject[accounts.salesReturns]?.balance || 0))
-    );
-
+      ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
+        (accountsObject[accounts.salesReturns]?.balance || 0));
     // 2.
-    const safi_almushtariat = Math.abs(
+    const safi_almushtariat =
       (accountsObject[accounts.purchases]?.balance || 0) +
-        (accountsObject[accounts.purchasesExpenses]?.balance || 0) -
-        (accountsObject[accounts.purchaseReturns]?.balance || 0) -
-        (accountsObject[accounts.khasmuktasib]?.balance || 0)
-    );
-
+      (accountsObject[accounts.purchasesExpenses]?.balance || 0) -
+      (accountsObject[accounts.purchaseReturns]?.balance || 0) -
+      (accountsObject[accounts.khasmuktasib]?.balance || 0);
     // 3.
-    const tukalifuh_almabieat = Math.abs(
+    const tukalifuh_almabieat =
       inventory2?.previousYearsBalance +
-        safi_almushtariat -
-        inventory2?.thisYearBalance
-    );
-
+      safi_almushtariat -
+      inventory2?.thisYearBalance;
     // 4.
     const alribh_altashghiliu = safi_almabieat - tukalifuh_almabieat;
 
@@ -149,7 +143,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const nasabuh_alnaqdih =
       (theBox?.thisYearBalance +
         theBanK?.thisYearBalance +
-        Math.abs(accountsObject[accounts.arrestPapers]?.balance || 0)) /
+        accountsObject[accounts.arrestPapers]?.balance || 0) /
       (accountsObject[accounts.awraqAldafe]?.balance || 0);
 
     // 13.
@@ -223,9 +217,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       (clients?.thisYearBalance + clients?.previousYearsBalance) / 2;
 
     const mueadal_dawaran_almadinin =
-      (Math.abs(accountsObject[accounts.arrestPapers]?.balance || 0) +
-        clients?.thisYearBalance) /
-      mutawasit_almadinin;
+      (accountsObject[accounts.arrestPapers]?.balance ||
+        0 + clients?.thisYearBalance) / mutawasit_almadinin;
 
     // 25.
     const mutawasit_fatrih_altahsil = mueadal_dawaran_almadinin / 365;

@@ -44,12 +44,10 @@ const qayimat_aldakhlController = async (
     const totalSellingAndDistributionExpenses =
       masarifTaswiqayh.thisYearBalance;
 
-    const safi_almabieat = Math.abs(
+    const safi_almabieat =
       (accountsObject[accounts.sales]?.balance || 0) -
-        ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
-          (accountsObject[accounts.salesReturns]?.balance || 0))
-    );
-
+      ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
+        (accountsObject[accounts.salesReturns]?.balance || 0));
     const purchasesReturnedExpenses =
       (accountsObject[accounts.purchases]?.balance || 0) +
       (accountsObject[accounts.purchaseReturns]?.balance || 0);
@@ -64,12 +62,11 @@ const qayimat_aldakhlController = async (
     const variousTotalRevenues =
       safi_almabieat - costOfGoodsSold + (otherRevenues?.thisYearBalance || 0);
 
-    const safi_almushtariat = Math.abs(
+    const safi_almushtariat =
       (accountsObject[accounts.purchases]?.balance || 0) +
-        (accountsObject[accounts.purchasesExpenses]?.balance || 0) -
-        (accountsObject[accounts.purchaseReturns]?.balance || 0) -
-        (accountsObject[accounts.khasmuktasib]?.balance || 0)
-    );
+      (accountsObject[accounts.purchasesExpenses]?.balance || 0) -
+      (accountsObject[accounts.purchaseReturns]?.balance || 0) -
+      (accountsObject[accounts.khasmuktasib]?.balance || 0);
 
     const tukalifuh_almabieat =
       safi_almushtariat + (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);

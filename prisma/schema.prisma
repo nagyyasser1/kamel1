@@ -72,15 +72,16 @@ model ProductTransaction {
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   amount      Float
   description String
-  number      Int      @unique
+  number      Int       @unique
+  date        DateTime?
   fromId      String
   toId        String
-  from        Account  @relation("SentTransactions", fields: [fromId], references: [id], onDelete: Cascade)
-  to          Account  @relation("ReceivedTransactions", fields: [toId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  from        Account   @relation("SentTransactions", fields: [fromId], references: [id], onDelete: Cascade)
+  to          Account   @relation("ReceivedTransactions", fields: [toId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 }
 
 model Report {

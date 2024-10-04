@@ -31,22 +31,20 @@ const altaghayurFiHuquqAlmalakih = async (
       categories.ras_almal
     );
 
-    const safi_almabieat = Math.abs(
+    const safi_almabieat =
       (accountsObject[accounts.sales]?.balance || 0) -
-        ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
-          (accountsObject[accounts.salesReturns]?.balance || 0))
-    );
+      ((accountsObject[accounts.allowedDiscount]?.balance || 0) -
+        (accountsObject[accounts.salesReturns]?.balance || 0));
 
     const masarifTaswiqayh = await categoryService.getCategoryBalance(
       categories.masarifTaswiqayh
     );
 
-    const tukalifuh_albidaeuh_almubaeuh = Math.abs(
+    const tukalifuh_albidaeuh_almubaeuh =
       (accountsObject[accounts.sales]?.balance || 0) +
-        (accountsObject[accounts.salesReturns]?.balance || 0) +
-        (accountsObject[accounts.purchaseReturns]?.balance || 0) -
-        (makhzun_akhir_alfatrih.thisYearBalance || 0)
-    );
+      (accountsObject[accounts.salesReturns]?.balance || 0) +
+      (accountsObject[accounts.purchaseReturns]?.balance || 0) -
+      (makhzun_akhir_alfatrih.thisYearBalance || 0);
 
     const alribh_altashghiliu_qabl_aldarayib =
       safi_almabieat -
@@ -60,12 +58,11 @@ const altaghayurFiHuquqAlmalakih = async (
 
     const mashubat_shakhsayh = 404;
 
-    const ras_almal_fi_nihayih_alfatrah = Math.abs(
+    const ras_almal_fi_nihayih_alfatrah =
       ras_almal.previousYearsBalance +
-        ras_almal.thisYearBalance +
-        safi_alribh -
-        mashubat_shakhsayh
-    );
+      ras_almal.thisYearBalance +
+      safi_alribh -
+      mashubat_shakhsayh;
 
     const { category, ...ras_almal_without_category } = ras_almal;
 
