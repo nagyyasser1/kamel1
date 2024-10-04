@@ -115,8 +115,8 @@ const almizanihAleumumihController = async (
     const totalGeneralAdministrativeAndOperatingExpenses =
       masarifAdarih.thisYearBalance;
 
-    const daribuhAlmabieat =
-      accountsObject[accounts.daribuhAlmabieat]?.currentYear?.balance || 0;
+    const daribuhAldukhl =
+      accountsObject[accounts.daribuhAldukhl]?.currentYear?.balance || 0;
 
     const costOfGoodsSold =
       purchasesReturnedExpenses -
@@ -130,7 +130,7 @@ const almizanihAleumumihController = async (
         totalGeneralAdministrativeAndOperatingExpenses);
 
     const netProfitOrLossAfterDeductingTaxes =
-      netProfitOrLossBeforeTaxes - daribuhAlmabieat;
+      netProfitOrLossBeforeTaxes - daribuhAldukhl;
 
     const safi_almushtariat =
       (accountsObject[accounts.purchases]?.currentYear?.balance || 0) +

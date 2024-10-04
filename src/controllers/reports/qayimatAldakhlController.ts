@@ -35,8 +35,8 @@ const qayimat_aldakhlController = async (
       categories.alMothsatat
     );
 
-    const daribuhAlmabieat =
-      accountsObject[accounts.daribuhAlmabieat]?.currentYear.balance || 0;
+    const daribuhAldukhl =
+      accountsObject[accounts.daribuhAldukhl]?.currentYear.balance || 0;
 
     const totalGeneralAdministrativeAndOperatingExpenses =
       masarifAdarih.thisYearBalance + masarifTaswiqayh.thisYearBalance;
@@ -96,7 +96,7 @@ const qayimat_aldakhlController = async (
         totalGeneralAdministrativeAndOperatingExpenses);
 
     const netProfitOrLossAfterDeductingTaxes =
-      netProfitOrLossBeforeTaxes - daribuhAlmabieat;
+      netProfitOrLossBeforeTaxes - daribuhAldukhl;
 
     res.json({
       almukhasasat: almukhasasat.thisYearBalance,
@@ -119,7 +119,7 @@ const qayimat_aldakhlController = async (
       variousTotalRevenues,
       netProfitOrLossBeforeTaxes,
       netProfitOrLossAfterDeductingTaxes,
-      salesOutputTax: daribuhAlmabieat,
+      salesOutputTax: daribuhAldukhl,
       accountsObject,
     });
   } catch (error) {
