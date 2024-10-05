@@ -42,6 +42,12 @@ router.get("/test/account/:number", async (req, res) => {
   res.send(result);
 });
 
+router.get("/account-all-transactions/:number", async (req, res) => {
+  const { number } = req.params;
+  const result = await accountsService.getAccountTransactions(number);
+  res.send(result);
+});
+
 // main api endpoints
 router.use("/auth", authRoutes);
 router.use("/accounts", accountsRoutes);

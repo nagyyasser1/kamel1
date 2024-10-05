@@ -107,4 +107,5 @@ export const categories = {
   masrufatMustahaqa: "2204",
   alasulAlthaabituhGhayrAlmalmusih: "1102",
   alasulAlthaabituhAlmalmusah: "1101",
+  darayib: "55",
 };

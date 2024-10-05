@@ -9,13 +9,14 @@ const qayimat_aldakhlController = async (
   next: NextFunction
 ) => {
   try {
+    /**  */
     const { accountsObject } = await accountsService.getAccountsBalances();
-    const inventoryAtTheEndOfThePeriod =
-      await categoryService.getCategoryBalance(
-        categories.inventoryAtTheEndOfThePeriod
-      );
 
-    const otherRevenues = await categoryService.getCategoryBalance(
+    const makhzun_akhir_alfatrih = await categoryService.getCategoryBalance(
+      categories.inventoryAtTheEndOfThePeriod
+    );
+
+    const ayradat_akhari = await categoryService.getCategoryBalance(
       categories.otherRevenues
     );
 
@@ -23,105 +24,106 @@ const qayimat_aldakhlController = async (
       categories.masarifTaswiqayh
     );
 
-    const masarifAdarih = await categoryService.getCategoryBalance(
-      categories.masarifAdarih
+    const masarifTashghilayh = await categoryService.getCategoryBalance(
+      categories.masarifTashghilayh
     );
 
-    const activitySalesRevenue = await categoryService.getCategoryBalance(
-      categories.activitySalesRevenue
+    const masarifAdarih = await categoryService.getCategoryBalance(
+      categories.masarifAdarih
     );
 
     const almukhasasat = await categoryService.getCategoryBalance(
       categories.alMothsatat
     );
 
-    const daribuhAldukhl =
+    const daribuh_aldukhl =
       accountsObject[accounts.daribuhAldukhl]?.currentYear.balance || 0;
 
-    const totalGeneralAdministrativeAndOperatingExpenses =
-      masarifAdarih.thisYearBalance + masarifTaswiqayh.thisYearBalance;
+    /** Page ( 1 )*/
 
-    const totalSellingAndDistributionExpenses =
-      masarifTaswiqayh.thisYearBalance;
-
+    // 1.
     const safi_almabieat =
       (accountsObject[accounts.sales]?.currentYear.balance || 0) -
       ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
         (accountsObject[accounts.salesReturns]?.currentYear.balance || 0));
 
+    // 2.
     const purchasesReturnedExpenses =
       (accountsObject[accounts.purchases]?.currentYear.balance || 0) +
-        (accountsObject[accounts.purchaseReturns]?.currentYear.balance || 0) +
-        accountsObject[accounts.purchasesExpenses]?.currentYear.balance || 0;
+      (accountsObject[accounts.purchaseReturns]?.currentYear.balance || 0) +
+      (accountsObject[accounts.purchasesExpenses]?.currentYear.balance || 0);
 
-    const costOfGoodsSold =
-      purchasesReturnedExpenses -
-      (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
+    const tukalifuh_albidaeuh_almubaeuh =
+      purchasesReturnedExpenses +
+      (makhzun_akhir_alfatrih?.thisYearBalance || 0);
 
-    const totalIncome = safi_almabieat - costOfGoodsSold;
+    // 4.
+    const mujmal_alribh =
+      safi_almabieat - Math.abs(tukalifuh_albidaeuh_almubaeuh);
 
-    const variousTotalRevenues =
-      safi_almabieat - costOfGoodsSold + (otherRevenues?.thisYearBalance || 0);
-
-    const safi_almushtariat =
-      (accountsObject[accounts.purchases]?.currentYear?.balance || 0) +
-      (accountsObject[accounts.purchasesExpenses]?.currentYear?.balance || 0) -
-      (accountsObject[accounts.purchaseReturns]?.currentYear?.balance || 0) -
-      (accountsObject[accounts.khasmuktasib]?.currentYear?.balance || 0);
-
-    const tukalifuh_almabieat =
-      safi_almushtariat + (inventoryAtTheEndOfThePeriod?.thisYearBalance || 0);
-
-    const mujmal_alribh = safi_almabieat - tukalifuh_almabieat;
-
-    const alribh_qabl_aldarayib =
-      mujmal_alribh +
-      (otherRevenues?.thisYearBalance || 0) -
-      (totalSellingAndDistributionExpenses +
-        totalGeneralAdministrativeAndOperatingExpenses +
-        almukhasasat.thisYearBalance);
-
-    const daribuh_aldukhl =
-      accountsObject[accounts.daribuhAldukhl]?.currentYear.balance || 0;
-
-    const safi_alribh = alribh_qabl_aldarayib - daribuh_aldukhl; //
-
+    // 5.
     const ajamali_ayradat_mukhtalifuh =
-      mujmal_alribh + (otherRevenues?.thisYearBalance || 0);
+      mujmal_alribh + (ayradat_akhari?.thisYearBalance || 0);
 
-    const netProfitOrLossBeforeTaxes =
-      safi_almabieat -
-      costOfGoodsSold +
-      (otherRevenues?.thisYearBalance || 0) -
-      (totalSellingAndDistributionExpenses -
-        totalGeneralAdministrativeAndOperatingExpenses);
+    /** Page ( 2 ) */
+    // 6.
+    const ajamaliu_almasarif_4 =
+      masarifAdarih.thisYearBalance +
+      masarifTaswiqayh.thisYearBalance +
+      almukhasasat.thisYearBalance +
+      masarifTashghilayh.thisYearBalance;
 
-    const netProfitOrLossAfterDeductingTaxes =
-      netProfitOrLossBeforeTaxes - daribuhAldukhl;
+    // 7.
+    const alribh_qabl_aldarayib =
+      ajamali_ayradat_mukhtalifuh - Math.abs(ajamaliu_almasarif_4);
 
+    // 8.
+    const alribh_baed_aldarayib = alribh_qabl_aldarayib - daribuh_aldukhl;
+
+    // res.json({
+    //   safi_almabieat,
+    //   purchasesReturnedExpenses,
+    //   tukalifuh_albidaeuh_almubaeuh,
+    //   mujmal_alribh,
+    //   ajamali_ayradat_mukhtalifuh,
+    //   ajamaliu_almasarif_4,
+    //   alribh_qabl_aldarayib,
+    //   alribh_baed_aldarayib,
+    //   details: {
+    //     makhzun_akhir_alfatrih: makhzun_akhir_alfatrih.thisYearBalance,
+    //     ayradat_akhari: ayradat_akhari.thisYearBalance,
+    //     masarifTaswiqayh: masarifTaswiqayh.thisYearBalance,
+    //     masarifAdarih: masarifAdarih.thisYearBalance,
+    //     masarifTashghilayh: masarifTashghilayh.thisYearBalance,
+    //     almukhasasat: almukhasasat.thisYearBalance,
+    //     daribuh_aldukhl: daribuh_aldukhl,
+    //   },
+    // });
     res.json({
       almukhasasat: almukhasasat.thisYearBalance,
+      masarifAdarih: masarifAdarih.thisYearBalance,
+      masarifTaswiqayh: masarifTaswiqayh.thisYearBalance,
       safi_almabieat,
-      tukalifuh_almabieat,
+      // tukalifuh_almabieat,
       mujmal_alribh,
       alribh_qabl_aldarayib,
-      safi_alribh,
+      safi_alribh: alribh_baed_aldarayib,
       ajamali_ayradat_mukhtalifuh,
       NetSales: safi_almabieat,
       purchasesReturnedExpenses,
-      inventoryAtTheEndOfThePeriod:
-        inventoryAtTheEndOfThePeriod.thisYearBalance,
-      otherRevenues: otherRevenues.thisYearBalance,
-      activitySalesRevenue: activitySalesRevenue.thisYearBalance,
-      totalSellingAndDistributionExpenses,
-      totalGeneralAdministrativeAndOperatingExpenses,
+      inventoryAtTheEndOfThePeriod: makhzun_akhir_alfatrih.thisYearBalance,
+      otherRevenues: ayradat_akhari.thisYearBalance,
+      // activitySalesRevenue: activitySalesRevenue.thisYearBalance,
+      totalSellingAndDistributionExpenses: masarifTaswiqayh.thisYearBalance,
+      totalGeneralAdministrativeAndOperatingExpenses:
+        masarifAdarih.thisYearBalance,
       AllotmentsAfter: almukhasasat.thisYearBalance,
-      costOfGoodsSold,
-      totalIncome,
-      variousTotalRevenues,
-      netProfitOrLossBeforeTaxes,
-      netProfitOrLossAfterDeductingTaxes,
-      salesOutputTax: daribuhAldukhl,
+      costOfGoodsSold: tukalifuh_albidaeuh_almubaeuh,
+      totalIncome: mujmal_alribh,
+      variousTotalRevenues: ajamali_ayradat_mukhtalifuh,
+      netProfitOrLossBeforeTaxes: alribh_qabl_aldarayib,
+      netProfitOrLossAfterDeductingTaxes: alribh_baed_aldarayib,
+      salesOutputTax: daribuh_aldukhl,
       accountsObject,
     });
   } catch (error) {

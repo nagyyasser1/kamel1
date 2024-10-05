@@ -527,6 +527,20 @@ const getAllAccountsNums = async () => {
   return accounts;
 };
 
+const getAccountTransactions = async (number: string) => {
+  const account = await prisma.account.findMany({
+    where: {
+      number,
+    },
+    include: {
+      sentTransactions: true,
+      receivedTransactions: true,
+    },
+  });
+
+  return account;
+};
+
 export default {
   getAccountBalance,
   getAccountsBalances,
@@ -539,4 +553,5 @@ export default {
   deleteAccount,
   getAccountByName,
   getAccountByNumber,
+  getAccountTransactions,
 };
