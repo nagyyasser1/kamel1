@@ -9,7 +9,6 @@ const qayimat_aldakhlController = async (
   next: NextFunction
 ) => {
   try {
-    /**  */
     const { accountsObject } = await accountsService.getAccountsBalances();
 
     const makhzun_akhir_alfatrih = await categoryService.getCategoryBalance(
@@ -107,7 +106,6 @@ const qayimat_aldakhlController = async (
       masarifAdarih: masarifAdarih.thisYearBalance,
       masarifTaswiqayh: masarifTaswiqayh.thisYearBalance,
       safi_almabieat,
-      // tukalifuh_almabieat,
       mujmal_alribh,
       alribh_qabl_aldarayib,
       safi_alribh: alribh_baed_aldarayib,
@@ -116,7 +114,6 @@ const qayimat_aldakhlController = async (
       purchasesReturnedExpenses,
       inventoryAtTheEndOfThePeriod: makhzun_akhir_alfatrih.thisYearBalance,
       otherRevenues: ayradat_akhari.thisYearBalance,
-      // activitySalesRevenue: activitySalesRevenue.thisYearBalance,
       totalSellingAndDistributionExpenses: masarifTaswiqayh.thisYearBalance,
       totalGeneralAdministrativeAndOperatingExpenses:
         masarifAdarih.thisYearBalance,
