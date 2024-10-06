@@ -12,7 +12,7 @@ export const createAccountSchema = Joi.object({
 
 export const updateAccountSchema = Joi.object({
   name: Joi.string().trim().optional(),
-  number: Joi.string().optional(),
+  number: Joi.number().optional(),
   email: Joi.string().trim().optional(),
   description: Joi.string().optional(),
   categoryId: Joi.string().optional(),
@@ -33,6 +33,9 @@ export const validateCreateAccount = async (
       errors: result.error.details.map((err) => err.message),
     });
   }
+
+  // Transform the `number` field from number to string
+  req.body.number = req.body.number.toString();
 
   next();
 };

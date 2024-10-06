@@ -4,7 +4,7 @@ import { STATUS_CODES } from "../../constants/statusCodes";
 
 export const createCategorySchema = Joi.object({
   name: Joi.string().required(),
-  number: Joi.string().required(),
+  number: Joi.number().required(),
   status: Joi.boolean().required(),
   parentId: Joi.string().allow(null).required(),
 });
@@ -24,6 +24,9 @@ export const validateCreateCategory = async (
       errors: result.error.details.map((err) => err.message),
     });
   }
+
+  // Transform the `number` field from number to string
+  req.body.number = req.body.number.toString();
 
   next();
 };
