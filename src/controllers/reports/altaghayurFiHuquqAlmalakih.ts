@@ -97,7 +97,7 @@ const altaghayurFiHuquqAlmalakih = async (
 
     res.json({
       ras_almal: ras_almal_without_category,
-      alribh_baed_aldarayib,
+      safi_alribh: alribh_baed_aldarayib,
       mashubat_shakhsayh,
       ras_almal_fi_nihayih_alfatrah,
     });
