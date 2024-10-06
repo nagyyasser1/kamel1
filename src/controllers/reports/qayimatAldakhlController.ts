@@ -44,8 +44,10 @@ const qayimat_aldakhlController = async (
     // 1.
     const safi_almabieat =
       (accountsObject[accounts.sales]?.currentYear.balance || 0) -
-      ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
-        (accountsObject[accounts.salesReturns]?.currentYear.balance || 0));
+      Math.abs(
+        (accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
+          (accountsObject[accounts.salesReturns]?.currentYear.balance || 0)
+      );
 
     // 2.
     const purchasesReturnedExpenses =
@@ -78,7 +80,8 @@ const qayimat_aldakhlController = async (
       ajamali_ayradat_mukhtalifuh - Math.abs(ajamaliu_almasarif_4);
 
     // 8.
-    const alribh_baed_aldarayib = alribh_qabl_aldarayib - daribuh_aldukhl;
+    const alribh_baed_aldarayib =
+      alribh_qabl_aldarayib - Math.abs(daribuh_aldukhl);
 
     // res.json({
     //   safi_almabieat,
