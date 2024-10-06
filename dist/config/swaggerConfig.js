@@ -14,12 +14,12 @@ const options = {
         },
         servers: [
             {
-                url: "http://localhost:3000", // Update the URL accordingly
+                url: "http://localhost:3000",
                 description: "Development Server",
             },
         ],
     },
-    apis: ["./src/routes/*.ts"], // Update the path to your route files
+    apis: ["./src/routes/*.ts"],
 };
 const specs = (0, swagger_jsdoc_1.default)(options);
 exports.default = specs;

@@ -175,7 +175,7 @@ const getCategoryStatistics = async (id?: any, code?: string) => {
 
 // Get a category by Number
 const getCategoryByNumber = async (number: string) => {
-  return prisma.category.findUnique({
+  return await prisma.category.findUnique({
     where: { number },
     include: {
       subCategories: {

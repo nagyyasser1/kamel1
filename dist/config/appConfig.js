@@ -11,6 +11,8 @@ const appConfig = {
     dbUrl: process.env.POSTGRES_PRISMA_URL ||
         "postgresql://postgres:postgres@localhost:5432/mydb",
     jwtSecret: process.env.JWT_SECRET || "your_jwt_secret",
+    bcryptSalt: Number(process.env.BCRYPT_SALT) || 10,
     apiPrefix: process.env.API_PREFIX || "/api",
+    clientUrl: process.env.CLIENT_URL || "http://localhost:3000",
 };
 exports.default = appConfig;

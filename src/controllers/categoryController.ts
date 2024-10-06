@@ -10,11 +10,11 @@ export const createCategory = async (
 ) => {
   try {
     const categoryExists = await categoryService.getCategoryByNumber(
-      req.body?.number
+      String(req.body?.number)
     );
     if (categoryExists) {
       throw new CustomError(
-        `asset with ${categoryExists.number} aready exists!.`,
+        `category with ${categoryExists.number} aready exists!.`,
         STATUS_CODES.CONFLICT
       );
     }
