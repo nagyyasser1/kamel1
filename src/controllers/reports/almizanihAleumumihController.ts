@@ -51,10 +51,8 @@ const almizanihAleumumihController = async (
     // 1.
     const safi_almabieat =
       (accountsObject[accounts.sales]?.currentYear.balance || 0) -
-      Math.abs(
-        (accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
-          (accountsObject[accounts.salesReturns]?.currentYear.balance || 0)
-      );
+      ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
+        (accountsObject[accounts.salesReturns]?.currentYear.balance || 0));
 
     // 2.
     const purchasesReturnedExpenses =
@@ -87,8 +85,7 @@ const almizanihAleumumihController = async (
       ajamali_ayradat_mukhtalifuh - Math.abs(ajamaliu_almasarif_4);
 
     // 8.
-    const alribh_baed_aldarayib =
-      alribh_qabl_aldarayib - Math.abs(daribuh_aldukhl);
+    const alribh_baed_aldarayib = alribh_qabl_aldarayib - daribuh_aldukhl;
 
     /**#########################################################
      *  to get "almizanihAleumumih"
@@ -160,8 +157,7 @@ const almizanihAleumumihController = async (
       alasulAlmutaduluh.thisYearBalance +
       alasulAlthaabituhAlmalmusah.thisYearBalance +
       alasulAlthaabituhGhayrAlmalmusih.thisYearBalance -
-      inventory2.thisYearBalance +
-      (purchases.currentYear?.balance || 0);
+      (inventory2.thisYearBalance + (purchases.currentYear?.balance || 0));
 
     const alkhusumFinal =
       alkhusumAlmutadawiluh.thisYearBalance +
@@ -174,6 +170,7 @@ const almizanihAleumumihController = async (
       alasulAlthaabituhAlmalmusah: alasulAlthaabituhAlmalmusah.thisYearBalance,
       alasulAlthaabituhGhayrAlmalmusih:
         alasulAlthaabituhGhayrAlmalmusih.thisYearBalance,
+
       alasulFinal,
       alkhusumFinal,
       inventory2,
