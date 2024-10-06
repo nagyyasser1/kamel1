@@ -4,7 +4,7 @@ import { STATUS_CODES } from "../../constants/statusCodes";
 
 export const createAccountSchema = Joi.object({
   name: Joi.string().trim().required(),
-  number: Joi.number().required(),
+  number: Joi.string().required(),
   email: Joi.string().trim().optional(),
   description: Joi.string().required(),
   categoryId: Joi.string().required(),
@@ -12,7 +12,7 @@ export const createAccountSchema = Joi.object({
 
 export const updateAccountSchema = Joi.object({
   name: Joi.string().trim().optional(),
-  number: Joi.number().optional(),
+  number: Joi.string().optional(),
   email: Joi.string().trim().optional(),
   description: Joi.string().optional(),
   categoryId: Joi.string().optional(),
