@@ -351,12 +351,224 @@ async function getCategoryTransactionSummaryForAllCategories() {
   return results;
 }
 
-async function getCategoryTransactionSummary(categoryNumber?: string) {
+// async function getCategoryTransactionSummary(
+//   categoryNumber?: string,
+//   categoryName?: string
+// ) {
+//   let categoryFilter: any = {};
+
+//   if (categoryName && categoryName.trim() !== "") {
+//     categoryFilter.name = {
+//       contains: categoryName,
+//       mode: "insensitive",
+//     };
+//   }
+
+//   if (categoryNumber && categoryNumber.trim() !== "") {
+//     categoryFilter.number = categoryNumber;
+//   }
+
+//   // Get the current date
+//   const currentDate = new Date();
+
+//   // Calculate the start and end dates for the current and previous years
+//   const currentYearStart = new Date(currentDate.getFullYear(), 0, 1);
+//   const currentYearEnd = new Date(
+//     currentDate.getFullYear(),
+//     11,
+//     31,
+//     23,
+//     59,
+//     59,
+//     999
+//   );
+//   const previousYearStart = new Date(currentDate.getFullYear() - 1, 0, 1);
+//   const previousYearEnd = new Date(
+//     currentDate.getFullYear() - 1,
+//     11,
+//     31,
+//     23,
+//     59,
+//     59,
+//     999
+//   );
+
+//   // Fetch all accounts that belong to the category by filtering on category
+//   const accounts = await prisma.account.findMany({
+//     where: {
+//       category: {
+//         ...categoryFilter, // Apply the filters for category number and/or name
+//       },
+//     },
+//     select: {
+//       id: true,
+//       name: true,
+//       number: true,
+//     },
+//   });
+
+//   if (!accounts || accounts.length === 0) {
+//     return []; // Return empty array if no accounts found for the category
+//   }
+
+//   const accountIds = accounts.map((account) => account.id);
+
+//   // Batch query: Get all current and previous year transactions in one query
+//   const [currentYearTransactions, previousYearTransactions] = await Promise.all(
+//     [
+//       prisma.transaction.findMany({
+//         where: {
+//           OR: [
+//             {
+//               fromId: { in: accountIds },
+//               createdAt: { gte: currentYearStart, lte: currentYearEnd },
+//             },
+//             {
+//               toId: { in: accountIds },
+//               createdAt: { gte: currentYearStart, lte: currentYearEnd },
+//             },
+//           ],
+//         },
+//       }),
+//       prisma.transaction.findMany({
+//         where: {
+//           OR: [
+//             {
+//               fromId: { in: accountIds },
+//               createdAt: { gte: previousYearStart, lte: previousYearEnd },
+//             },
+//             {
+//               toId: { in: accountIds },
+//               createdAt: { gte: previousYearStart, lte: previousYearEnd },
+//             },
+//           ],
+//         },
+//       }),
+//     ]
+//   );
+
+//   // Group transactions by account ID for both current and previous years
+//   const groupTransactions = (
+//     transactions: any[],
+//     accountId: string,
+//     isReceived: boolean
+//   ) => {
+//     return transactions.filter((t) =>
+//       isReceived ? t.toId === accountId : t.fromId === accountId
+//     );
+//   };
+
+//   // Process transaction summaries for each account
+//   const transactionSummary = accounts.map((account) => {
+//     const currentYearSent = groupTransactions(
+//       currentYearTransactions,
+//       account.id,
+//       false
+//     );
+//     const currentYearReceived = groupTransactions(
+//       currentYearTransactions,
+//       account.id,
+//       true
+//     );
+//     const previousYearSent = groupTransactions(
+//       previousYearTransactions,
+//       account.id,
+//       false
+//     );
+//     const previousYearReceived = groupTransactions(
+//       previousYearTransactions,
+//       account.id,
+//       true
+//     );
+
+//     // Summing amounts for sent and received transactions
+//     const sumAmount = (transactions: any[]) =>
+//       transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+//     const thisYearBalance =
+//       sumAmount(currentYearReceived) - sumAmount(currentYearSent);
+//     const previousYearBalance =
+//       sumAmount(previousYearReceived) - sumAmount(previousYearSent);
+//     const totalBalance = previousYearBalance + thisYearBalance;
+
+//     return {
+//       id: account.id,
+//       number: account.number,
+//       name: account.name,
+//       totalBalance,
+//       currentYear: {
+//         balance: thisYearBalance,
+//         sentTransactions: currentYearSent.length,
+//         sentAmount: sumAmount(currentYearSent),
+//         receivedTransactions: currentYearReceived.length,
+//         receivedAmount: sumAmount(currentYearReceived),
+//       },
+//       previousYear: {
+//         balance: previousYearBalance,
+//         sentTransactions: previousYearSent.length,
+//         sentAmount: sumAmount(previousYearSent),
+//         receivedTransactions: previousYearReceived.length,
+//         receivedAmount: sumAmount(previousYearReceived),
+//       },
+//     };
+//   });
+
+//   return transactionSummary;
+// }
+
+async function getCategoryTransactionSummary(
+  categoryNumber?: string,
+  categoryName?: string
+) {
+  let categoryFilter: any = {};
+
+  if (categoryName && categoryName.trim() !== "") {
+    categoryFilter.name = {
+      contains: categoryName,
+      mode: "insensitive",
+    };
+  }
+
+  if (categoryNumber && categoryNumber.trim() !== "") {
+    categoryFilter.number = categoryNumber;
+  }
+
+  // Fetch the root category and its subcategories recursively
+  const rootCategory = await prisma.category.findFirst({
+    where: {
+      ...categoryFilter,
+    },
+    include: {
+      subCategories: {
+        include: {
+          subCategories: true, // Continue to include subcategories at deeper levels
+        },
+      },
+    },
+  });
+
+  if (!rootCategory) {
+    return []; // Return an empty array if no matching category is found
+  }
+
+  // Recursively fetch all subcategory IDs
+  const fetchAllSubCategoryIds = (category: any): string[] => {
+    const ids = [category.id];
+    if (category.subCategories && category.subCategories.length > 0) {
+      for (const subCategory of category.subCategories) {
+        ids.push(...fetchAllSubCategoryIds(subCategory));
+      }
+    }
+    return ids;
+  };
+
+  const categoryIds = fetchAllSubCategoryIds(rootCategory);
+
   // Get the current date
   const currentDate = new Date();
 
-  // Calculate the start and end dates for the current year
-  const currentYearStart = new Date(currentDate.getFullYear(), 0, 1); // January 1st of the current year
+  // Calculate the start and end dates for the current and previous years
+  const currentYearStart = new Date(currentDate.getFullYear(), 0, 1);
   const currentYearEnd = new Date(
     currentDate.getFullYear(),
     11,
@@ -365,10 +577,8 @@ async function getCategoryTransactionSummary(categoryNumber?: string) {
     59,
     59,
     999
-  ); // December 31st of the current year
-
-  // Calculate the start and end dates for the previous year
-  const previousYearStart = new Date(currentDate.getFullYear() - 1, 0, 1); // January 1st of the previous year
+  );
+  const previousYearStart = new Date(currentDate.getFullYear() - 1, 0, 1);
   const previousYearEnd = new Date(
     currentDate.getFullYear() - 1,
     11,
@@ -377,118 +587,127 @@ async function getCategoryTransactionSummary(categoryNumber?: string) {
     59,
     59,
     999
-  ); // December 31st of the previous year
+  );
 
-  // Fetch all accounts that belong to the category
+  // Fetch all accounts that belong to any of the subcategories (or the root category)
   const accounts = await prisma.account.findMany({
     where: {
-      category: {
-        number: categoryNumber,
+      categoryId: {
+        in: categoryIds, // Find accounts belonging to the root or any subcategory
       },
     },
     select: {
       id: true,
       name: true,
       number: true,
-      sentTransactions: true,
-      receivedTransactions: true,
     },
   });
 
-  const transactionSummary = await Promise.all(
-    accounts.map(async (account) => {
-      // Get total sent transactions and sum for the current year
-      const currentYearSent = await prisma.transaction.aggregate({
+  if (!accounts || accounts.length === 0) {
+    return []; // Return empty array if no accounts found for the category
+  }
+
+  const accountIds = accounts.map((account) => account.id);
+
+  // Batch query: Get all current and previous year transactions in one query
+  const [currentYearTransactions, previousYearTransactions] = await Promise.all(
+    [
+      prisma.transaction.findMany({
         where: {
-          fromId: account.id,
-          createdAt: {
-            gte: currentYearStart,
-            lte: currentYearEnd,
-          },
+          OR: [
+            {
+              fromId: { in: accountIds },
+              createdAt: { gte: currentYearStart, lte: currentYearEnd },
+            },
+            {
+              toId: { in: accountIds },
+              createdAt: { gte: currentYearStart, lte: currentYearEnd },
+            },
+          ],
         },
-        _count: true,
-        _sum: {
-          amount: true,
-        },
-      });
-
-      // Get total sent transactions and sum for the previous year
-      const previousYearSent = await prisma.transaction.aggregate({
+      }),
+      prisma.transaction.findMany({
         where: {
-          fromId: account.id,
-          createdAt: {
-            gte: previousYearStart,
-            lte: previousYearEnd,
-          },
+          OR: [
+            {
+              fromId: { in: accountIds },
+              createdAt: { gte: previousYearStart, lte: previousYearEnd },
+            },
+            {
+              toId: { in: accountIds },
+              createdAt: { gte: previousYearStart, lte: previousYearEnd },
+            },
+          ],
         },
-        _count: true,
-        _sum: {
-          amount: true,
-        },
-      });
-
-      // Get total received transactions and sum for the current year
-      const currentYearReceived = await prisma.transaction.aggregate({
-        where: {
-          toId: account.id,
-          createdAt: {
-            gte: currentYearStart,
-            lte: currentYearEnd,
-          },
-        },
-        _count: true,
-        _sum: {
-          amount: true,
-        },
-      });
-
-      // Get total received transactions and sum for the previous year
-      const previousYearReceived = await prisma.transaction.aggregate({
-        where: {
-          toId: account.id,
-          createdAt: {
-            gte: previousYearStart,
-            lte: previousYearEnd,
-          },
-        },
-        _count: true,
-        _sum: {
-          amount: true,
-        },
-      });
-
-      const thisYearBalance =
-        (currentYearReceived._sum.amount || 0) -
-        (currentYearSent._sum.amount || 0);
-
-      const previousYearsBalance =
-        (previousYearReceived._sum.amount || 0) -
-        (previousYearSent._sum.amount || 0);
-
-      const totalBalance = previousYearsBalance + thisYearBalance;
-
-      return {
-        id: account.id,
-        number: account.number,
-        name: account.name,
-        totalBalance,
-        currentYear: {
-          balance: thisYearBalance,
-          sentTransactions: currentYearSent._count,
-          sentAmount: currentYearSent._sum.amount || 0,
-          receivedTransactions: currentYearReceived._count,
-          receivedAmount: currentYearReceived._sum.amount || 0,
-        },
-        previousYear: {
-          balance: previousYearsBalance,
-          sentTransactions: previousYearSent._count,
-          sentAmount: previousYearSent._sum.amount || 0,
-          receivedTransactions: previousYearReceived._count,
-          receivedAmount: previousYearReceived._sum.amount || 0,
-        },
-      };
-    })
+      }),
+    ]
   );
+
+  // Group transactions by account ID for both current and previous years
+  const groupTransactions = (
+    transactions: any[],
+    accountId: string,
+    isReceived: boolean
+  ) => {
+    return transactions.filter((t) =>
+      isReceived ? t.toId === accountId : t.fromId === accountId
+    );
+  };
+
+  // Process transaction summaries for each account
+  const transactionSummary = accounts.map((account) => {
+    const currentYearSent = groupTransactions(
+      currentYearTransactions,
+      account.id,
+      false
+    );
+    const currentYearReceived = groupTransactions(
+      currentYearTransactions,
+      account.id,
+      true
+    );
+    const previousYearSent = groupTransactions(
+      previousYearTransactions,
+      account.id,
+      false
+    );
+    const previousYearReceived = groupTransactions(
+      previousYearTransactions,
+      account.id,
+      true
+    );
+
+    // Summing amounts for sent and received transactions
+    const sumAmount = (transactions: any[]) =>
+      transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+    const thisYearBalance =
+      sumAmount(currentYearReceived) - sumAmount(currentYearSent);
+    const previousYearBalance =
+      sumAmount(previousYearReceived) - sumAmount(previousYearSent);
+    const totalBalance = previousYearBalance + thisYearBalance;
+
+    return {
+      id: account.id,
+      number: account.number,
+      name: account.name,
+      totalBalance,
+      currentYear: {
+        balance: thisYearBalance,
+        sentTransactions: currentYearSent.length,
+        sentAmount: sumAmount(currentYearSent),
+        receivedTransactions: currentYearReceived.length,
+        receivedAmount: sumAmount(currentYearReceived),
+      },
+      previousYear: {
+        balance: previousYearBalance,
+        sentTransactions: previousYearSent.length,
+        sentAmount: sumAmount(previousYearSent),
+        receivedTransactions: previousYearReceived.length,
+        receivedAmount: sumAmount(previousYearReceived),
+      },
+    };
+  });
 
   return transactionSummary;
 }

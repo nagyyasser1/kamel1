@@ -148,15 +148,18 @@ export const getCategoryTransactionSummary = async (
   next: NextFunction
 ) => {
   try {
-    const { code } = req.query;
+    const { code, name } = req.query;
 
-    if (!code)
+    if (!code && !name)
       return res.status(STATUS_CODES.BAD_REQUEST).json({
-        message: "category 'code' must be provided in the query!",
+        message: "category 'code' or 'name' must be provided in the query!",
       });
 
+    console.log(code);
+    console.log(name);
     const result = await categoryService.getCategoryTransactionSummary(
-      code as string
+      code as string,
+      name as string
     );
 
     res.send(result);
