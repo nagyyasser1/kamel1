@@ -160,9 +160,8 @@ const almizanihAleumumihController = async (
       alasulAlmutaduluh.thisYearBalance +
       alasulAlthaabituhAlmalmusah.thisYearBalance +
       alasulAlthaabituhGhayrAlmalmusih.thisYearBalance -
-      Math.abs(
-        inventory2.thisYearBalance + (purchases.currentYear?.balance || 0)
-      );
+      inventory2.thisYearBalance +
+      (purchases.currentYear?.balance || 0);
 
     const alkhusumFinal =
       alkhusumAlmutadawiluh.thisYearBalance +
