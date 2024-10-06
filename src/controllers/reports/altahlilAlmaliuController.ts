@@ -88,8 +88,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     // 1.
     const safi_almabieat =
       (accountsObject[accounts.sales]?.currentYear.balance || 0) -
-      ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
-        (accountsObject[accounts.salesReturns]?.currentYear.balance || 0));
+      Math.abs(
+        (accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
+          (accountsObject[accounts.salesReturns]?.currentYear.balance || 0)
+      );
     // 2.
     const safi_almushtariat =
       (accountsObject[accounts.purchases]?.currentYear.balance || 0) +

@@ -33,8 +33,10 @@ const altaghayurFiHuquqAlmalakih = async (
 
     const safi_almabieat =
       (accountsObject[accounts.sales]?.currentYear?.balance || 0) -
-      ((accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
-        (accountsObject[accounts.salesReturns]?.currentYear.balance || 0));
+      Math.abs(
+        (accountsObject[accounts.allowedDiscount]?.currentYear.balance || 0) +
+          (accountsObject[accounts.salesReturns]?.currentYear.balance || 0)
+      );
 
     const masarifTaswiqayh = await categoryService.getCategoryBalance(
       categories.masarifTaswiqayh
