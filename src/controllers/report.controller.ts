@@ -2,9 +2,9 @@ import reportService from "../services/report.service";
 import { Request, Response } from "express";
 
 const createReport = async (req: Request, res: Response) => {
-  const { type, description } = req.body;
+  const { type, description, name } = req.body;
   try {
-    const report = await reportService.createReport(type, description);
+    const report = await reportService.createReport(type, description, name);
     return res.status(201).json(report);
   } catch (error) {
     return res.status(500).json({ message: "Failed to create report", error });
@@ -47,9 +47,14 @@ const deleteReport = async (req: Request, res: Response) => {
 
 const updateReport = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { type, description } = req.body;
+  const { type, description, name } = req.body;
   try {
-    const report = await reportService.updateReport(id, type, description);
+    const report = await reportService.updateReport(
+      id,
+      type,
+      description,
+      name
+    );
     return res.status(200).json(report);
   } catch (error) {
     return res.status(500).json({ message: "Failed to update report", error });

@@ -1,6 +1,10 @@
 import reportModel from "../models/report.model";
 
-const createReport = async (type: string, description: string) => {
+const createReport = async (
+  type: string,
+  description: string,
+  name: string
+) => {
   return await reportModel.createReport({ type, description });
 };
 
@@ -19,7 +23,8 @@ const removeReport = async (id: string) => {
 const updateReport = async (
   id: string,
   type?: string,
-  description?: string
+  description?: string,
+  name?: string
 ) => {
   return await reportModel.updateReport(id, { type, description });
 };
