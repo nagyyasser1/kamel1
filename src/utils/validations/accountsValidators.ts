@@ -4,7 +4,7 @@ import { STATUS_CODES } from "../../constants/statusCodes";
 
 export const createAccountSchema = Joi.object({
   name: Joi.string().trim().required(),
-  number: Joi.string().required(),
+  number: Joi.number().required(),
   email: Joi.string().trim().optional(),
   description: Joi.string().required(),
   categoryId: Joi.string().required(),
@@ -55,6 +55,9 @@ export const validateUpdateAccount = async (
       errors: result.error.details.map((err) => err.message),
     });
   }
+
+  // Transform the `number` field from number to string
+  req.body.number = req.body.number.toString();
 
   next();
 };
