@@ -1,6 +1,10 @@
 import prisma from "../prisma/index";
 
-const createReport = async (data: { type: string; description: string }) => {
+const createReport = async (data: {
+  type: string;
+  description: string;
+  name: string;
+}) => {
   return await prisma.report.create({
     data,
   });
@@ -29,7 +33,7 @@ const deleteReport = async (id: string) => {
 
 const updateReport = async (
   id: string,
-  data: { type?: string; description?: string }
+  data: { type?: string; description?: string; name?: string }
 ) => {
   return await prisma.report.update({
     where: { id },

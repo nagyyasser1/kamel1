@@ -5,7 +5,7 @@ const createReport = async (
   description: string,
   name: string
 ) => {
-  return await reportModel.createReport({ type, description });
+  return await reportModel.createReport({ type, description, name });
 };
 
 const getAllReports = async (type: string) => {
@@ -26,7 +26,7 @@ const updateReport = async (
   description?: string,
   name?: string
 ) => {
-  return await reportModel.updateReport(id, { type, description });
+  return await reportModel.updateReport(id, { type, description, name });
 };
 
 export default {

@@ -88,5 +88,5 @@ model Report {
   id          String @id @default(uuid())
   type        String @default("all")
   description String
-  name        String @default("")
+  name        String
 }
